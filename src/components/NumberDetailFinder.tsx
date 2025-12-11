@@ -16,9 +16,15 @@ import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
+import ShubhCam from "./ShubhCam";
+
+interface NumberDetailFinderProps {
+  onShubhClick?: () => void;
+}
 
 const NumberDetailFinder = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showShubhCam, setShowShubhCam] = useState(false);
 
   const handleSearch = () => {
     if (!searchQuery.trim()) {
@@ -35,6 +41,14 @@ const NumberDetailFinder = () => {
     });
   };
 
+  const handleButtonClick = (label: string) => {
+    if (label === "SHUBH") {
+      setShowShubhCam(!showShubhCam);
+    } else {
+      toast({ title: label, description: "Feature coming soon!" });
+    }
+  };
+
   const buttons = [
     { icon: Phone, label: "Phone Search", color: "green" as const },
     { icon: CreditCard, label: "Aadhar Search", color: "purple" as const },
@@ -42,12 +56,13 @@ const NumberDetailFinder = () => {
     { icon: Camera, label: "Insta Search", color: "cyan" as const },
     { icon: Users, label: "Family Info", color: "pink" as const },
     { icon: ClipboardPaste, label: "Manual Paste", color: "purple" as const },
-    { icon: Sparkles, label: "SHUBH", color: "purple" as const },
+    { icon: Sparkles, label: "SHUBH", color: "purple" as const, active: showShubhCam },
     { icon: Code, label: "Dark Phishing", color: "red" as const },
     { icon: Globe, label: "Webcam 360", color: "green" as const },
   ];
 
   return (
+    <>
     <div className="relative border-2 border-neon-green rounded-lg p-6 bg-card/30 backdrop-blur glow-green">
       {/* External link icon */}
       <ExternalLink className="absolute top-4 right-4 w-4 h-4 text-muted-foreground" />
@@ -68,7 +83,8 @@ const NumberDetailFinder = () => {
             icon={btn.icon}
             label={btn.label}
             color={btn.color}
-            onClick={() => toast({ title: btn.label, description: "Feature coming soon!" })}
+            active={'active' in btn ? btn.active : false}
+            onClick={() => handleButtonClick(btn.label)}
           />
         ))}
       </div>
@@ -98,6 +114,10 @@ const NumberDetailFinder = () => {
         [WARNING] API FIREWALL ACTIVE - AUTO TRACE MAY FAIL
       </p>
     </div>
+    
+    {/* ShubhCam - shows when SHUBH tab is active */}
+    {showShubhCam && <ShubhCam />}
+    </>
   );
 };
 
