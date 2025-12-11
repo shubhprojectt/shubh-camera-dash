@@ -73,51 +73,25 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border-2 backdrop-blur transition-all duration-300",
-        "hover:scale-105 hover:-translate-y-1 active:scale-95",
-        "hover:animate-pulse-glow",
+        "group relative flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border backdrop-blur transition-all duration-200",
+        "hover:scale-[1.02] active:scale-95",
         colors.border,
         colors.text,
-        colors.bg,
-        colors.hoverBg,
-        colors.glow.replace('glow-', 'hover:glow-'),
-        active && [colors.glow, colors.activeBg, "scale-105 -translate-y-1"]
+        active ? colors.activeBg : "bg-black/60",
+        "hover:bg-opacity-40",
+        active && colors.glow
       )}
     >
-      {/* Gradient overlay on hover */}
-      <div className={cn(
-        "absolute inset-0 rounded-2xl bg-gradient-to-t opacity-0 group-hover:opacity-100 transition-opacity duration-300",
-        colors.gradient
+      {/* Icon */}
+      <Icon className={cn(
+        "w-3.5 h-3.5 flex-shrink-0",
+        active && "animate-pulse"
       )} />
       
-      {/* Icon with glow effect */}
-      <div className="relative">
-        <Icon className={cn(
-          "w-6 h-6 transition-all duration-300 group-hover:scale-110",
-          active && "animate-pulse"
-        )} />
-        {active && (
-          <div className={cn(
-            "absolute inset-0 blur-md opacity-50",
-            colors.text
-          )}>
-            <Icon className="w-6 h-6" />
-          </div>
-        )}
-      </div>
-      
       {/* Label */}
-      <span className="relative text-[10px] font-bold tracking-wider uppercase text-center leading-tight">
+      <span className="text-[9px] font-bold tracking-wide uppercase truncate">
         {label}
       </span>
-      
-      {/* Active indicator */}
-      {active && (
-        <div className={cn(
-          "absolute -bottom-1 left-1/2 -translate-x-1/2 w-6 h-0.5 rounded-full",
-          `bg-current`
-        )} />
-      )}
     </button>
   );
 };
