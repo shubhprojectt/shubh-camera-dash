@@ -10,7 +10,8 @@ import {
   Code, 
   Globe,
   Search,
-  ExternalLink
+  Terminal,
+  AlertTriangle
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -63,20 +64,30 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      <div className="relative border-2 border-neon-green rounded-lg p-6 bg-card/30 backdrop-blur glow-green">
-        {/* External link icon */}
-        <ExternalLink className="absolute top-4 right-4 w-4 h-4 text-muted-foreground" />
+      <div className="relative border-2 border-neon-green rounded-xl p-6 bg-card/40 backdrop-blur-md neon-border overflow-hidden">
+        {/* Background grid pattern */}
+        <div className="absolute inset-0 cyber-grid opacity-10" />
         
-        {/* Header */}
-        <h2 className="text-neon-green font-display font-bold text-lg tracking-wide mb-1">
-          NUMBER DETAIL FINDER
-        </h2>
-        <p className="text-muted-foreground text-sm mb-6">
+        {/* Animated corner accents */}
+        <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-neon-green" />
+        <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-neon-pink" />
+        <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-neon-cyan" />
+        <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-neon-purple" />
+        
+        {/* Header with terminal style */}
+        <div className="relative flex items-center gap-3 mb-2">
+          <Terminal className="w-5 h-5 text-neon-green" />
+          <h2 className="text-neon-green font-display font-black text-xl tracking-wider text-glow-green">
+            NUMBER DETAIL FINDER
+          </h2>
+        </div>
+        
+        <p className="relative text-muted-foreground text-sm mb-6 pl-8 border-l-2 border-neon-green/30 ml-2">
           SEARCH BY PHONE, AADHAR, VEHICLE, INSTAGRAM, FAMILY INFO
         </p>
         
-        {/* Button Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        {/* Button Grid - Enhanced */}
+        <div className="relative grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
           {buttons.map((btn) => (
             <SearchButton
               key={btn.label}
@@ -89,30 +100,36 @@ const NumberDetailFinder = () => {
           ))}
         </div>
         
-        {/* Search Input */}
-        <div className="flex gap-3">
-          <div className="flex-1 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neon-green">&gt;&gt;&gt;</span>
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="NUMBER..."
-              className="pl-12 bg-input border-neon-green/50 text-neon-green placeholder:text-neon-green/50 focus:border-neon-green"
-            />
+        {/* Search Input - Enhanced */}
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-neon-green via-neon-pink to-neon-cyan rounded-lg blur opacity-25 animate-gradient-shift" />
+          <div className="relative flex gap-3 p-1 bg-background/80 rounded-lg border border-neon-green/30">
+            <div className="flex-1 relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neon-green font-mono text-sm">&gt;&gt;&gt;</span>
+              <Input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="ENTER TARGET..."
+                className="pl-14 bg-transparent border-0 text-neon-green placeholder:text-neon-green/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-12 text-lg font-mono"
+              />
+            </div>
+            <Button 
+              onClick={handleSearch}
+              className="bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background font-black px-8 h-12 hover:opacity-90 transition-all hover:scale-105 animate-gradient-shift"
+            >
+              <Search className="w-5 h-5 mr-2" />
+              EXECUTE
+            </Button>
           </div>
-          <Button 
-            onClick={handleSearch}
-            className="bg-gradient-to-r from-neon-green to-neon-pink text-background font-bold px-6 hover:opacity-90"
-          >
-            <Search className="w-4 h-4 mr-2" />
-            SEARCH
-          </Button>
         </div>
         
-        {/* Warning */}
-        <p className="text-neon-orange text-xs mt-4 tracking-wide">
-          [WARNING] API FIREWALL ACTIVE - AUTO TRACE MAY FAIL
-        </p>
+        {/* Warning - Enhanced */}
+        <div className="relative flex items-center gap-2 mt-6 p-3 border border-neon-orange/30 bg-neon-orange/5 rounded-lg">
+          <AlertTriangle className="w-4 h-4 text-neon-orange animate-pulse" />
+          <p className="text-neon-orange text-xs tracking-wide font-mono">
+            [WARNING] API FIREWALL ACTIVE - AUTO TRACE MAY FAIL
+          </p>
+        </div>
       </div>
       
       {/* ShubhCam - shows when SHUBH tab is active */}
