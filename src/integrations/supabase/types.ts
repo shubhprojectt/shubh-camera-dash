@@ -41,6 +41,30 @@ export type Database = {
         }
         Relationships: []
       }
+      search_history: {
+        Row: {
+          id: string
+          ip_address: string | null
+          search_query: string
+          search_type: string
+          searched_at: string
+        }
+        Insert: {
+          id?: string
+          ip_address?: string | null
+          search_query: string
+          search_type: string
+          searched_at?: string
+        }
+        Update: {
+          id?: string
+          ip_address?: string | null
+          search_query?: string
+          search_type?: string
+          searched_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

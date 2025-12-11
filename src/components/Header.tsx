@@ -1,4 +1,5 @@
-import { Zap, Wifi } from "lucide-react";
+import { Zap, Wifi, Settings } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   return (
@@ -14,6 +15,14 @@ const Header = () => {
           <span>SECURE</span>
         </div>
       </div>
+
+      {/* Admin Link */}
+      <Link 
+        to="/admin" 
+        className="absolute top-2 right-2 p-2 rounded-lg border border-neon-orange/50 text-neon-orange hover:bg-neon-orange/10 transition-all hover:shadow-[0_0_10px_hsl(var(--neon-orange)/0.5)]"
+      >
+        <Settings className="w-4 h-4" />
+      </Link>
       
       {/* Logo */}
       <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-green mb-3">
