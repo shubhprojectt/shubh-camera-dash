@@ -69,7 +69,7 @@ const NumberDetailFinder = () => {
     { icon: Phone, label: "Phone", color: "green" as const, placeholder: "Enter phone number...", searchType: "phone" },
     { icon: CreditCard, label: "Aadhar", color: "purple" as const, placeholder: "Enter Aadhar number...", searchType: "aadhar" },
     { icon: Car, label: "Vehicle", color: "orange" as const, placeholder: "Enter RC number...", searchType: "vehicle" },
-    { icon: Camera, label: "Insta", color: "cyan" as const, placeholder: "Enter username...", searchType: "instagram" },
+    { icon: Camera, label: "Instagram", color: "cyan" as const, placeholder: "Enter username...", searchType: "instagram" },
     { icon: Users, label: "Family", color: "pink" as const, placeholder: "Enter name/number...", searchType: "family" },
     { icon: ClipboardPaste, label: "Manual", color: "purple" as const, placeholder: "Enter number...", searchType: "manual" },
     { icon: Sparkles, label: "SHUBH", color: "cyan" as const, placeholder: "", searchType: "shubh" },
@@ -341,13 +341,13 @@ const NumberDetailFinder = () => {
             <Zap className="w-4 h-4 text-neon-pink animate-pulse" />
           </div>
           
-          {/* Button Grid - 3 columns, compact */}
-          <div className="relative grid grid-cols-3 gap-1.5">
+          {/* Button Grid - 3 columns */}
+          <div className="relative grid grid-cols-3 gap-2">
             {buttons.map((btn, index) => (
               <div
                 key={btn.label}
                 className="animate-bounce-in"
-                style={{ animationDelay: `${index * 50}ms` }}
+                style={{ animationDelay: `${index * 40}ms` }}
               >
                 <SearchButton
                   icon={btn.icon}
