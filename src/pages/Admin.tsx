@@ -53,12 +53,6 @@ const Admin = () => {
   const [localSitePassword, setLocalSitePassword] = useState(settings.sitePassword);
   const [localAdminPassword, setLocalAdminPassword] = useState(settings.adminPassword);
 
-  useEffect(() => {
-    const auth = sessionStorage.getItem("admin_authenticated");
-    if (auth === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -88,7 +82,6 @@ const Admin = () => {
 
   const handleAdminLogin = () => {
     if (adminPasswordInput === settings.adminPassword) {
-      sessionStorage.setItem("admin_authenticated", "true");
       setIsAuthenticated(true);
       toast({ title: "Access Granted", description: "Welcome to Admin Panel" });
     } else {
