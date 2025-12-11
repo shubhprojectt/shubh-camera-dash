@@ -75,10 +75,12 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
       className={cn(
         "group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-2xl border-2 backdrop-blur transition-all duration-300",
         "hover:scale-105 hover:-translate-y-1 active:scale-95",
+        "hover:animate-pulse-glow",
         colors.border,
         colors.text,
         colors.bg,
         colors.hoverBg,
+        colors.glow.replace('glow-', 'hover:glow-'),
         active && [colors.glow, colors.activeBg, "scale-105 -translate-y-1"]
       )}
     >
