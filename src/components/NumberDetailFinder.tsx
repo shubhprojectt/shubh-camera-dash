@@ -312,30 +312,20 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      <div className="relative border-2 border-neon-green rounded-3xl p-4 bg-gradient-to-br from-neon-cyan/20 via-neon-green/10 to-neon-purple/20 backdrop-blur-md neon-border overflow-hidden">
+      <div className="relative border border-neon-green/50 rounded-xl p-3 bg-black/90 backdrop-blur-md overflow-hidden">
         {/* Background grid pattern */}
-        <div className="absolute inset-0 cyber-grid opacity-10" />
-        
-        {/* Animated corner accents */}
-        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-neon-green rounded-tl-2xl" />
-        <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-neon-pink rounded-tr-2xl" />
-        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-neon-cyan rounded-bl-2xl" />
-        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-neon-purple rounded-br-2xl" />
+        <div className="absolute inset-0 cyber-grid opacity-5" />
         
         {/* Header with terminal style */}
-        <div className="relative flex items-center gap-2 mb-1">
-          <Terminal className="w-4 h-4 text-neon-green" />
-          <h2 className="text-neon-green font-display font-black text-lg tracking-wider text-glow-green">
+        <div className="relative flex items-center gap-2 mb-2">
+          <Terminal className="w-3 h-3 text-neon-green" />
+          <h2 className="text-neon-green font-display font-bold text-sm tracking-wider text-glow-green">
             NUMBER DETAIL FINDER
           </h2>
         </div>
         
-        <p className="relative text-muted-foreground text-xs mb-4 pl-6 border-l-2 border-neon-green/30 ml-1">
-          SEARCH BY PHONE, AADHAR, VEHICLE, INSTAGRAM, FAMILY INFO
-        </p>
-        
-        {/* Button Grid - Compact for mobile */}
-        <div className="relative grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 mb-4">
+        {/* Button Grid - More compact */}
+        <div className="relative grid grid-cols-3 gap-1.5 mb-3">
           {buttons.map((btn) => (
             <SearchButton
               key={btn.label}
@@ -350,43 +340,21 @@ const NumberDetailFinder = () => {
         
         {/* Search Input - Shows when a non-SHUBH tab is selected */}
         {activeTab && activeTab !== "SHUBH" && activeButton && (
-          <div className="relative animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="absolute -inset-1 bg-gradient-to-r from-neon-green via-neon-pink to-neon-cyan rounded-2xl blur opacity-25 animate-gradient-shift" />
-            <div className="relative flex gap-2 p-1 bg-background/80 rounded-2xl border border-neon-green/30">
-              <div className="flex-1 relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neon-green font-mono text-xs">&gt;&gt;</span>
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder={activeButton.placeholder}
-                  className="pl-10 bg-transparent border-0 text-neon-green placeholder:text-neon-green/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm font-mono rounded-xl uppercase"
-                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                />
-              </div>
-              <Button 
-                onClick={handleSearch}
-                disabled={loading}
-                className="bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background font-black px-4 h-10 hover:opacity-90 transition-all hover:scale-105 animate-gradient-shift rounded-xl text-xs"
-              >
-                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4 mr-1" />}
-                {loading ? "" : "SEARCH"}
-              </Button>
-            </div>
-            
-            {/* Info text */}
-            <p className="text-xs text-center mt-2" style={{ color: activeButton.colorHex }}>
-              [INFO] {activeButton.label.toUpperCase()} DATABASE CONNECTION
-            </p>
-          </div>
-        )}
-        
-        {/* Warning - Show when no tab selected */}
-        {!activeTab && (
-          <div className="relative flex items-center gap-2 p-2 border border-neon-orange/30 bg-neon-orange/5 rounded-xl">
-            <AlertTriangle className="w-3 h-3 text-neon-orange animate-pulse flex-shrink-0" />
-            <p className="text-neon-orange text-[10px] tracking-wide font-mono">
-              [WARNING] SELECT A TAB TO START SEARCH
-            </p>
+          <div className="relative flex gap-1.5 bg-black/50 rounded-lg border border-neon-green/30 p-1">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={activeButton.placeholder}
+              className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-neon-green/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 text-xs font-mono uppercase"
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <Button 
+              onClick={handleSearch}
+              disabled={loading}
+              className="bg-neon-green text-background font-bold px-3 h-8 hover:bg-neon-green/80 text-[10px]"
+            >
+              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : "SEARCH"}
+            </Button>
           </div>
         )}
       </div>
