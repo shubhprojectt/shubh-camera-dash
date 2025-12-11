@@ -84,12 +84,12 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     >
       {/* Icon */}
       <Icon className={cn(
-        "w-3.5 h-3.5 flex-shrink-0",
+        "w-4 h-4 flex-shrink-0",
         active && "animate-pulse"
       )} />
       
       {/* Label */}
-      <span className="text-[9px] font-bold tracking-wide uppercase truncate">
+      <span className="text-[10px] font-bold tracking-wide uppercase truncate">
         {label}
       </span>
     </button>

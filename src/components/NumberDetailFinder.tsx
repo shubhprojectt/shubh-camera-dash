@@ -312,20 +312,20 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      <div className="relative border border-neon-green/50 rounded-xl p-3 bg-black/90 backdrop-blur-md overflow-hidden">
+      <div className="relative border border-neon-green/50 rounded-xl p-4 bg-black/90 backdrop-blur-md overflow-hidden">
         {/* Background grid pattern */}
         <div className="absolute inset-0 cyber-grid opacity-5" />
         
         {/* Header with terminal style */}
-        <div className="relative flex items-center gap-2 mb-2">
-          <Terminal className="w-3 h-3 text-neon-green" />
-          <h2 className="text-neon-green font-display font-bold text-sm tracking-wider text-glow-green">
+        <div className="relative flex items-center gap-2 mb-3">
+          <Terminal className="w-4 h-4 text-neon-green" />
+          <h2 className="text-neon-green font-display font-bold text-base tracking-wider text-glow-green">
             NUMBER DETAIL FINDER
           </h2>
         </div>
         
-        {/* Button Grid - More compact */}
-        <div className="relative grid grid-cols-3 gap-1.5 mb-3">
+        {/* Button Grid */}
+        <div className="relative grid grid-cols-3 gap-2 mb-3">
           {buttons.map((btn) => (
             <SearchButton
               key={btn.label}
