@@ -1,7 +1,15 @@
-import { Zap, Wifi, Settings } from "lucide-react";
+import { Wifi, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useSettings } from "@/contexts/SettingsContext";
+import * as Icons from "lucide-react";
+import { LucideIcon } from "lucide-react";
 
 const Header = () => {
+  const { settings } = useSettings();
+  
+  // Get dynamic icon
+  const IconComponent = (Icons[settings.headerIcon as keyof typeof Icons] as LucideIcon) || Icons.Zap;
+
   return (
     <header className="relative py-4 text-center">
       {/* Status indicators */}
@@ -26,13 +34,13 @@ const Header = () => {
       
       {/* Logo */}
       <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-green mb-3">
-        <Zap className="w-8 h-8 text-neon-green animate-neon-flicker" />
+        <IconComponent className="w-8 h-8 text-neon-green animate-neon-flicker" />
       </div>
       
       {/* Title */}
       <h1 className="font-display text-3xl md:text-4xl font-black tracking-wider">
-        <span className="text-neon-green text-glow-green">SHUBH</span>
-        <span className="text-neon-pink text-glow-pink ml-2">OSINT</span>
+        <span className="text-neon-green text-glow-green">{settings.headerName1}</span>
+        <span className="text-neon-pink text-glow-pink ml-2">{settings.headerName2}</span>
       </h1>
     </header>
   );

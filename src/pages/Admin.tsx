@@ -12,8 +12,10 @@ import {
   Shield,
   Eye,
   EyeOff,
-  ExternalLink
+  ExternalLink,
+  Type
 } from "lucide-react";
+import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,6 +34,12 @@ const colorOptions = [
   { value: "yellow", label: "Yellow", color: "bg-neon-yellow" },
 ];
 
+const iconOptions = [
+  "Zap", "Sparkles", "Shield", "Terminal", "Code", "Wifi", "Globe", 
+  "Eye", "Lock", "Skull", "Bug", "Fingerprint", "Radar", "Search",
+  "Database", "Server", "Cpu", "Binary", "Hash", "Key"
+];
+
 interface SearchHistoryItem {
   id: string;
   search_type: string;
@@ -42,7 +50,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"tabs" | "theme" | "password" | "history">("tabs");
+  const [activeSection, setActiveSection] = useState<"header" | "tabs" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -165,6 +173,7 @@ const Admin = () => {
         {/* Section Tabs */}
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
+            { id: "header", icon: Type, label: "Header" },
             { id: "tabs", icon: LayoutGrid, label: "Tabs" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
@@ -184,6 +193,60 @@ const Admin = () => {
             </Button>
           ))}
         </div>
+
+        {/* Header Section */}
+        {activeSection === "header" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-cyan mb-4">Header Configuration</h2>
+            
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-green">Website Title</h3>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">First Part (Green)</label>
+                  <Input
+                    value={settings.headerName1}
+                    onChange={(e) => updateSettings({ headerName1: e.target.value })}
+                    placeholder="SHUBH"
+                    className="h-10"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Second Part (Pink)</label>
+                  <Input
+                    value={settings.headerName2}
+                    onChange={(e) => updateSettings({ headerName2: e.target.value })}
+                    placeholder="OSINT"
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-pink">Header Icon</h3>
+              <div className="grid grid-cols-5 gap-2">
+                {iconOptions.map((iconName) => {
+                  const IconComp = Icons[iconName as keyof typeof Icons] as React.FC<{ className?: string }>;
+                  return IconComp ? (
+                    <button
+                      key={iconName}
+                      onClick={() => updateSettings({ headerIcon: iconName })}
+                      className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
+                        settings.headerIcon === iconName
+                          ? "border-neon-green bg-neon-green/10 shadow-[0_0_10px_hsl(var(--neon-green)/0.5)]"
+                          : "border-border/50 hover:border-neon-green/50"
+                      }`}
+                    >
+                      <IconComp className="w-5 h-5 text-neon-green" />
+                      <span className="text-[10px] text-muted-foreground">{iconName}</span>
+                    </button>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Tabs Section */}
         {activeSection === "tabs" && (

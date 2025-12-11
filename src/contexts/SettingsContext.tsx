@@ -15,6 +15,9 @@ export interface AppSettings {
   sitePassword: string;
   adminPassword: string;
   theme: "dark" | "neon-green" | "neon-pink" | "neon-cyan";
+  headerName1: string;
+  headerName2: string;
+  headerIcon: string;
   tabs: TabConfig[];
 }
 
@@ -34,6 +37,9 @@ const defaultSettings: AppSettings = {
   sitePassword: "shubh123",
   adminPassword: "admin123",
   theme: "dark",
+  headerName1: "SHUBH",
+  headerName2: "OSINT",
+  headerIcon: "Zap",
   tabs: defaultTabs,
 };
 
