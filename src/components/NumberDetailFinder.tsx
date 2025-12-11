@@ -49,15 +49,15 @@ const NumberDetailFinder = () => {
   };
 
   const buttons = [
-    { icon: Phone, label: "Phone Search", color: "green" as const, placeholder: "Enter phone number...", colorHex: "#00ff00" },
-    { icon: CreditCard, label: "Aadhar Search", color: "purple" as const, placeholder: "Enter Aadhar number...", colorHex: "#a855f7" },
-    { icon: Car, label: "Vehicle CH", color: "orange" as const, placeholder: "Enter vehicle number...", colorHex: "#ff9500" },
-    { icon: Camera, label: "Insta Search", color: "cyan" as const, placeholder: "Enter Instagram username...", colorHex: "#00ffff" },
-    { icon: Users, label: "Family Info", color: "pink" as const, placeholder: "Enter name or number...", colorHex: "#ff00aa" },
-    { icon: ClipboardPaste, label: "Manual Paste", color: "purple" as const, placeholder: "Paste any data...", colorHex: "#a855f7" },
-    { icon: Sparkles, label: "SHUBH", color: "purple" as const, placeholder: "", colorHex: "#a855f7" },
-    { icon: Code, label: "Dark Phishing", color: "red" as const, placeholder: "Enter target URL...", colorHex: "#ff0000" },
-    { icon: Globe, label: "Webcam 360", color: "green" as const, placeholder: "Enter IP or location...", colorHex: "#00ff00" },
+    { icon: Phone, label: "Phone Search", color: "green" as const, placeholder: "Enter phone number...", colorHex: "#00ff00", searchType: "phone" },
+    { icon: CreditCard, label: "Aadhar Search", color: "purple" as const, placeholder: "Enter Aadhar number...", colorHex: "#a855f7", searchType: "aadhar" },
+    { icon: Car, label: "Vehicle CH", color: "orange" as const, placeholder: "Enter RC number (e.g., UP32AB1234)...", colorHex: "#ff9500", searchType: "vehicle" },
+    { icon: Camera, label: "Insta Search", color: "cyan" as const, placeholder: "Enter Instagram username...", colorHex: "#00ffff", searchType: "instagram" },
+    { icon: Users, label: "Family Info", color: "pink" as const, placeholder: "Enter name or number...", colorHex: "#ff00aa", searchType: "family" },
+    { icon: ClipboardPaste, label: "Manual Paste", color: "purple" as const, placeholder: "Paste any data...", colorHex: "#a855f7", searchType: "manual" },
+    { icon: Sparkles, label: "SHUBH", color: "purple" as const, placeholder: "", colorHex: "#a855f7", searchType: "shubh" },
+    { icon: Code, label: "Dark Phishing", color: "red" as const, placeholder: "Enter target URL...", colorHex: "#ff0000", searchType: "phishing" },
+    { icon: Globe, label: "Webcam 360", color: "green" as const, placeholder: "Enter IP or location...", colorHex: "#00ff00", searchType: "webcam" },
   ];
 
   const activeButton = buttons.find(b => b.label === activeModal);
@@ -143,6 +143,7 @@ const NumberDetailFinder = () => {
           title={activeButton.label}
           placeholder={activeButton.placeholder}
           color={activeButton.colorHex}
+          searchType={activeButton.searchType}
         />
       )}
     </>
