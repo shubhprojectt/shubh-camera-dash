@@ -13,20 +13,9 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   const { settings } = useSettings();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    // Check if already unlocked in this session
-    const unlocked = sessionStorage.getItem("site_unlocked");
-    if (unlocked === "true") {
-      setIsUnlocked(true);
-    }
-    setIsLoading(false);
-  }, []);
 
   const handleUnlock = () => {
     if (password === settings.sitePassword) {
-      sessionStorage.setItem("site_unlocked", "true");
       setIsUnlocked(true);
       toast({
         title: "Access Granted",
@@ -42,13 +31,6 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Lock className="w-8 h-8 text-neon-green animate-pulse" />
-      </div>
-    );
-  }
 
   if (isUnlocked) {
     return <>{children}</>;
