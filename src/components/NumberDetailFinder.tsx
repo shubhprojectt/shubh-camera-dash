@@ -67,14 +67,14 @@ const NumberDetailFinder = () => {
 
   const buttons = [
     { icon: Phone, label: "Phone", color: "green" as const, placeholder: "Enter phone number...", searchType: "phone" },
-    { icon: CreditCard, label: "Aadhar", color: "purple" as const, placeholder: "Enter Aadhar number...", searchType: "aadhar" },
+    { icon: CreditCard, label: "Aadhar", color: "pink" as const, placeholder: "Enter Aadhar number...", searchType: "aadhar" },
     { icon: Car, label: "Vehicle", color: "orange" as const, placeholder: "Enter RC number...", searchType: "vehicle" },
     { icon: Camera, label: "Instagram", color: "cyan" as const, placeholder: "Enter username...", searchType: "instagram" },
-    { icon: Users, label: "Family", color: "pink" as const, placeholder: "Enter name/number...", searchType: "family" },
-    { icon: ClipboardPaste, label: "Manual", color: "purple" as const, placeholder: "Enter number...", searchType: "manual" },
+    { icon: Users, label: "Family", color: "purple" as const, placeholder: "Enter name/number...", searchType: "family" },
+    { icon: ClipboardPaste, label: "Manual", color: "yellow" as const, placeholder: "Enter number...", searchType: "manual" },
     { icon: Sparkles, label: "SHUBH", color: "cyan" as const, placeholder: "", searchType: "shubh" },
     { icon: Code, label: "Phishing", color: "red" as const, placeholder: "Enter target URL...", searchType: "phishing" },
-    { icon: Globe, label: "Webcam", color: "green" as const, placeholder: "Enter IP/location...", searchType: "webcam" },
+    { icon: Globe, label: "Webcam", color: "pink" as const, placeholder: "Enter IP/location...", searchType: "webcam" },
   ];
 
   const activeButton = buttons.find(b => b.label === activeTab);
