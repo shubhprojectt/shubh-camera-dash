@@ -11,58 +11,46 @@ interface SearchButtonProps {
 
 const colorClasses = {
   green: {
-    border: "border-neon-green",
+    border: "border-neon-green/60",
     text: "text-neon-green",
-    bg: "bg-gradient-to-br from-neon-green/30 via-neon-cyan/20 to-neon-green/10",
-    hoverBg: "hover:from-neon-green/40 hover:via-neon-cyan/30 hover:to-neon-green/20",
-    glow: "glow-green",
-    activeBg: "bg-neon-green/30",
-    gradient: "from-neon-green/30 to-neon-cyan/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-green)/0.5),inset_0_0_10px_hsl(var(--neon-green)/0.2)]",
+    activeBg: "bg-neon-green/20",
+    hoverBg: "hover:bg-neon-green/10",
   },
   pink: {
-    border: "border-neon-pink",
+    border: "border-neon-pink/60",
     text: "text-neon-pink",
-    bg: "bg-gradient-to-br from-neon-pink/30 via-neon-purple/20 to-neon-pink/10",
-    hoverBg: "hover:from-neon-pink/40 hover:via-neon-purple/30 hover:to-neon-pink/20",
-    glow: "glow-pink",
-    activeBg: "bg-neon-pink/30",
-    gradient: "from-neon-pink/30 to-neon-purple/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-pink)/0.5),inset_0_0_10px_hsl(var(--neon-pink)/0.2)]",
+    activeBg: "bg-neon-pink/20",
+    hoverBg: "hover:bg-neon-pink/10",
   },
   orange: {
-    border: "border-neon-orange",
+    border: "border-neon-orange/60",
     text: "text-neon-orange",
-    bg: "bg-gradient-to-br from-neon-orange/30 via-neon-yellow/20 to-neon-orange/10",
-    hoverBg: "hover:from-neon-orange/40 hover:via-neon-yellow/30 hover:to-neon-orange/20",
-    glow: "glow-orange",
-    activeBg: "bg-neon-orange/30",
-    gradient: "from-neon-orange/30 to-neon-yellow/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-orange)/0.5),inset_0_0_10px_hsl(var(--neon-orange)/0.2)]",
+    activeBg: "bg-neon-orange/20",
+    hoverBg: "hover:bg-neon-orange/10",
   },
   cyan: {
-    border: "border-neon-cyan",
+    border: "border-neon-cyan/60",
     text: "text-neon-cyan",
-    bg: "bg-gradient-to-br from-neon-cyan/30 via-neon-green/20 to-neon-cyan/10",
-    hoverBg: "hover:from-neon-cyan/40 hover:via-neon-green/30 hover:to-neon-cyan/20",
-    glow: "glow-cyan",
-    activeBg: "bg-neon-cyan/30",
-    gradient: "from-neon-cyan/30 to-neon-green/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-cyan)/0.5),inset_0_0_10px_hsl(var(--neon-cyan)/0.2)]",
+    activeBg: "bg-neon-cyan/20",
+    hoverBg: "hover:bg-neon-cyan/10",
   },
   red: {
-    border: "border-neon-red",
+    border: "border-neon-red/60",
     text: "text-neon-red",
-    bg: "bg-gradient-to-br from-neon-red/30 via-neon-orange/20 to-neon-red/10",
-    hoverBg: "hover:from-neon-red/40 hover:via-neon-orange/30 hover:to-neon-red/20",
-    glow: "glow-red",
-    activeBg: "bg-neon-red/30",
-    gradient: "from-neon-red/30 to-neon-orange/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-red)/0.5),inset_0_0_10px_hsl(var(--neon-red)/0.2)]",
+    activeBg: "bg-neon-red/20",
+    hoverBg: "hover:bg-neon-red/10",
   },
   purple: {
-    border: "border-neon-purple",
+    border: "border-neon-purple/60",
     text: "text-neon-purple",
-    bg: "bg-gradient-to-br from-neon-purple/30 via-neon-pink/20 to-neon-purple/10",
-    hoverBg: "hover:from-neon-purple/40 hover:via-neon-pink/30 hover:to-neon-purple/20",
-    glow: "glow-purple",
-    activeBg: "bg-neon-purple/30",
-    gradient: "from-neon-purple/30 to-neon-pink/20",
+    glow: "shadow-[0_0_15px_hsl(var(--neon-purple)/0.5),inset_0_0_10px_hsl(var(--neon-purple)/0.2)]",
+    activeBg: "bg-neon-purple/20",
+    hoverBg: "hover:bg-neon-purple/10",
   },
 };
 
@@ -73,24 +61,39 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg border backdrop-blur transition-all duration-200",
-        "hover:scale-[1.02] active:scale-95",
+        "group relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border-2 backdrop-blur-sm transition-all duration-300",
+        "active:scale-90 min-h-[60px]",
         colors.border,
         colors.text,
-        active ? colors.activeBg : "bg-black/60",
-        "hover:bg-opacity-40",
-        active && colors.glow
+        colors.hoverBg,
+        active ? [colors.activeBg, colors.glow, "scale-[1.02]"] : "bg-background/40 hover:scale-[1.03]"
       )}
     >
-      {/* Icon */}
-      <Icon className={cn(
-        "w-4 h-4 flex-shrink-0",
-        active && "animate-pulse"
-      )} />
+      {/* Animated border on active */}
+      {active && (
+        <div className="absolute inset-0 rounded-xl overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-current to-transparent opacity-30 animate-shimmer" 
+               style={{ backgroundSize: '200% 100%' }} />
+        </div>
+      )}
+      
+      {/* Icon with glow */}
+      <div className={cn(
+        "relative p-1.5 rounded-lg transition-all duration-300",
+        active ? "bg-current/20" : "bg-current/5 group-hover:bg-current/10"
+      )}>
+        <Icon className={cn(
+          "w-5 h-5 transition-transform duration-300",
+          active && "animate-pulse"
+        )} />
+      </div>
       
       {/* Label */}
-      <span className="text-[10px] font-bold tracking-wide uppercase truncate">
-        {label}
+      <span className={cn(
+        "text-[9px] font-bold tracking-wider uppercase leading-tight text-center",
+        active && "text-glow-green"
+      )}>
+        {label.split(' ')[0]}
       </span>
     </button>
   );

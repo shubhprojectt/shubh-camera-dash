@@ -93,12 +93,33 @@ export default {
           "0%, 100%": { borderColor: "hsl(var(--neon-green))" },
           "50%": { borderColor: "hsl(var(--neon-green) / 0.5)" },
         },
+        "glow-pulse": {
+          "0%, 100%": { boxShadow: "0 0 5px currentColor, 0 0 10px currentColor" },
+          "50%": { boxShadow: "0 0 15px currentColor, 0 0 25px currentColor, 0 0 35px currentColor" },
+        },
+        "slide-up": {
+          from: { opacity: "0", transform: "translateY(10px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        "bounce-in": {
+          "0%": { transform: "scale(0.9)", opacity: "0" },
+          "50%": { transform: "scale(1.02)" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         flicker: "flicker 3s ease-in-out infinite",
         "border-glow": "border-glow 2s ease-in-out infinite",
+        "glow-pulse": "glow-pulse 2s ease-in-out infinite",
+        "slide-up": "slide-up 0.3s ease-out",
+        "bounce-in": "bounce-in 0.4s ease-out",
+        "shimmer": "shimmer 2s linear infinite",
       },
     },
   },

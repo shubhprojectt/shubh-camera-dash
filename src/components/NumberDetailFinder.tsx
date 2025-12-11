@@ -9,9 +9,6 @@ import {
   Sparkles, 
   Code, 
   Globe,
-  Search,
-  Terminal,
-  AlertTriangle,
   Loader2,
   User,
   Calendar,
@@ -19,7 +16,9 @@ import {
   Fuel,
   Settings,
   FileText,
-  Shield
+  Shield,
+  Zap,
+  Search
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -67,15 +66,15 @@ const NumberDetailFinder = () => {
   const [error, setError] = useState<string | null>(null);
 
   const buttons = [
-    { icon: Phone, label: "Phone Search", color: "green" as const, placeholder: "Enter phone number...", colorHex: "#00ff00", searchType: "phone" },
-    { icon: CreditCard, label: "Aadhar Search", color: "purple" as const, placeholder: "Enter Aadhar number...", colorHex: "#a855f7", searchType: "aadhar" },
-    { icon: Car, label: "Vehicle CH", color: "orange" as const, placeholder: "Enter RC number (e.g., UP32AB1234)...", colorHex: "#ff9500", searchType: "vehicle" },
-    { icon: Camera, label: "Insta Search", color: "cyan" as const, placeholder: "Enter Instagram username...", colorHex: "#00ffff", searchType: "instagram" },
-    { icon: Users, label: "Family Info", color: "pink" as const, placeholder: "Enter name or number...", colorHex: "#ff00aa", searchType: "family" },
-    { icon: ClipboardPaste, label: "Manual Paste", color: "purple" as const, placeholder: "Paste any data...", colorHex: "#a855f7", searchType: "manual" },
-    { icon: Sparkles, label: "SHUBH", color: "purple" as const, placeholder: "", colorHex: "#a855f7", searchType: "shubh" },
-    { icon: Code, label: "Dark Phishing", color: "red" as const, placeholder: "Enter target URL...", colorHex: "#ff0000", searchType: "phishing" },
-    { icon: Globe, label: "Webcam 360", color: "green" as const, placeholder: "Enter IP or location...", colorHex: "#00ff00", searchType: "webcam" },
+    { icon: Phone, label: "Phone", color: "green" as const, placeholder: "Enter phone number...", searchType: "phone" },
+    { icon: CreditCard, label: "Aadhar", color: "purple" as const, placeholder: "Enter Aadhar number...", searchType: "aadhar" },
+    { icon: Car, label: "Vehicle", color: "orange" as const, placeholder: "Enter RC number...", searchType: "vehicle" },
+    { icon: Camera, label: "Insta", color: "cyan" as const, placeholder: "Enter username...", searchType: "instagram" },
+    { icon: Users, label: "Family", color: "pink" as const, placeholder: "Enter name/number...", searchType: "family" },
+    { icon: ClipboardPaste, label: "Manual", color: "purple" as const, placeholder: "Enter number...", searchType: "manual" },
+    { icon: Sparkles, label: "SHUBH", color: "cyan" as const, placeholder: "", searchType: "shubh" },
+    { icon: Code, label: "Phishing", color: "red" as const, placeholder: "Enter target URL...", searchType: "phishing" },
+    { icon: Globe, label: "Webcam", color: "green" as const, placeholder: "Enter IP/location...", searchType: "webcam" },
   ];
 
   const activeButton = buttons.find(b => b.label === activeTab);
@@ -172,7 +171,7 @@ const NumberDetailFinder = () => {
     const n2 = data.result?.Nexus2 || {};
     
     return (
-      <div className="space-y-3 animate-in fade-in duration-300">
+      <div className="space-y-3 animate-slide-up">
         {/* Header Card with Image */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-cyan/20 via-neon-green/10 to-neon-cyan/5 border border-neon-cyan/50 p-4">
           <div className="absolute top-0 right-0 w-20 h-20 bg-neon-cyan/10 rounded-full blur-2xl" />
@@ -289,7 +288,7 @@ const NumberDetailFinder = () => {
   };
 
   const renderDefaultResult = () => (
-    <div className="border border-neon-green/30 rounded-lg p-4 bg-muted/30 animate-in fade-in duration-300">
+    <div className="border border-neon-green/30 rounded-lg p-4 bg-muted/30 animate-slide-up">
       <div className="flex items-center justify-between mb-3">
         <span className="text-neon-green font-bold">RESULT</span>
         <span className="text-xs bg-neon-green/20 text-neon-green px-2 py-1 rounded">
@@ -322,87 +321,105 @@ const NumberDetailFinder = () => {
   );
 
   return (
-    <>
-      <div className="relative border border-neon-green/50 rounded-xl p-4 bg-black/90 backdrop-blur-md overflow-hidden">
-        {/* Background grid pattern */}
-        <div className="absolute inset-0 cyber-grid opacity-5" />
+    <div className="space-y-3">
+      {/* Main Card with Neon Border Effect */}
+      <div className="relative">
+        {/* Animated border glow */}
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 blur-sm animate-pulse-glow" />
         
-        {/* Header with terminal style */}
-        <div className="relative flex items-center gap-2 mb-3">
-          <Terminal className="w-4 h-4 text-neon-green" />
-          <h2 className="text-neon-green font-display font-bold text-base tracking-wider text-glow-green">
-            NUMBER DETAIL FINDER
-          </h2>
-        </div>
-        
-        {/* Button Grid */}
-        <div className="relative grid grid-cols-3 gap-2 mb-3">
-          {buttons.map((btn) => (
-            <SearchButton
-              key={btn.label}
-              icon={btn.icon}
-              label={btn.label}
-              color={btn.color}
-              active={btn.label === activeTab}
-              onClick={() => handleTabClick(btn.label)}
-            />
-          ))}
-        </div>
-        
-        {/* Search Input - Shows when a non-SHUBH tab is selected */}
-        {activeTab && activeTab !== "SHUBH" && activeButton && (
-          <div className="relative flex gap-1.5 bg-black/50 rounded-lg border border-neon-green/30 p-1">
-            <Input
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={activeButton.placeholder}
-              className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-neon-green/40 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 text-xs font-mono uppercase"
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-            />
-            <Button 
-              onClick={handleSearch}
-              disabled={loading}
-              className="bg-neon-green text-background font-bold px-3 h-8 hover:bg-neon-green/80 text-[10px]"
-            >
-              {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : "SEARCH"}
-            </Button>
+        <div className="relative rounded-2xl p-3 bg-background/95 backdrop-blur-xl overflow-hidden border border-neon-green/30">
+          {/* Background effects */}
+          <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-neon-green/10 rounded-full blur-3xl" />
+          
+          {/* Header */}
+          <div className="relative flex items-center justify-center gap-2 mb-3">
+            <Zap className="w-4 h-4 text-neon-cyan animate-pulse" />
+            <h2 className="text-sm font-display font-bold tracking-[0.2em] text-neon-green text-glow-green">
+              OSINT FINDER
+            </h2>
+            <Zap className="w-4 h-4 text-neon-pink animate-pulse" />
           </div>
-        )}
+          
+          {/* Button Grid - 3 columns, compact */}
+          <div className="relative grid grid-cols-3 gap-1.5">
+            {buttons.map((btn, index) => (
+              <div
+                key={btn.label}
+                className="animate-bounce-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <SearchButton
+                  icon={btn.icon}
+                  label={btn.label}
+                  color={btn.color}
+                  active={btn.label === activeTab}
+                  onClick={() => handleTabClick(btn.label)}
+                />
+              </div>
+            ))}
+          </div>
+          
+          {/* Search Input - Shows when a non-SHUBH tab is selected */}
+          {activeTab && activeTab !== "SHUBH" && activeButton && (
+            <div className="relative mt-3 animate-slide-up">
+              <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
+                <Input
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={activeButton.placeholder}
+                  className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-xs font-mono"
+                  onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                />
+                <Button 
+                  onClick={handleSearch}
+                  disabled={loading}
+                  className="bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-4 h-9 hover:opacity-90 text-xs shadow-[0_0_10px_hsl(var(--neon-cyan)/0.5)] transition-all active:scale-95"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* ShubhCam - shows when SHUBH tab is active */}
       {activeTab === "SHUBH" && <ShubhCam />}
 
-      {/* Results Section - Shows below the main card */}
+      {/* Results Section */}
       {activeTab && activeTab !== "SHUBH" && (
-        <div className="mt-4">
+        <div>
           {/* Loading */}
           {loading && (
-            <div className="text-center py-8 border-2 border-neon-cyan/30 rounded-2xl bg-card/50">
-              <Loader2 className="w-8 h-8 animate-spin mx-auto text-neon-cyan mb-2" />
-              <p className="text-muted-foreground">Searching database...</p>
+            <div className="text-center py-8 border-2 border-neon-cyan/30 rounded-2xl bg-card/50 animate-pulse">
+              <div className="relative inline-block">
+                <Loader2 className="w-10 h-10 animate-spin text-neon-cyan" />
+                <div className="absolute inset-0 w-10 h-10 rounded-full bg-neon-cyan/20 animate-ping" />
+              </div>
+              <p className="text-muted-foreground mt-3 text-sm">Searching database...</p>
             </div>
           )}
 
           {/* Error */}
           {error && !loading && (
-            <div className="text-center py-6 text-neon-red border-2 border-neon-red/30 rounded-2xl bg-card/50">
+            <div className="text-center py-6 text-neon-red border-2 border-neon-red/30 rounded-2xl bg-card/50 animate-slide-up">
               <p>{error}</p>
             </div>
           )}
 
           {/* Results */}
           {result && !loading && !error && (
-            <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4">
-              <h3 className="text-neon-yellow font-display font-bold text-lg mb-4 text-center">
-                {activeButton?.searchType === "vehicle" ? "VEHICLE INFORMATION" : "SEARCH RESULTS"}
+            <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
+              <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : "📊 RESULTS"}
               </h3>
               {activeButton?.searchType === "vehicle" ? renderVehicleResult(result) : renderDefaultResult()}
             </div>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
