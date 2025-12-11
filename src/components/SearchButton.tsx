@@ -5,6 +5,7 @@ interface SearchButtonProps {
   icon: LucideIcon;
   label: string;
   color: "green" | "pink" | "orange" | "cyan" | "red" | "purple";
+  active?: boolean;
   onClick?: () => void;
 }
 
@@ -17,13 +18,14 @@ const colorClasses = {
   purple: "border-neon-purple text-neon-purple hover:bg-neon-purple/10 glow-purple",
 };
 
-const SearchButton = ({ icon: Icon, label, color, onClick }: SearchButtonProps) => {
+const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButtonProps) => {
   return (
     <button
       onClick={onClick}
       className={cn(
         "flex flex-col items-center justify-center gap-2 p-4 rounded-lg border-2 bg-card/50 backdrop-blur transition-all duration-300 hover:scale-105 active:scale-95",
-        colorClasses[color]
+        colorClasses[color],
+        active && "bg-current/20 scale-105"
       )}
     >
       <Icon className="w-6 h-6" />

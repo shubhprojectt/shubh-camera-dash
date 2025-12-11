@@ -1,6 +1,5 @@
 import Header from "@/components/Header";
 import NumberDetailFinder from "@/components/NumberDetailFinder";
-import ShubhCam from "@/components/ShubhCam";
 
 const Index = () => {
   return (
@@ -16,7 +15,6 @@ const Index = () => {
         <Header />
         <main className="max-w-2xl mx-auto">
           <NumberDetailFinder />
-          <ShubhCam />
         </main>
       </div>
       
