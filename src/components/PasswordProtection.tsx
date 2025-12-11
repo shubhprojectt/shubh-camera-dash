@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
-import { Lock, X } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
-
-const SITE_PASSWORD = "shubh123"; // Change this password as needed
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
 }
 
 const PasswordProtection = ({ children }: PasswordProtectionProps) => {
+  const { settings } = useSettings();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(true);
@@ -25,7 +25,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   }, []);
 
   const handleUnlock = () => {
-    if (password === SITE_PASSWORD) {
+    if (password === settings.sitePassword) {
       sessionStorage.setItem("site_unlocked", "true");
       setIsUnlocked(true);
       toast({

@@ -18,13 +18,20 @@ import {
   FileText,
   Shield,
   Zap,
-  Search
+  Search,
+  LucideIcon
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
+import { useSettings } from "@/contexts/SettingsContext";
+import { supabase } from "@/integrations/supabase/client";
+
+const iconMap: Record<string, LucideIcon> = {
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe
+};
 
 interface VehicleResult {
   error: boolean;
@@ -59,25 +66,15 @@ interface VehicleResult {
 }
 
 const NumberDetailFinder = () => {
+  const { settings } = useSettings();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const buttons = [
-    { icon: Phone, label: "Phone", color: "green" as const, placeholder: "Enter phone number...", searchType: "phone" },
-    { icon: CreditCard, label: "Aadhar", color: "pink" as const, placeholder: "Enter Aadhar number...", searchType: "aadhar" },
-    { icon: Car, label: "Vehicle", color: "orange" as const, placeholder: "Enter RC number...", searchType: "vehicle" },
-    { icon: Camera, label: "Instagram", color: "cyan" as const, placeholder: "Enter username...", searchType: "instagram" },
-    { icon: Users, label: "Family", color: "purple" as const, placeholder: "Enter name/number...", searchType: "family" },
-    { icon: ClipboardPaste, label: "Manual", color: "yellow" as const, placeholder: "Enter number...", searchType: "manual" },
-    { icon: Sparkles, label: "SHUBH", color: "cyan" as const, placeholder: "", searchType: "shubh" },
-    { icon: Code, label: "Phishing", color: "red" as const, placeholder: "Enter target URL...", searchType: "phishing" },
-    { icon: Globe, label: "Webcam", color: "pink" as const, placeholder: "Enter IP/location...", searchType: "webcam" },
-  ];
-
-  const activeButton = buttons.find(b => b.label === activeTab);
+  const enabledTabs = settings.tabs.filter(tab => tab.enabled);
+  const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
     if (activeTab === label) {
@@ -87,6 +84,17 @@ const NumberDetailFinder = () => {
       setSearchQuery("");
       setResult(null);
       setError(null);
+    }
+  };
+
+  const logSearchHistory = async (searchType: string, query: string) => {
+    try {
+      await supabase.from("search_history").insert({
+        search_type: searchType,
+        search_query: query,
+      });
+    } catch (err) {
+      console.error("Failed to log search:", err);
     }
   };
 
@@ -100,9 +108,12 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Manual Paste - Open API in new tab
-    if (activeButton?.searchType === "manual") {
-      const apiUrl = `https://hydrashop.in.net/number.php?q=${encodeURIComponent(searchQuery.trim())}`;
+    // Log search history
+    await logSearchHistory(activeButton?.searchType || "unknown", searchQuery.trim());
+
+    // If tab has API URL and is manual type - open in new tab
+    if (activeButton?.apiUrl && activeButton.searchType === "manual") {
+      const apiUrl = `${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`;
       window.open(apiUrl, '_blank');
       toast({
         title: "Opening API",
@@ -115,9 +126,10 @@ const NumberDetailFinder = () => {
     setResult(null);
     setError(null);
 
-    if (activeButton?.searchType === "vehicle") {
+    // If tab has API URL - use it
+    if (activeButton?.apiUrl && activeButton.searchType === "vehicle") {
       try {
-        const response = await fetch(`https://darknagi-osint-vehicle-api.vercel.app/api/vehicle?rc=${encodeURIComponent(searchQuery.trim().toUpperCase())}`);
+        const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim().toUpperCase())}`);
         const data = await response.json();
         
         if (data && !data.error) {
@@ -135,17 +147,26 @@ const NumberDetailFinder = () => {
           });
         }
       } catch (err) {
-        setError("Failed to fetch vehicle data. Please try again.");
+        setError("Failed to fetch data. Please try again.");
         toast({
           title: "Error",
-          description: "Failed to fetch vehicle data",
+          description: "Failed to fetch data",
           variant: "destructive",
         });
       } finally {
         setLoading(false);
       }
+    } else if (activeButton?.apiUrl) {
+      // Open API URL in new tab for other tabs with API
+      const apiUrl = `${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`;
+      window.open(apiUrl, '_blank');
+      setLoading(false);
+      toast({
+        title: "Opening API",
+        description: `Opening search for: ${searchQuery}`,
+      });
     } else {
-      // Default demo behavior for other search types
+      // Default demo behavior for tabs without API
       setTimeout(() => {
         setLoading(false);
         setResult({
@@ -343,21 +364,24 @@ const NumberDetailFinder = () => {
           
           {/* Button Grid - 3 columns */}
           <div className="relative grid grid-cols-3 gap-2">
-            {buttons.map((btn, index) => (
-              <div
-                key={btn.label}
-                className="animate-bounce-in"
-                style={{ animationDelay: `${index * 40}ms` }}
-              >
-                <SearchButton
-                  icon={btn.icon}
-                  label={btn.label}
-                  color={btn.color}
-                  active={btn.label === activeTab}
-                  onClick={() => handleTabClick(btn.label)}
-                />
-              </div>
-            ))}
+            {enabledTabs.map((tab, index) => {
+              const IconComponent = iconMap[tab.icon] || Sparkles;
+              return (
+                <div
+                  key={tab.id}
+                  className="animate-bounce-in"
+                  style={{ animationDelay: `${index * 40}ms` }}
+                >
+                  <SearchButton
+                    icon={IconComponent}
+                    label={tab.label}
+                    color={tab.color as any}
+                    active={tab.label === activeTab}
+                    onClick={() => handleTabClick(tab.label)}
+                  />
+                </div>
+              );
+            })}
           </div>
           
           {/* Search Input - Shows when a non-SHUBH tab is selected */}
