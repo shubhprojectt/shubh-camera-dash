@@ -14,7 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      captured_photos: {
+        Row: {
+          captured_at: string
+          id: string
+          image_data: string
+          ip_address: string | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          captured_at?: string
+          id?: string
+          image_data: string
+          ip_address?: string | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          captured_at?: string
+          id?: string
+          image_data?: string
+          ip_address?: string | null
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
