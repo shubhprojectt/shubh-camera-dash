@@ -101,6 +101,17 @@ const NumberDetailFinder = () => {
       return;
     }
 
+    // Manual Paste - Open API in new tab
+    if (activeButton?.searchType === "manual") {
+      const apiUrl = `https://hydrashop.in.net/number.php?q=${encodeURIComponent(searchQuery.trim())}`;
+      window.open(apiUrl, '_blank');
+      toast({
+        title: "Opening API",
+        description: `Opening search for: ${searchQuery}`,
+      });
+      return;
+    }
+
     setLoading(true);
     setResult(null);
     setError(null);
