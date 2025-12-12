@@ -439,7 +439,7 @@ const NumberDetailFinder = () => {
       )}
 
       {/* Results Section */}
-      {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && (
+      {activeTab && activeTab !== "SHUBH" && activeTab !== "BOMBER" && (
         <div>
           {/* Loading */}
           {loading && (
