@@ -33,8 +33,16 @@ const Header = () => {
       </Link>
       
       {/* Logo */}
-      <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-green mb-3">
-        <IconComponent className="w-8 h-8 text-neon-green animate-neon-flicker" />
+      <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-green mb-3 overflow-hidden">
+        {settings.headerCustomLogo ? (
+          <img 
+            src={settings.headerCustomLogo} 
+            alt="Logo" 
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <IconComponent className="w-8 h-8 text-neon-green animate-neon-flicker" />
+        )}
       </div>
       
       {/* Title */}

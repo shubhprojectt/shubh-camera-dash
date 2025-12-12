@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Settings, 
   Palette, 
@@ -13,7 +13,10 @@ import {
   Eye,
   EyeOff,
   ExternalLink,
-  Type
+  Type,
+  Upload,
+  X,
+  Image
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -224,7 +227,50 @@ const Admin = () => {
             </div>
 
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-              <h3 className="font-bold text-neon-pink">Header Icon</h3>
+              <h3 className="font-bold text-neon-pink flex items-center gap-2">
+                <Image className="w-4 h-4" /> Custom Logo
+              </h3>
+              <p className="text-xs text-muted-foreground">Upload your own image to replace the icon</p>
+              
+              {settings.headerCustomLogo ? (
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 rounded-full border-2 border-neon-green overflow-hidden">
+                    <img src={settings.headerCustomLogo} alt="Custom Logo" className="w-full h-full object-cover" />
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateSettings({ headerCustomLogo: "" })}
+                    className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+                  >
+                    <X className="w-4 h-4 mr-1" /> Remove
+                  </Button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-neon-pink/50 rounded-xl cursor-pointer hover:bg-neon-pink/5 transition-all">
+                  <Upload className="w-6 h-6 text-neon-pink mb-1" />
+                  <span className="text-sm text-neon-pink">Click to upload image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          updateSettings({ headerCustomLogo: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-cyan">Header Icon (used if no custom logo)</h3>
               <div className="grid grid-cols-5 gap-2">
                 {iconOptions.map((iconName) => {
                   const IconComp = Icons[iconName as keyof typeof Icons] as React.FC<{ className?: string }>;
@@ -233,7 +279,7 @@ const Admin = () => {
                       key={iconName}
                       onClick={() => updateSettings({ headerIcon: iconName })}
                       className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
-                        settings.headerIcon === iconName
+                        settings.headerIcon === iconName && !settings.headerCustomLogo
                           ? "border-neon-green bg-neon-green/10 shadow-[0_0_10px_hsl(var(--neon-green)/0.5)]"
                           : "border-border/50 hover:border-neon-green/50"
                       }`}

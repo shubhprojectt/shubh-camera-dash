@@ -18,6 +18,7 @@ export interface AppSettings {
   headerName1: string;
   headerName2: string;
   headerIcon: string;
+  headerCustomLogo: string; // Base64 custom logo image
   tabs: TabConfig[];
 }
 
@@ -40,6 +41,7 @@ const defaultSettings: AppSettings = {
   headerName1: "SHUBH",
   headerName2: "OSINT",
   headerIcon: "Zap",
+  headerCustomLogo: "",
   tabs: defaultTabs,
 };
 
