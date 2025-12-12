@@ -386,7 +386,7 @@ const NumberDetailFinder = () => {
           </div>
           
           {/* Search Input - Shows when a non-SHUBH and non-DARK DB tab is selected */}
-          {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && activeButton && (
+          {activeTab && activeTab !== "SHUBH" && activeTab !== "BOMBER" && activeButton && (
             <div className="relative mt-3 animate-slide-up">
               <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
                 <Input
