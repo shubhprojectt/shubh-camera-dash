@@ -41,7 +41,7 @@ const defaultTabs: TabConfig[] = [
   { id: "shubh", label: "CAM HACK", icon: "Sparkles", color: "cyan", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
   { id: "phishing", label: "Phishing", icon: "Code", color: "red", placeholder: "Enter target URL...", searchType: "phishing", apiUrl: "", enabled: true },
   { id: "webcam", label: "Webcam", icon: "Globe", color: "pink", placeholder: "Enter IP/location...", searchType: "webcam", apiUrl: "", enabled: true },
-  { id: "darkdb", label: "BOMBER", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://shubhinfo.vercel.app/", enabled: true },
+  { id: "darkdb", label: "DARK DB", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://shubhinfo.vercel.app/", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
