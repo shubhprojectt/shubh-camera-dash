@@ -43,6 +43,28 @@ const iconOptions = [
   "Database", "Server", "Cpu", "Binary", "Hash", "Key"
 ];
 
+const fontOptions = [
+  { value: "Orbitron", label: "Orbitron", style: "font-display" },
+  { value: "Share Tech Mono", label: "Share Tech Mono", style: "font-mono" },
+  { value: "Courier New", label: "Courier New", style: "font-mono" },
+  { value: "Impact", label: "Impact", style: "font-sans" },
+  { value: "Georgia", label: "Georgia", style: "font-serif" },
+  { value: "Arial Black", label: "Arial Black", style: "font-sans" },
+  { value: "Verdana", label: "Verdana", style: "font-sans" },
+  { value: "Times New Roman", label: "Times New Roman", style: "font-serif" },
+];
+
+const headerStyleOptions = [
+  { value: "normal", label: "Normal" },
+  { value: "uppercase", label: "UPPERCASE" },
+  { value: "lowercase", label: "lowercase" },
+  { value: "capitalize", label: "Capitalize" },
+  { value: "italic", label: "Italic" },
+  { value: "bold", label: "Bold" },
+  { value: "glow", label: "Glow Effect" },
+  { value: "flicker", label: "Neon Flicker" },
+];
+
 interface SearchHistoryItem {
   id: string;
   search_type: string;
@@ -206,7 +228,7 @@ const Admin = () => {
               <h3 className="font-bold text-neon-green">Website Title</h3>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">First Part (Green)</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">First Part</label>
                   <Input
                     value={settings.headerName1}
                     onChange={(e) => updateSettings({ headerName1: e.target.value })}
@@ -215,7 +237,7 @@ const Admin = () => {
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Second Part (Pink)</label>
+                  <label className="text-xs text-muted-foreground mb-1 block">Second Part</label>
                   <Input
                     value={settings.headerName2}
                     onChange={(e) => updateSettings({ headerName2: e.target.value })}
@@ -223,6 +245,88 @@ const Admin = () => {
                     className="h-10"
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Header Colors */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-cyan">Header Colors</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">First Part Color</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {colorOptions.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => updateSettings({ headerColor1: c.value })}
+                        className={`h-10 rounded-lg ${c.color} transition-all ${
+                          settings.headerColor1 === c.value 
+                            ? "ring-2 ring-white scale-110" 
+                            : "opacity-60 hover:opacity-100"
+                        }`}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-2 block">Second Part Color</label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {colorOptions.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => updateSettings({ headerColor2: c.value })}
+                        className={`h-10 rounded-lg ${c.color} transition-all ${
+                          settings.headerColor2 === c.value 
+                            ? "ring-2 ring-white scale-110" 
+                            : "opacity-60 hover:opacity-100"
+                        }`}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Font Selection */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-orange">Header Font</h3>
+              <div className="grid grid-cols-2 gap-2">
+                {fontOptions.map((font) => (
+                  <button
+                    key={font.value}
+                    onClick={() => updateSettings({ headerFont: font.value })}
+                    style={{ fontFamily: font.value }}
+                    className={`p-3 rounded-lg border-2 text-center transition-all ${
+                      settings.headerFont === font.value
+                        ? "border-neon-orange bg-neon-orange/10 shadow-[0_0_10px_hsl(var(--neon-orange)/0.5)]"
+                        : "border-border/50 hover:border-neon-orange/50"
+                    }`}
+                  >
+                    <span className="text-lg text-foreground">{font.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Header Style */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-purple">Header Style</h3>
+              <div className="grid grid-cols-4 gap-2">
+                {headerStyleOptions.map((style) => (
+                  <button
+                    key={style.value}
+                    onClick={() => updateSettings({ headerStyle: style.value })}
+                    className={`p-2 rounded-lg border-2 text-sm transition-all ${
+                      settings.headerStyle === style.value
+                        ? "border-neon-purple bg-neon-purple/10 shadow-[0_0_10px_hsl(var(--neon-purple)/0.5)]"
+                        : "border-border/50 hover:border-neon-purple/50"
+                    }`}
+                  >
+                    {style.label}
+                  </button>
+                ))}
               </div>
             </div>
 

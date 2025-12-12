@@ -18,7 +18,11 @@ export interface AppSettings {
   headerName1: string;
   headerName2: string;
   headerIcon: string;
-  headerCustomLogo: string; // Base64 custom logo image
+  headerCustomLogo: string;
+  headerColor1: string;
+  headerColor2: string;
+  headerFont: string;
+  headerStyle: string;
   tabs: TabConfig[];
 }
 
@@ -42,6 +46,10 @@ const defaultSettings: AppSettings = {
   headerName2: "OSINT",
   headerIcon: "Zap",
   headerCustomLogo: "",
+  headerColor1: "green",
+  headerColor2: "pink",
+  headerFont: "Orbitron",
+  headerStyle: "normal",
   tabs: defaultTabs,
 };
 
