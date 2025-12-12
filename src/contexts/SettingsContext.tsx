@@ -68,7 +68,12 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     const saved = localStorage.getItem("app_settings");
     if (saved) {
       try {
-        return { ...defaultSettings, ...JSON.parse(saved) };
+        const parsed = JSON.parse(saved);
+        // Merge saved tabs with default tabs to ensure new tabs are included
+        const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
+        const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
+        const mergedTabs = [...(parsed.tabs || []), ...newTabs];
+        return { ...defaultSettings, ...parsed, tabs: mergedTabs };
       } catch {
         return defaultSettings;
       }
