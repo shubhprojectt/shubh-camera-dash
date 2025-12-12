@@ -415,10 +415,21 @@ const NumberDetailFinder = () => {
       {/* DARK DB iframe - shows when DARK DB tab is active */}
       {activeTab === "DARK DB" && (
         <div className="animate-slide-up">
-          <div className="relative rounded-2xl overflow-hidden border-2 border-neon-purple/50 shadow-[0_0_20px_hsl(var(--neon-purple)/0.3)]">
+          <div 
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              borderWidth: `${settings.darkDbBorderWidth}px`,
+              borderStyle: 'solid',
+              borderColor: `hsl(var(--neon-${settings.darkDbBorderColor}))`,
+              boxShadow: settings.darkDbBorderWidth !== "0" 
+                ? `0 0 20px hsl(var(--neon-${settings.darkDbBorderColor}) / 0.3)` 
+                : 'none'
+            }}
+          >
             <iframe
-              src="https://shubhinfo.vercel.app/"
-              className="w-full h-[90vh] bg-background"
+              src={settings.darkDbUrl}
+              className="w-full bg-background"
+              style={{ height: `${settings.darkDbHeight}vh` }}
               title="DARK DB"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
