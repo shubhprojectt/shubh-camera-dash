@@ -410,10 +410,10 @@ const NumberDetailFinder = () => {
       </div>
       
       {/* ShubhCam - shows when SHUBH tab is active */}
-      {activeTab === "SHUBH" && <ShubhCam />}
+      {activeTab === "CAM HACK" && <ShubhCam />}
 
       {/* DARK DB iframe - shows when DARK DB tab is active */}
-      {activeTab === "DARK DB" && (
+      {activeTab === "BOMBER" && (
         <div className="animate-slide-up">
           <div 
             className="relative rounded-2xl overflow-hidden"
