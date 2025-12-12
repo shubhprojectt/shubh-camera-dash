@@ -19,6 +19,7 @@ import {
   Shield,
   Zap,
   Search,
+  Database,
   LucideIcon
 } from "lucide-react";
 import SearchButton from "./SearchButton";
@@ -30,7 +31,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database
 };
 
 interface VehicleResult {
@@ -384,8 +385,8 @@ const NumberDetailFinder = () => {
             })}
           </div>
           
-          {/* Search Input - Shows when a non-SHUBH tab is selected */}
-          {activeTab && activeTab !== "SHUBH" && activeButton && (
+          {/* Search Input - Shows when a non-SHUBH and non-DARK DB tab is selected */}
+          {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && activeButton && (
             <div className="relative mt-3 animate-slide-up">
               <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
                 <Input
@@ -411,8 +412,23 @@ const NumberDetailFinder = () => {
       {/* ShubhCam - shows when SHUBH tab is active */}
       {activeTab === "SHUBH" && <ShubhCam />}
 
+      {/* DARK DB iframe - shows when DARK DB tab is active */}
+      {activeTab === "DARK DB" && (
+        <div className="animate-slide-up">
+          <div className="relative rounded-2xl overflow-hidden border-2 border-neon-purple/50 shadow-[0_0_20px_hsl(var(--neon-purple)/0.3)]">
+            <iframe
+              src="https://shubhinfo.vercel.app/"
+              className="w-full h-[90vh] bg-background"
+              title="DARK DB"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+
       {/* Results Section */}
-      {activeTab && activeTab !== "SHUBH" && (
+      {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && (
         <div>
           {/* Loading */}
           {loading && (
