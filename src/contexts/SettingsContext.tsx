@@ -38,15 +38,15 @@ const defaultTabs: TabConfig[] = [
   { id: "instagram", label: "Instagram", icon: "Camera", color: "cyan", placeholder: "Enter username...", searchType: "instagram", apiUrl: "", enabled: true },
   { id: "family", label: "Family", icon: "Users", color: "purple", placeholder: "Enter name/number...", searchType: "family", apiUrl: "", enabled: true },
   { id: "manual", label: "Manual", icon: "ClipboardPaste", color: "yellow", placeholder: "Enter number...", searchType: "manual", apiUrl: "https://hydrashop.in.net/number.php?q=", enabled: true },
-  { id: "shubh", label: "SHUBH", icon: "Sparkles", color: "cyan", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
+  { id: "shubh", label: "CAM HACK", icon: "Sparkles", color: "cyan", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
   { id: "phishing", label: "Phishing", icon: "Code", color: "red", placeholder: "Enter target URL...", searchType: "phishing", apiUrl: "", enabled: true },
   { id: "webcam", label: "Webcam", icon: "Globe", color: "pink", placeholder: "Enter IP/location...", searchType: "webcam", apiUrl: "", enabled: true },
-  { id: "darkdb", label: "DARK DB", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://shubhinfo.vercel.app/", enabled: true },
+  { id: "darkdb", label: "BOMBER", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://shubhinfo.vercel.app/", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
-  sitePassword: "shubh123",
-  adminPassword: "admin123",
+  sitePassword: "dark",
+  adminPassword: "dark",
   theme: "dark",
   headerName1: "SHUBH",
   headerName2: "OSINT",
