@@ -4,11 +4,37 @@ import { useSettings } from "@/contexts/SettingsContext";
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
+const colorClasses: Record<string, { text: string; glow: string }> = {
+  green: { text: "text-neon-green", glow: "text-glow-green" },
+  pink: { text: "text-neon-pink", glow: "text-glow-pink" },
+  orange: { text: "text-neon-orange", glow: "" },
+  cyan: { text: "text-neon-cyan", glow: "text-glow-cyan" },
+  red: { text: "text-neon-red", glow: "" },
+  purple: { text: "text-neon-purple", glow: "text-glow-purple" },
+  yellow: { text: "text-neon-yellow", glow: "" },
+};
+
 const Header = () => {
   const { settings } = useSettings();
   
   // Get dynamic icon
   const IconComponent = (Icons[settings.headerIcon as keyof typeof Icons] as LucideIcon) || Icons.Zap;
+
+  const getStyleClasses = () => {
+    switch (settings.headerStyle) {
+      case "uppercase": return "uppercase";
+      case "lowercase": return "lowercase";
+      case "capitalize": return "capitalize";
+      case "italic": return "italic";
+      case "bold": return "font-black";
+      case "glow": return "animate-pulse-glow";
+      case "flicker": return "animate-neon-flicker";
+      default: return "";
+    }
+  };
+
+  const color1 = colorClasses[settings.headerColor1] || colorClasses.green;
+  const color2 = colorClasses[settings.headerColor2] || colorClasses.pink;
 
   return (
     <header className="relative py-4 text-center">
@@ -33,7 +59,7 @@ const Header = () => {
       </Link>
       
       {/* Logo */}
-      <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-green mb-3 overflow-hidden">
+      <div className={`relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-${settings.headerColor1} mb-3 overflow-hidden`}>
         {settings.headerCustomLogo ? (
           <img 
             src={settings.headerCustomLogo} 
@@ -41,14 +67,17 @@ const Header = () => {
             className="w-full h-full object-cover"
           />
         ) : (
-          <IconComponent className="w-8 h-8 text-neon-green animate-neon-flicker" />
+          <IconComponent className={`w-8 h-8 ${color1.text} animate-neon-flicker`} />
         )}
       </div>
       
       {/* Title */}
-      <h1 className="font-display text-3xl md:text-4xl font-black tracking-wider">
-        <span className="text-neon-green text-glow-green">{settings.headerName1}</span>
-        <span className="text-neon-pink text-glow-pink ml-2">{settings.headerName2}</span>
+      <h1 
+        className={`text-3xl md:text-4xl font-black tracking-wider ${getStyleClasses()}`}
+        style={{ fontFamily: settings.headerFont }}
+      >
+        <span className={`${color1.text} ${color1.glow}`}>{settings.headerName1}</span>
+        <span className={`${color2.text} ${color2.glow} ml-2`}>{settings.headerName2}</span>
       </h1>
     </header>
   );
