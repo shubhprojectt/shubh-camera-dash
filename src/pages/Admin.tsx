@@ -5,6 +5,7 @@ import {
   Key, 
   History, 
   LayoutGrid,
+  Database,
   ArrowLeft,
   Save,
   Trash2,
@@ -75,7 +76,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "tabs" | "theme" | "password" | "history">("header");
+  const [activeSection, setActiveSection] = useState<"header" | "tabs" | "darkdb" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -200,6 +201,7 @@ const Admin = () => {
           {[
             { id: "header", icon: Type, label: "Header" },
             { id: "tabs", icon: LayoutGrid, label: "Tabs" },
+            { id: "darkdb", icon: Database, label: "DARK DB" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
             { id: "history", icon: History, label: "History" },
@@ -460,6 +462,116 @@ const Admin = () => {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* DARK DB Section */}
+        {activeSection === "darkdb" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-purple mb-4 flex items-center gap-2">
+              <Database className="w-5 h-5" /> DARK DB Configuration
+            </h2>
+            
+            {/* URL Setting */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-cyan">Website URL</h3>
+              <p className="text-xs text-muted-foreground">Enter the URL to load in DARK DB iframe</p>
+              <Input
+                value={settings.darkDbUrl}
+                onChange={(e) => updateSettings({ darkDbUrl: e.target.value })}
+                placeholder="https://example.com"
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {/* Height Setting */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-green">Iframe Height (vh)</h3>
+              <p className="text-xs text-muted-foreground">Set height in viewport height units (10-100)</p>
+              <div className="flex items-center gap-3">
+                <Input
+                  type="number"
+                  min="10"
+                  max="100"
+                  value={settings.darkDbHeight}
+                  onChange={(e) => updateSettings({ darkDbHeight: e.target.value })}
+                  className="w-24"
+                />
+                <span className="text-muted-foreground">vh</span>
+                <div className="flex-1 flex gap-2">
+                  {["50", "70", "80", "90"].map((h) => (
+                    <button
+                      key={h}
+                      onClick={() => updateSettings({ darkDbHeight: h })}
+                      className={`px-3 py-1 rounded-lg border text-sm transition-all ${
+                        settings.darkDbHeight === h
+                          ? "border-neon-green bg-neon-green/20 text-neon-green"
+                          : "border-border/50 text-muted-foreground hover:border-neon-green/50"
+                      }`}
+                    >
+                      {h}vh
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Border Color */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-pink">Border Color</h3>
+              <div className="grid grid-cols-7 gap-2">
+                {colorOptions.map((c) => (
+                  <button
+                    key={c.value}
+                    onClick={() => updateSettings({ darkDbBorderColor: c.value })}
+                    className={`h-10 rounded-lg ${c.color} transition-all ${
+                      settings.darkDbBorderColor === c.value 
+                        ? "ring-2 ring-white scale-110" 
+                        : "opacity-60 hover:opacity-100"
+                    }`}
+                    title={c.label}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Border Width */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-orange">Border Width</h3>
+              <div className="flex gap-2">
+                {["0", "1", "2", "3", "4"].map((w) => (
+                  <button
+                    key={w}
+                    onClick={() => updateSettings({ darkDbBorderWidth: w })}
+                    className={`px-4 py-2 rounded-lg border-2 transition-all ${
+                      settings.darkDbBorderWidth === w
+                        ? "border-neon-orange bg-neon-orange/20 text-neon-orange"
+                        : "border-border/50 text-muted-foreground hover:border-neon-orange/50"
+                    }`}
+                  >
+                    {w === "0" ? "None" : `${w}px`}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Preview */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-yellow">Preview</h3>
+              <div 
+                className={`w-full h-32 rounded-xl bg-muted/30 flex items-center justify-center`}
+                style={{
+                  borderWidth: `${settings.darkDbBorderWidth}px`,
+                  borderStyle: 'solid',
+                  borderColor: `hsl(var(--neon-${settings.darkDbBorderColor}))`,
+                  boxShadow: settings.darkDbBorderWidth !== "0" 
+                    ? `0 0 20px hsl(var(--neon-${settings.darkDbBorderColor}) / 0.3)` 
+                    : 'none'
+                }}
+              >
+                <span className="text-muted-foreground text-sm">Iframe Preview Border</span>
+              </div>
+            </div>
           </div>
         )}
 

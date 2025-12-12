@@ -24,6 +24,11 @@ export interface AppSettings {
   headerFont: string;
   headerStyle: string;
   tabs: TabConfig[];
+  // DARK DB settings
+  darkDbUrl: string;
+  darkDbHeight: string;
+  darkDbBorderColor: string;
+  darkDbBorderWidth: string;
 }
 
 const defaultTabs: TabConfig[] = [
@@ -52,6 +57,11 @@ const defaultSettings: AppSettings = {
   headerFont: "Orbitron",
   headerStyle: "normal",
   tabs: defaultTabs,
+  // DARK DB defaults
+  darkDbUrl: "https://shubhinfo.vercel.app/",
+  darkDbHeight: "90",
+  darkDbBorderColor: "purple",
+  darkDbBorderWidth: "2",
 };
 
 interface SettingsContextType {
