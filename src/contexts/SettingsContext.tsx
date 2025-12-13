@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface TabConfig {
   id: string;
@@ -74,43 +75,106 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [settings, setSettings] = useState<AppSettings>(() => {
-    const saved = localStorage.getItem("app_settings");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Merge saved tabs with default tabs to ensure new tabs are included
-        const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
-        const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
-        const mergedTabs = [...(parsed.tabs || []), ...newTabs];
-        return { ...defaultSettings, ...parsed, tabs: mergedTabs };
-      } catch {
-        return defaultSettings;
-      }
-    }
-    return defaultSettings;
-  });
+  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [isLoaded, setIsLoaded] = useState(false);
 
+  // Load settings from Supabase on mount
   useEffect(() => {
-    localStorage.setItem("app_settings", JSON.stringify(settings));
-  }, [settings]);
+    const loadSettings = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('app_settings')
+          .select('setting_value')
+          .eq('setting_key', 'main_settings')
+          .maybeSingle();
+
+        if (error) {
+          console.error('Error loading settings:', error);
+          // Fall back to localStorage
+          const saved = localStorage.getItem("app_settings");
+          if (saved) {
+            const parsed = JSON.parse(saved);
+            const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
+            const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
+            const mergedTabs = [...(parsed.tabs || []), ...newTabs];
+            setSettings({ ...defaultSettings, ...parsed, tabs: mergedTabs });
+          }
+        } else if (data) {
+          const parsed = data.setting_value as unknown as AppSettings;
+          const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
+          const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
+          const mergedTabs = [...(parsed.tabs || []), ...newTabs];
+          setSettings({ ...defaultSettings, ...parsed, tabs: mergedTabs });
+        }
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  // Save settings to Supabase whenever they change
+  const saveToSupabase = useCallback(async (newSettings: AppSettings) => {
+    try {
+      const settingsJson = JSON.parse(JSON.stringify(newSettings));
+      
+      const { data: existing } = await supabase
+        .from('app_settings')
+        .select('id')
+        .eq('setting_key', 'main_settings')
+        .maybeSingle();
+
+      if (existing) {
+        await supabase
+          .from('app_settings')
+          .update({ setting_value: settingsJson })
+          .eq('setting_key', 'main_settings');
+      } else {
+        await supabase
+          .from('app_settings')
+          .insert([{ setting_key: 'main_settings', setting_value: settingsJson }]);
+      }
+      
+      // Also save to localStorage as backup
+      localStorage.setItem("app_settings", JSON.stringify(newSettings));
+    } catch (err) {
+      console.error('Error saving settings:', err);
+    }
+  }, []);
 
   const updateSettings = (newSettings: Partial<AppSettings>) => {
-    setSettings(prev => ({ ...prev, ...newSettings }));
+    setSettings(prev => {
+      const updated = { ...prev, ...newSettings };
+      saveToSupabase(updated);
+      return updated;
+    });
   };
 
   const updateTab = (tabId: string, updates: Partial<TabConfig>) => {
-    setSettings(prev => ({
-      ...prev,
-      tabs: prev.tabs.map(tab => 
-        tab.id === tabId ? { ...tab, ...updates } : tab
-      ),
-    }));
+    setSettings(prev => {
+      const updated = {
+        ...prev,
+        tabs: prev.tabs.map(tab => 
+          tab.id === tabId ? { ...tab, ...updates } : tab
+        ),
+      };
+      saveToSupabase(updated);
+      return updated;
+    });
   };
 
-  const resetSettings = () => {
+  const resetSettings = async () => {
     setSettings(defaultSettings);
     localStorage.removeItem("app_settings");
+    
+    // Delete from Supabase
+    await supabase
+      .from('app_settings')
+      .delete()
+      .eq('setting_key', 'main_settings');
   };
 
   return (
