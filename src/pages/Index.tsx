@@ -19,14 +19,11 @@ const Index = () => {
         {/* Cyber grid background */}
         <div className="fixed inset-0 cyber-grid opacity-20" />
         
-        {/* Rainbow floating neon orbs with color cycling */}
-        <div className="fixed top-10 left-[10%] w-72 h-72 rounded-full blur-[100px] animate-float bg-gradient-to-r from-neon-green via-neon-cyan to-neon-blue opacity-30" style={{ animation: 'float 8s ease-in-out infinite, gradient-shift 6s ease infinite' }} />
-        <div className="fixed bottom-10 right-[10%] w-96 h-96 rounded-full blur-[120px] animate-float bg-gradient-to-r from-neon-pink via-neon-purple to-neon-red opacity-25" style={{ animation: 'float 10s ease-in-out infinite, gradient-shift 8s ease infinite', animationDelay: '-2s' }} />
-        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full blur-[150px] bg-gradient-to-tr from-neon-cyan via-neon-pink to-neon-yellow opacity-20" style={{ animation: 'pulse 4s ease-in-out infinite, gradient-shift 10s ease infinite' }} />
-        <div className="fixed top-[20%] right-[20%] w-48 h-48 rounded-full blur-[80px] bg-gradient-to-br from-neon-purple via-neon-pink to-neon-orange opacity-30" style={{ animation: 'float 7s ease-in-out infinite, gradient-shift 5s ease infinite', animationDelay: '-4s' }} />
-        <div className="fixed bottom-[30%] left-[15%] w-56 h-56 rounded-full blur-[90px] bg-gradient-to-r from-neon-orange via-neon-yellow to-neon-green opacity-25" style={{ animation: 'float 9s ease-in-out infinite, gradient-shift 7s ease infinite', animationDelay: '-3s' }} />
-        <div className="fixed top-[60%] right-[30%] w-40 h-40 rounded-full blur-[70px] bg-gradient-to-bl from-neon-red via-neon-pink to-neon-cyan opacity-20" style={{ animation: 'float 6s ease-in-out infinite, gradient-shift 4s ease infinite', animationDelay: '-1s' }} />
-        <div className="fixed top-[15%] left-[40%] w-32 h-32 rounded-full blur-[60px] bg-gradient-to-r from-neon-yellow via-neon-green to-neon-cyan opacity-25" style={{ animation: 'float 5s ease-in-out infinite, gradient-shift 6s ease infinite', animationDelay: '-5s' }} />
+        {/* Floating neon orbs */}
+        <div className="fixed top-10 left-[10%] w-72 h-72 bg-neon-green/20 rounded-full blur-[100px] animate-float" />
+        <div className="fixed bottom-10 right-[10%] w-96 h-96 bg-neon-pink/15 rounded-full blur-[120px] animate-float" style={{ animationDelay: '-2s' }} />
+        <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[150px] animate-pulse" />
+        <div className="fixed top-[20%] right-[20%] w-48 h-48 bg-neon-purple/20 rounded-full blur-[80px] animate-float" style={{ animationDelay: '-4s' }} />
         
         {/* Moving light streaks */}
         <div className="fixed top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-neon-cyan/30 to-transparent animate-pulse" style={{ animationDuration: '3s' }} />
