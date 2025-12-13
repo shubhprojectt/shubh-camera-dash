@@ -66,6 +66,31 @@ interface VehicleResult {
   source_by?: string;
 }
 
+interface PhoneResult {
+  data1?: {
+    id?: string;
+    mobile?: string;
+    name?: string;
+    father_name?: string;
+    address?: string;
+    alt_mobile?: string;
+    circle?: string;
+    id_number?: string;
+    email?: string | null;
+  };
+  data2?: {
+    id?: string;
+    mobile?: string;
+    name?: string;
+    father_name?: string;
+    address?: string;
+    alt_mobile?: string;
+    circle?: string;
+    id_number?: string;
+    email?: string | null;
+  };
+}
+
 const NumberDetailFinder = () => {
   const { settings } = useSettings();
   const [searchQuery, setSearchQuery] = useState("");
@@ -127,7 +152,40 @@ const NumberDetailFinder = () => {
     setResult(null);
     setError(null);
 
-    // If tab has API URL - use it
+    // Phone search API
+    if (activeButton?.searchType === "phone") {
+      try {
+        const response = await fetch(`https://vishal-number-info.22web.org/information.php?number=${encodeURIComponent(searchQuery.trim())}&api_key=vishal_Hacker`);
+        const data = await response.json();
+        
+        if (data && (data.data1 || data.data2)) {
+          setResult({ type: "phone", data });
+          toast({
+            title: "Phone Found",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } else {
+          setError("No information found for this number");
+          toast({
+            title: "Not Found",
+            description: "No information found",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        setError("Failed to fetch data. Please try again.");
+        toast({
+          title: "Error",
+          description: "Failed to fetch data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // If tab has API URL - use it for vehicle
     if (activeButton?.apiUrl && activeButton.searchType === "vehicle") {
       try {
         const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim().toUpperCase())}`);
@@ -309,6 +367,105 @@ const NumberDetailFinder = () => {
     );
   };
 
+  const renderPhoneResult = (data: PhoneResult) => {
+    const info = data.data1 || data.data2 || {};
+    
+    return (
+      <div className="space-y-3 animate-slide-up">
+        {/* Header Card with Phone */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-green/20 via-neon-cyan/10 to-neon-green/5 border border-neon-green/50 p-4">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-neon-green/10 rounded-full blur-2xl" />
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-neon-green/20 border border-neon-green/50">
+              <Phone className="w-6 h-6 text-neon-green" />
+            </div>
+            <div>
+              <p className="text-xs text-neon-green/70 uppercase tracking-wider">Mobile Number</p>
+              <p className="text-xl font-display font-bold text-neon-green">{info.mobile || "N/A"}</p>
+            </div>
+          </div>
+          {info.circle && (
+            <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-neon-cyan/20 border border-neon-cyan/30">
+              <Globe className="w-3 h-3 text-neon-cyan" />
+              <span className="text-xs font-medium text-neon-cyan">{info.circle}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Owner Info */}
+        {info.name && (
+          <div className="rounded-xl bg-gradient-to-r from-neon-pink/15 to-neon-purple/10 border border-neon-pink/40 p-3">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-neon-pink" />
+              <span className="text-xs text-neon-pink/70 uppercase">Name</span>
+            </div>
+            <p className="mt-1 font-semibold text-neon-pink text-lg">{info.name}</p>
+            {info.father_name && (
+              <p className="text-xs text-muted-foreground mt-1">Father: {info.father_name}</p>
+            )}
+          </div>
+        )}
+
+        {/* Address */}
+        {info.address && (
+          <div className="rounded-xl bg-gradient-to-r from-neon-orange/15 to-neon-yellow/10 border border-neon-orange/40 p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-4 h-4 text-neon-orange" />
+              <span className="text-xs text-neon-orange/70 uppercase">Address</span>
+            </div>
+            <p className="text-sm text-neon-orange">{info.address}</p>
+          </div>
+        )}
+
+        {/* Grid Info Cards */}
+        <div className="grid grid-cols-2 gap-2">
+          {info.alt_mobile && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-cyan/15 to-neon-green/10 border border-neon-cyan/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-neon-cyan" />
+                <span className="text-[10px] text-neon-cyan/70 uppercase">Alt Mobile</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-cyan">{info.alt_mobile}</p>
+            </div>
+          )}
+          
+          {info.email && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-purple/15 to-neon-pink/10 border border-neon-purple/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-neon-purple" />
+                <span className="text-[10px] text-neon-purple/70 uppercase">Email</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-purple truncate">{info.email}</p>
+            </div>
+          )}
+
+          {info.id_number && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-yellow/15 to-neon-orange/10 border border-neon-yellow/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-neon-yellow" />
+                <span className="text-[10px] text-neon-yellow/70 uppercase">ID Number</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-yellow">{info.id_number}</p>
+            </div>
+          )}
+
+          {info.id && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-red/15 to-neon-pink/10 border border-neon-red/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <Database className="w-3.5 h-3.5 text-neon-red" />
+                <span className="text-[10px] text-neon-red/70 uppercase">Record ID</span>
+              </div>
+              <p className="mt-1 text-xs font-medium text-neon-red truncate">{info.id}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Source */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT</p>
+      </div>
+    );
+  };
+
   const renderDefaultResult = () => (
     <div className="border border-neon-green/30 rounded-lg p-4 bg-muted/30 animate-slide-up">
       <div className="flex items-center justify-between mb-3">
@@ -463,9 +620,11 @@ const NumberDetailFinder = () => {
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
               <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : "📊 RESULTS"}
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : "📊 RESULTS"}
               </h3>
-              {activeButton?.searchType === "vehicle" ? renderVehicleResult(result) : renderDefaultResult()}
+              {activeButton?.searchType === "vehicle" 
+                ? renderVehicleResult(result) 
+                : (result?.type === "phone" ? renderPhoneResult(result.data) : renderDefaultResult())}
             </div>
           )}
         </div>
