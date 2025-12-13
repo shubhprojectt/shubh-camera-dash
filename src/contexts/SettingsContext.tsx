@@ -40,8 +40,6 @@ const defaultTabs: TabConfig[] = [
   { id: "family", label: "Family", icon: "Users", color: "purple", placeholder: "Enter name/number...", searchType: "family", apiUrl: "", enabled: true },
   { id: "manual", label: "Manual", icon: "ClipboardPaste", color: "yellow", placeholder: "Enter number...", searchType: "manual", apiUrl: "https://hydrashop.in.net/number.php?q=", enabled: true },
   { id: "shubh", label: "CAM HACK", icon: "Sparkles", color: "cyan", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
-  { id: "phishing", label: "Phishing", icon: "Code", color: "red", placeholder: "Enter target URL...", searchType: "phishing", apiUrl: "", enabled: true },
-  { id: "webcam", label: "Webcam", icon: "Globe", color: "pink", placeholder: "Enter IP/location...", searchType: "webcam", apiUrl: "", enabled: true },
   { id: "darkdb", label: "DARK DB", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://shubhinfo.vercel.app/", enabled: true },
 ];
 
