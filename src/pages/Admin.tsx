@@ -76,7 +76,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "tabs" | "darkdb" | "theme" | "password" | "history">("header");
+  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -200,6 +200,7 @@ const Admin = () => {
         <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
           {[
             { id: "header", icon: Type, label: "Header" },
+            { id: "background", icon: Image, label: "Background" },
             { id: "tabs", icon: LayoutGrid, label: "Tabs" },
             { id: "darkdb", icon: Database, label: "DARK DB" },
             { id: "theme", icon: Palette, label: "Theme" },
@@ -396,6 +397,56 @@ const Admin = () => {
                   ) : null;
                 })}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Background Section */}
+        {activeSection === "background" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-cyan mb-4">Background Configuration</h2>
+            
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-green flex items-center gap-2">
+                <Image className="w-4 h-4" /> Custom Background Image
+              </h3>
+              <p className="text-xs text-muted-foreground">Upload a custom background image for the website. Leave empty for solid black background.</p>
+              
+              {settings.backgroundImage ? (
+                <div className="space-y-4">
+                  <div className="w-full h-40 rounded-xl border-2 border-neon-green overflow-hidden">
+                    <img src={settings.backgroundImage} alt="Background Preview" className="w-full h-full object-cover" />
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => updateSettings({ backgroundImage: "" })}
+                    className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+                  >
+                    <X className="w-4 h-4 mr-1" /> Remove Background
+                  </Button>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-neon-cyan/50 rounded-xl cursor-pointer hover:bg-neon-cyan/5 transition-all">
+                  <Upload className="w-8 h-8 text-neon-cyan mb-2" />
+                  <span className="text-sm text-neon-cyan">Click to upload background image</span>
+                  <span className="text-xs text-muted-foreground mt-1">Recommended: High resolution image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          updateSettings({ backgroundImage: reader.result as string });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
+              )}
             </div>
           </div>
         )}
