@@ -82,30 +82,36 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-2 p-3 rounded-2xl border-2 transition-all duration-300",
-        "active:scale-90 min-h-[80px]",
+        "group relative flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border-[3px] transition-all duration-300",
+        "active:scale-90 min-h-[90px]",
         colors.border,
         colors.text,
         colors.hoverGlow,
-        "hover:scale-[1.03]",
-        active ? [colors.activeBg, colors.glow, "scale-[1.02]"] : [colors.bg, "border-opacity-70"]
+        "hover:scale-[1.05]",
+        active ? [colors.activeBg, colors.glow, "scale-[1.03]"] : [colors.bg, "border-opacity-80"]
       )}
     >
       {/* Animated pulse ring on active */}
       {active && (
-        <div className="absolute inset-0 rounded-2xl border-2 border-current animate-ping opacity-20" />
+        <div className="absolute inset-0 rounded-2xl border-[3px] border-current animate-ping opacity-25" />
       )}
+      
+      {/* Corner accents */}
+      <div className="absolute top-1 left-1 w-2 h-2 border-l-2 border-t-2 border-current opacity-60" />
+      <div className="absolute top-1 right-1 w-2 h-2 border-r-2 border-t-2 border-current opacity-60" />
+      <div className="absolute bottom-1 left-1 w-2 h-2 border-l-2 border-b-2 border-current opacity-60" />
+      <div className="absolute bottom-1 right-1 w-2 h-2 border-r-2 border-b-2 border-current opacity-60" />
       
       {/* Icon */}
       <Icon className={cn(
-        "w-6 h-6 transition-all duration-300",
+        "w-7 h-7 transition-all duration-300",
         active ? colors.iconGlow : "group-hover:scale-110"
       )} />
       
       {/* Label */}
       <span className={cn(
-        "text-[11px] font-bold tracking-wide uppercase text-center leading-tight",
-        active && "drop-shadow-[0_0_8px_currentColor]"
+        "text-[11px] font-black tracking-wider uppercase text-center leading-tight",
+        active && "drop-shadow-[0_0_10px_currentColor]"
       )}>
         {label}
       </span>
