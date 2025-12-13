@@ -18,7 +18,17 @@ const ShubhCam = () => {
   const [redirectUrl, setRedirectUrl] = useState("https://google.com");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState(() => Math.random().toString(36).substring(2, 10));
+  
+  // Persist session ID in localStorage so it survives page refresh
+  const [sessionId, setSessionId] = useState(() => {
+    const savedSessionId = localStorage.getItem('shubhcam_session_id');
+    if (savedSessionId) {
+      return savedSessionId;
+    }
+    const newSessionId = Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('shubhcam_session_id', newSessionId);
+    return newSessionId;
+  });
 
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -60,6 +70,7 @@ const ShubhCam = () => {
 
   const generateNewSession = () => {
     const newSessionId = Math.random().toString(36).substring(2, 10);
+    localStorage.setItem('shubhcam_session_id', newSessionId);
     setSessionId(newSessionId);
     setPhotos([]);
     toast({
