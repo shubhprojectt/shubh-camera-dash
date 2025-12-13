@@ -62,9 +62,6 @@ const Index = () => {
         <div className="fixed bottom-0 left-0 w-32 h-32 border-l-2 border-b-2 border-neon-cyan/30" />
         <div className="fixed bottom-0 right-0 w-32 h-32 border-r-2 border-b-2 border-neon-purple/30" />
         
-        {/* Animated bottom bar */}
-        <div className="fixed bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-green via-neon-pink via-neon-cyan to-neon-purple animate-gradient-shift" />
-        
       </div>
     </PasswordProtection>
   );
