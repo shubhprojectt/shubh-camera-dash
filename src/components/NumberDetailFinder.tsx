@@ -386,7 +386,7 @@ const NumberDetailFinder = () => {
           </div>
           
           {/* Search Input - Shows when a non-camhack and non-darkdb tab is selected */}
-          {activeTab && activeButton && activeButton.searchType !== "camhack" && activeButton.searchType !== "darkdb" && (
+          {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && (
             <div className="relative mt-3 animate-slide-up">
               <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
                 <Input
@@ -410,7 +410,7 @@ const NumberDetailFinder = () => {
       </div>
       
       {/* ShubhCam - shows when camhack tab is active */}
-      {activeButton?.searchType === "camhack" && <ShubhCam />}
+      {activeButton?.searchType === "shubh" && <ShubhCam />}
 
       {/* DARK DB iframe - shows when darkdb tab is active */}
       {activeButton?.searchType === "darkdb" && (
@@ -439,7 +439,7 @@ const NumberDetailFinder = () => {
       )}
 
       {/* Results Section */}
-      {activeTab && activeButton && activeButton.searchType !== "camhack" && activeButton.searchType !== "darkdb" && (
+      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && (
         <div>
           {/* Loading */}
           {loading && (
