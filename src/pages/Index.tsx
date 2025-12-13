@@ -8,7 +8,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="h-screen bg-black relative overflow-hidden">
+      <div className="min-h-screen bg-black relative overflow-hidden">
         {/* Custom background image or solid black */}
         {settings.backgroundImage ? (
           <div 
@@ -20,9 +20,9 @@ const Index = () => {
         )}
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col">
+        <div className="relative z-10 container mx-auto px-4 pb-12">
           <Header />
-          <main className="max-w-3xl mx-auto flex-1 flex items-center justify-center">
+          <main className="max-w-3xl mx-auto">
             <NumberDetailFinder />
           </main>
         </div>
