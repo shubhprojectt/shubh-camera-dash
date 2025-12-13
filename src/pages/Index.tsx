@@ -37,9 +37,9 @@ const Index = () => {
         {/* Animated bottom bar */}
         <div className="fixed bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-green via-neon-pink via-neon-cyan to-neon-purple animate-gradient-shift" />
         
-        {/* Side accent lines */}
-        <div className="fixed left-4 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-green/50 to-transparent" />
-        <div className="fixed right-4 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-pink/50 to-transparent" />
+        {/* Side accent lines - hidden on mobile, visible on larger screens */}
+        <div className="fixed left-0 md:left-2 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-green/50 to-transparent" />
+        <div className="fixed right-0 md:right-2 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-pink/50 to-transparent" />
       </div>
     </PasswordProtection>
   );
