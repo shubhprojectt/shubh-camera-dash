@@ -20,9 +20,9 @@ const Index = () => {
         )}
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 pb-12">
+        <div className="relative z-10 container mx-auto px-4 h-full flex flex-col">
           <Header />
-          <main className="max-w-3xl mx-auto">
+          <main className="max-w-3xl mx-auto flex-1 flex items-center justify-center">
             <NumberDetailFinder />
           </main>
         </div>
