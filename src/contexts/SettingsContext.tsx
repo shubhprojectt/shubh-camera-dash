@@ -30,6 +30,8 @@ export interface AppSettings {
   darkDbHeight: string;
   darkDbBorderColor: string;
   darkDbBorderWidth: string;
+  // Background settings
+  backgroundImage: string;
 }
 
 const defaultTabs: TabConfig[] = [
@@ -61,6 +63,8 @@ const defaultSettings: AppSettings = {
   darkDbHeight: "90",
   darkDbBorderColor: "purple",
   darkDbBorderWidth: "2",
+  // Background defaults
+  backgroundImage: "",
 };
 
 interface SettingsContextType {

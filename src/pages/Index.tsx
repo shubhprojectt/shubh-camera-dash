@@ -1,13 +1,26 @@
 import Header from "@/components/Header";
 import NumberDetailFinder from "@/components/NumberDetailFinder";
 import PasswordProtection from "@/components/PasswordProtection";
+import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
+  const { settings } = useSettings();
+
   return (
     <PasswordProtection>
-      <div className="min-h-screen bg-background relative overflow-hidden">
-        {/* Deep space gradient base */}
-        <div className="fixed inset-0 bg-gradient-to-br from-[#0a0a0f] via-[#0d0d1a] to-[#0a0f0a]" />
+      <div className="min-h-screen bg-black relative overflow-hidden">
+        {/* Custom background image or solid black */}
+        {settings.backgroundImage ? (
+          <div 
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url(${settings.backgroundImage})` }}
+          />
+        ) : (
+          <div className="fixed inset-0 bg-black" />
+        )}
+        
+        {/* Dark overlay for readability */}
+        <div className="fixed inset-0 bg-black/50" />
         
         {/* Animated mesh gradient */}
         <div className="fixed inset-0 opacity-40">
@@ -52,9 +65,6 @@ const Index = () => {
         {/* Animated bottom bar */}
         <div className="fixed bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-neon-green via-neon-pink via-neon-cyan to-neon-purple animate-gradient-shift" />
         
-        {/* Side accent lines - hidden on mobile, visible on larger screens */}
-        <div className="fixed left-0 md:left-2 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-green/50 to-transparent" />
-        <div className="fixed right-0 md:right-2 top-1/4 bottom-1/4 w-px bg-gradient-to-b from-transparent via-neon-pink/50 to-transparent" />
       </div>
     </PasswordProtection>
   );
