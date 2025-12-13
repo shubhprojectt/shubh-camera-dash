@@ -385,8 +385,8 @@ const NumberDetailFinder = () => {
             })}
           </div>
           
-          {/* Search Input - Shows when a non-SHUBH and non-DARK DB tab is selected */}
-          {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && activeButton && (
+          {/* Search Input - Shows when a non-camhack and non-darkdb tab is selected */}
+          {activeTab && activeButton && activeButton.searchType !== "camhack" && activeButton.searchType !== "darkdb" && (
             <div className="relative mt-3 animate-slide-up">
               <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
                 <Input
@@ -409,11 +409,11 @@ const NumberDetailFinder = () => {
         </div>
       </div>
       
-      {/* ShubhCam - shows when SHUBH tab is active */}
-      {activeTab === "CAM HACK" && <ShubhCam />}
+      {/* ShubhCam - shows when camhack tab is active */}
+      {activeButton?.searchType === "camhack" && <ShubhCam />}
 
-      {/* DARK DB iframe - shows when DARK DB tab is active */}
-      {activeTab === "DARK DB" && (
+      {/* DARK DB iframe - shows when darkdb tab is active */}
+      {activeButton?.searchType === "darkdb" && (
         <div className="animate-slide-up">
           <div 
             className="relative rounded-2xl overflow-hidden"
@@ -439,7 +439,7 @@ const NumberDetailFinder = () => {
       )}
 
       {/* Results Section */}
-      {activeTab && activeTab !== "SHUBH" && activeTab !== "DARK DB" && (
+      {activeTab && activeButton && activeButton.searchType !== "camhack" && activeButton.searchType !== "darkdb" && (
         <div>
           {/* Loading */}
           {loading && (
