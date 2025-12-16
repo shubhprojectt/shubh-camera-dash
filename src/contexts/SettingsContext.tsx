@@ -60,7 +60,7 @@ const defaultSettings: AppSettings = {
   tabs: defaultTabs,
   // DARK DB defaults
   darkDbUrl: "https://shubhinfo.vercel.app/",
-  darkDbHeight: "90",
+  darkDbHeight: "70",
   darkDbBorderColor: "purple",
   darkDbBorderWidth: "2",
   // Background defaults
