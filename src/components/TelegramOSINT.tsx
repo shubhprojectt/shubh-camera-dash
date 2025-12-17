@@ -3,8 +3,8 @@ import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
-const JWT_TOKEN = "PASTE_JWT_TOKEN_HERE";
-const BASE_URL = "https://api.telegram-osint.com"; // Replace with actual API base URL
+const JWT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MjcwODU1NTI3IiwianRpIjoiNDhiMmFjODktN2VkZS00NTRlLWE5MjAtODE0Nzg0OGEzYWE0IiwiZXhwIjoxNzk3NDQ0NjQ0fQ.SToaZbha-xTT5WDeJrUFoSzgmCVuBKxHVR6mpvGcwjUPXxcfWQFLqwOlqUtO99r9rRnR_ZNd229rg_qbLxUKLdQhQCeHYgwr-fDhesy0QwKJBLCE34hvDXjD9F1_SEsrynx-hBGBKWlZ13MjkYwSQs_vjm7WobIeY9MSMykzp1E";
+const BASE_URL = "https://funstat.info";
 
 interface ToolButton {
   id: string;
