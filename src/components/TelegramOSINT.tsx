@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker, UserPlus, Loader2, ExternalLink, Lock, AlertTriangle, Database } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useSettings } from '@/contexts/SettingsContext';
 
-const JWT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MjcwODU1NTI3IiwianRpIjoiNDhiMmFjODktN2VkZS00NTRlLWE5MjAtODE0Nzg0OGEzYWE0IiwiZXhwIjoxNzk3NDQ0NjQ0fQ.SToaZbha-xTT5WDeJrUFoSzgmCVuBKxHVR6mpvGcwjUPXxcfWQFLqwOlqUtO99r9rRnR_ZNd229rg_qbLxUKLdQhQCeHYgwr-fDhesy0QwKJBLCE34hvDXjD9F1_SEsrynx-hBGBKWlZ13MjkYwSQs_vjm7WobIeY9MSMykzp1E";
-const BASE_URL = "https://funstat.info";
 const CACHE_KEY = 'telegram_osint_cache';
 
 interface ToolButton {
@@ -14,6 +13,7 @@ interface ToolButton {
   color: string;
   cost: string;
   needsUsername?: boolean;
+  enabled: boolean;
 }
 
 interface CacheEntry {
@@ -21,21 +21,21 @@ interface CacheEntry {
   timestamp: number;
 }
 
-const tools: ToolButton[] = [
-  { id: 'basic_info', label: 'BASIC INFO', icon: <User size={24} />, color: 'green', cost: '0.10 credit' },
-  { id: 'groups', label: 'GROUPS', icon: <Users size={24} />, color: 'cyan', cost: '5 credits' },
-  { id: 'group_count', label: 'GROUP COUNT', icon: <Users size={24} />, color: 'yellow', cost: 'FREE' },
-  { id: 'messages_count', label: 'MESSAGES COUNT', icon: <MessageSquare size={24} />, color: 'green', cost: 'FREE' },
-  { id: 'messages', label: 'MESSAGES (LIMITED)', icon: <MessageSquare size={24} />, color: 'pink', cost: '10 credits' },
-  { id: 'stats_min', label: 'BASIC STATS', icon: <BarChart3 size={24} />, color: 'purple', cost: 'FREE' },
-  { id: 'stats', label: 'FULL STATS', icon: <BarChart3 size={24} />, color: 'green', cost: '1 credit' },
-  { id: 'reputation', label: 'REPUTATION', icon: <Shield size={24} />, color: 'pink', cost: 'FREE' },
-  { id: 'resolve_username', label: 'USERNAME RESOLVE', icon: <AtSign size={24} />, color: 'yellow', cost: '0.10 credit', needsUsername: true },
-  { id: 'username_usage', label: 'USERNAME USAGE', icon: <UserPlus size={24} />, color: 'green', cost: '0.1 credit', needsUsername: true },
-  { id: 'usernames', label: 'USERNAMES HISTORY', icon: <History size={24} />, color: 'pink', cost: '3 credits' },
-  { id: 'names', label: 'NAMES HISTORY', icon: <History size={24} />, color: 'purple', cost: '3 credits' },
-  { id: 'stickers', label: 'STICKERS', icon: <Sticker size={24} />, color: 'cyan', cost: '1 credit' },
-  { id: 'common_groups', label: 'COMMON GROUPS', icon: <Users size={24} />, color: 'yellow', cost: '5 credits' },
+const defaultToolsConfig = [
+  { id: 'basic_info', icon: <User size={24} />, color: 'green', needsUsername: false },
+  { id: 'groups', icon: <Users size={24} />, color: 'cyan', needsUsername: false },
+  { id: 'group_count', icon: <Users size={24} />, color: 'yellow', needsUsername: false },
+  { id: 'messages_count', icon: <MessageSquare size={24} />, color: 'green', needsUsername: false },
+  { id: 'messages', icon: <MessageSquare size={24} />, color: 'pink', needsUsername: false },
+  { id: 'stats_min', icon: <BarChart3 size={24} />, color: 'purple', needsUsername: false },
+  { id: 'stats', icon: <BarChart3 size={24} />, color: 'green', needsUsername: false },
+  { id: 'reputation', icon: <Shield size={24} />, color: 'pink', needsUsername: false },
+  { id: 'resolve_username', icon: <AtSign size={24} />, color: 'yellow', needsUsername: true },
+  { id: 'username_usage', icon: <UserPlus size={24} />, color: 'green', needsUsername: true },
+  { id: 'usernames', icon: <History size={24} />, color: 'pink', needsUsername: false },
+  { id: 'names', icon: <History size={24} />, color: 'purple', needsUsername: false },
+  { id: 'stickers', icon: <Sticker size={24} />, color: 'cyan', needsUsername: false },
+  { id: 'common_groups', icon: <Users size={24} />, color: 'yellow', needsUsername: false },
 ];
 
 const colorClasses: Record<string, string> = {
@@ -47,6 +47,7 @@ const colorClasses: Record<string, string> = {
 };
 
 const TelegramOSINT: React.FC = () => {
+  const { settings } = useSettings();
   const [userId, setUserId] = useState('');
   const [username, setUsername] = useState('');
   const [activeTool, setActiveTool] = useState<string | null>(null);
@@ -55,6 +56,23 @@ const TelegramOSINT: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFromCache, setIsFromCache] = useState(false);
   const [cache, setCache] = useState<Record<string, CacheEntry>>({});
+
+  // Get JWT token and base URL from settings
+  const JWT_TOKEN = settings.telegramOsint?.jwtToken || "";
+  const BASE_URL = settings.telegramOsint?.baseUrl || "https://funstat.info";
+
+  // Merge settings tools with default config
+  const tools: ToolButton[] = useMemo(() => {
+    return defaultToolsConfig.map(defaultTool => {
+      const settingsTool = settings.telegramOsint?.tools?.find(t => t.id === defaultTool.id);
+      return {
+        ...defaultTool,
+        label: settingsTool?.label || defaultTool.id.toUpperCase().replace('_', ' '),
+        cost: settingsTool?.cost || 'FREE',
+        enabled: settingsTool?.enabled ?? true,
+      };
+    });
+  }, [settings.telegramOsint?.tools]);
 
   // Load cache from localStorage on mount
   useEffect(() => {
@@ -376,7 +394,7 @@ const TelegramOSINT: React.FC = () => {
       {/* Tools Grid */}
       <div className="bg-black/40 border border-gray-800 rounded-xl p-4 mb-6">
         <div className="grid grid-cols-3 gap-3">
-          {tools.map((tool) => (
+          {tools.filter(t => t.enabled).map((tool) => (
             <button
               key={tool.id}
               onClick={() => handleToolClick(tool)}

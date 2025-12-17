@@ -12,6 +12,19 @@ export interface TabConfig {
   enabled: boolean;
 }
 
+export interface TelegramToolConfig {
+  id: string;
+  label: string;
+  enabled: boolean;
+  cost: string;
+}
+
+export interface TelegramOsintSettings {
+  jwtToken: string;
+  baseUrl: string;
+  tools: TelegramToolConfig[];
+}
+
 export interface AppSettings {
   sitePassword: string;
   adminPassword: string;
@@ -32,7 +45,26 @@ export interface AppSettings {
   darkDbBorderWidth: string;
   // Background settings
   backgroundImage: string;
+  // Telegram OSINT settings
+  telegramOsint: TelegramOsintSettings;
 }
+
+const defaultTelegramTools: TelegramToolConfig[] = [
+  { id: 'basic_info', label: 'BASIC INFO', enabled: true, cost: '0.10 credit' },
+  { id: 'groups', label: 'GROUPS', enabled: true, cost: '5 credits' },
+  { id: 'group_count', label: 'GROUP COUNT', enabled: true, cost: 'FREE' },
+  { id: 'messages_count', label: 'MESSAGES COUNT', enabled: true, cost: 'FREE' },
+  { id: 'messages', label: 'MESSAGES (LIMITED)', enabled: true, cost: '10 credits' },
+  { id: 'stats_min', label: 'BASIC STATS', enabled: true, cost: 'FREE' },
+  { id: 'stats', label: 'FULL STATS', enabled: true, cost: '1 credit' },
+  { id: 'reputation', label: 'REPUTATION', enabled: true, cost: 'FREE' },
+  { id: 'resolve_username', label: 'USERNAME RESOLVE', enabled: true, cost: '0.10 credit' },
+  { id: 'username_usage', label: 'USERNAME USAGE', enabled: true, cost: '0.1 credit' },
+  { id: 'usernames', label: 'USERNAMES HISTORY', enabled: true, cost: '3 credits' },
+  { id: 'names', label: 'NAMES HISTORY', enabled: true, cost: '3 credits' },
+  { id: 'stickers', label: 'STICKERS', enabled: true, cost: '1 credit' },
+  { id: 'common_groups', label: 'COMMON GROUPS', enabled: true, cost: '5 credits' },
+];
 
 const defaultTabs: TabConfig[] = [
   { id: "phone", label: "Phone", icon: "Phone", color: "green", placeholder: "Enter phone number...", searchType: "phone", apiUrl: "", enabled: true },
@@ -66,12 +98,19 @@ const defaultSettings: AppSettings = {
   darkDbBorderWidth: "2",
   // Background defaults
   backgroundImage: "",
+  // Telegram OSINT defaults
+  telegramOsint: {
+    jwtToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MjcwODU1NTI3IiwianRpIjoiNDhiMmFjODktN2VkZS00NTRlLWE5MjAtODE0Nzg0OGEzYWE0IiwiZXhwIjoxNzk3NDQ0NjQ0fQ.SToaZbha-xTT5WDeJrUFoSzgmCVuBKxHVR6mpvGcwjUPXxcfWQFLqwOlqUtO99r9rRnR_ZNd229rg_qbLxUKLdQhQCeHYgwr-fDhesy0QwKJBLCE34hvDXjD9F1_SEsrynx-hBGBKWlZ13MjkYwSQs_vjm7WobIeY9MSMykzp1E",
+    baseUrl: "https://funstat.info",
+    tools: defaultTelegramTools,
+  },
 };
 
 interface SettingsContextType {
   settings: AppSettings;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   updateTab: (tabId: string, updates: Partial<TabConfig>) => void;
+  updateTelegramTool: (toolId: string, updates: Partial<TelegramToolConfig>) => void;
   resetSettings: () => void;
 }
 
@@ -169,6 +208,22 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
+  const updateTelegramTool = (toolId: string, updates: Partial<TelegramToolConfig>) => {
+    setSettings(prev => {
+      const updated = {
+        ...prev,
+        telegramOsint: {
+          ...prev.telegramOsint,
+          tools: prev.telegramOsint.tools.map(tool =>
+            tool.id === toolId ? { ...tool, ...updates } : tool
+          ),
+        },
+      };
+      saveToSupabase(updated);
+      return updated;
+    });
+  };
+
   const resetSettings = async () => {
     setSettings(defaultSettings);
     localStorage.removeItem("app_settings");
@@ -181,7 +236,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, updateTab, resetSettings }}>
+    <SettingsContext.Provider value={{ settings, updateSettings, updateTab, updateTelegramTool, resetSettings }}>
       {children}
     </SettingsContext.Provider>
   );
