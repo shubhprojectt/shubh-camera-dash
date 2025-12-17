@@ -129,13 +129,13 @@ const TelegramOSINT: React.FC = () => {
 
   const renderBasicInfo = (data: any) => (
     <div className="grid grid-cols-2 gap-3">
-      <InfoCard label="User ID" value={data.id || 'N/A'} color="cyan" />
-      <InfoCard label="Username" value={data.username ? `@${data.username}` : 'N/A'} color="green" />
-      <InfoCard label="First Name" value={data.first_name || 'N/A'} color="pink" />
-      <InfoCard label="Last Name" value={data.last_name || 'N/A'} color="yellow" />
-      <InfoCard label="Is Bot" value={data.is_bot ? 'Yes' : 'No'} color="purple" />
-      <InfoCard label="Is Active" value={data.is_active ? 'Yes' : 'No'} color="green" />
-      <InfoCard label="Premium" value={data.is_premium ? 'Yes' : 'No'} color="cyan" />
+      <InfoCard label="User ID" value={data?.id || 'N/A'} color="cyan" />
+      <InfoCard label="Username" value={data?.username ? `@${data.username}` : 'N/A'} color="green" />
+      <InfoCard label="First Name" value={data?.first_name || 'N/A'} color="pink" />
+      <InfoCard label="Last Name" value={data?.last_name || 'N/A'} color="yellow" />
+      <InfoCard label="Is Bot" value={data?.is_bot ? 'Yes' : 'No'} color="purple" />
+      <InfoCard label="Is Active" value={data?.is_active ? 'Yes' : 'No'} color="green" />
+      <InfoCard label="Premium" value={data?.has_premium || data?.is_premium ? 'Yes' : 'No'} color="cyan" />
     </div>
   );
 
@@ -182,10 +182,20 @@ const TelegramOSINT: React.FC = () => {
 
   const renderStats = (data: any) => (
     <div className="grid grid-cols-2 gap-3">
-      <InfoCard label="Language" value={data.language || 'N/A'} color="cyan" />
-      <InfoCard label="Activity %" value={`${data.activity_percent || 0}%`} color="green" />
-      <InfoCard label="Reply %" value={`${data.reply_percent || 0}%`} color="pink" />
-      <InfoCard label="Media Usage" value={data.media_summary || 'N/A'} color="yellow" />
+      <InfoCard label="Language" value={data?.lang_code || 'N/A'} color="cyan" />
+      <InfoCard label="Total Messages" value={data?.total_msg_count || 0} color="green" />
+      <InfoCard label="Reply %" value={`${data?.reply_percent || 0}%`} color="pink" />
+      <InfoCard label="Media %" value={`${data?.media_percent || 0}%`} color="yellow" />
+      <InfoCard label="Unique %" value={`${data?.unique_percent || 0}%`} color="purple" />
+      <InfoCard label="Link %" value={`${data?.link_percent || 0}%`} color="cyan" />
+      <InfoCard label="Total Groups" value={data?.total_groups || 0} color="green" />
+      <InfoCard label="Admin In" value={data?.adm_in_groups || 0} color="pink" />
+      {data?.favorite_chat && (
+        <div className="col-span-2 bg-black/50 border border-neon-purple/30 rounded-lg p-3">
+          <span className="text-gray-400 text-xs block mb-1">Favorite Chat</span>
+          <span className="text-neon-purple font-mono">{data.favorite_chat.title}</span>
+        </div>
+      )}
     </div>
   );
 
@@ -214,27 +224,34 @@ const TelegramOSINT: React.FC = () => {
   const renderResult = () => {
     if (!result) return null;
     
+    // Extract data from API response wrapper
+    const apiData = result.data;
+    if (!apiData) return renderGenericResult(result);
+    
+    // For basic_info, data is an array - get first element
+    const userData = Array.isArray(apiData) ? apiData[0] : apiData;
+    
     switch (activeTool) {
       case 'basic_info':
       case 'resolve_username':
-        return renderBasicInfo(result);
+        return renderBasicInfo(userData);
       case 'groups':
-        return renderGroups(result);
+        return renderGroups(apiData);
       case 'group_count':
-        return <InfoCard label="Total Groups" value={result.count || result.groups_count || 0} color="yellow" />;
+        return <InfoCard label="Total Groups" value={userData?.count || userData?.groups_count || userData?.total_groups || 0} color="yellow" />;
       case 'messages_count':
-        return <InfoCard label="Total Messages" value={result.count || result.messages_count || 0} color="green" />;
+        return <InfoCard label="Total Messages" value={userData?.count || userData?.messages_count || userData?.total_msg_count || 0} color="green" />;
       case 'stats_min':
       case 'stats':
-        return renderStats(result);
+        return renderStats(userData);
       case 'reputation':
-        return <InfoCard label="Reputation Score" value={result.score || result.reputation || 'N/A'} color="pink" />;
+        return <InfoCard label="Reputation Score" value={userData?.score || userData?.reputation || 'N/A'} color="pink" />;
       case 'usernames':
-        return renderHistory(result, 'usernames');
+        return renderHistory(apiData, 'usernames');
       case 'names':
-        return renderHistory(result, 'names');
+        return renderHistory(apiData, 'names');
       default:
-        return renderGenericResult(result);
+        return renderGenericResult(apiData);
     }
   };
 
