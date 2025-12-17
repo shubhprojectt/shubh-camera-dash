@@ -17,7 +17,8 @@ import {
   Type,
   Upload,
   X,
-  Image
+  Image,
+  Send
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -75,8 +76,8 @@ interface SearchHistoryItem {
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { settings, updateSettings, updateTab, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "theme" | "password" | "history">("header");
+  const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings } = useSettings();
+  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -203,6 +204,7 @@ const Admin = () => {
             { id: "background", icon: Image, label: "Background" },
             { id: "tabs", icon: LayoutGrid, label: "Tabs" },
             { id: "darkdb", icon: Database, label: "DARK DB" },
+            { id: "telegram", icon: Send, label: "Telegram" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
             { id: "history", icon: History, label: "History" },
@@ -621,6 +623,74 @@ const Admin = () => {
                 }}
               >
                 <span className="text-muted-foreground text-sm">Iframe Preview Border</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Telegram OSINT Section */}
+        {activeSection === "telegram" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-cyan mb-4 flex items-center gap-2">
+              <Send className="w-5 h-5" /> Telegram OSINT Configuration
+            </h2>
+            
+            {/* JWT Token */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-green">JWT Token</h3>
+              <p className="text-xs text-muted-foreground">API authentication token for funstat.info</p>
+              <Input
+                type="password"
+                value={settings.telegramOsint?.jwtToken || ""}
+                onChange={(e) => updateSettings({ 
+                  telegramOsint: { ...settings.telegramOsint, jwtToken: e.target.value } 
+                })}
+                placeholder="eyJhbGciOiJSUzI1NiIs..."
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {/* Base URL */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-pink">API Base URL</h3>
+              <Input
+                value={settings.telegramOsint?.baseUrl || "https://funstat.info"}
+                onChange={(e) => updateSettings({ 
+                  telegramOsint: { ...settings.telegramOsint, baseUrl: e.target.value } 
+                })}
+                placeholder="https://funstat.info"
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {/* Tools Configuration */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-orange">Tools Configuration</h3>
+              <p className="text-xs text-muted-foreground">Enable/disable individual tools and customize labels</p>
+              
+              <div className="space-y-3 mt-4">
+                {settings.telegramOsint?.tools?.map((tool) => (
+                  <div key={tool.id} className="flex items-center gap-3 p-3 bg-background/50 rounded-lg border border-border/30">
+                    <Switch
+                      checked={tool.enabled}
+                      onCheckedChange={(checked) => updateTelegramTool(tool.id, { enabled: checked })}
+                    />
+                    <div className="flex-1">
+                      <Input
+                        value={tool.label}
+                        onChange={(e) => updateTelegramTool(tool.id, { label: e.target.value })}
+                        className="h-8 text-sm"
+                      />
+                    </div>
+                    <span className={`text-xs px-2 py-1 rounded ${
+                      tool.cost === 'FREE' 
+                        ? 'bg-neon-green/20 text-neon-green' 
+                        : 'bg-neon-yellow/20 text-neon-yellow'
+                    }`}>
+                      {tool.cost}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
