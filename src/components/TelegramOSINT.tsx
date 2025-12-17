@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker, UserPlus, Loader2, ExternalLink, Lock, AlertTriangle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker, UserPlus, Loader2, ExternalLink, Lock, AlertTriangle, Database } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 
 const JWT_TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MjcwODU1NTI3IiwianRpIjoiNDhiMmFjODktN2VkZS00NTRlLWE5MjAtODE0Nzg0OGEzYWE0IiwiZXhwIjoxNzk3NDQ0NjQ0fQ.SToaZbha-xTT5WDeJrUFoSzgmCVuBKxHVR6mpvGcwjUPXxcfWQFLqwOlqUtO99r9rRnR_ZNd229rg_qbLxUKLdQhQCeHYgwr-fDhesy0QwKJBLCE34hvDXjD9F1_SEsrynx-hBGBKWlZ13MjkYwSQs_vjm7WobIeY9MSMykzp1E";
 const BASE_URL = "https://funstat.info";
+const CACHE_KEY = 'telegram_osint_cache';
 
 interface ToolButton {
   id: string;
@@ -13,6 +14,11 @@ interface ToolButton {
   color: string;
   cost: string;
   needsUsername?: boolean;
+}
+
+interface CacheEntry {
+  data: any;
+  timestamp: number;
 }
 
 const tools: ToolButton[] = [
@@ -47,11 +53,41 @@ const TelegramOSINT: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isFromCache, setIsFromCache] = useState(false);
+  const [cache, setCache] = useState<Record<string, CacheEntry>>({});
+
+  // Load cache from localStorage on mount
+  useEffect(() => {
+    const savedCache = localStorage.getItem(CACHE_KEY);
+    if (savedCache) {
+      try {
+        setCache(JSON.parse(savedCache));
+      } catch (e) {
+        console.error('Failed to load cache:', e);
+      }
+    }
+  }, []);
+
+  // Save cache to localStorage whenever it changes
+  useEffect(() => {
+    if (Object.keys(cache).length > 0) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+    }
+  }, [cache]);
+
+  const getCacheKey = (toolId: string): string => {
+    const tool = tools.find(t => t.id === toolId);
+    if (tool?.needsUsername) {
+      return `${toolId}_${username}`;
+    }
+    return `${toolId}_${userId}`;
+  };
 
   const handleToolClick = (tool: ToolButton) => {
     setActiveTool(tool.id);
     setResult(null);
     setError(null);
+    setIsFromCache(false);
   };
 
   const getEndpoint = (toolId: string): string => {
@@ -102,9 +138,20 @@ const TelegramOSINT: React.FC = () => {
       return;
     }
 
+    // Check cache first
+    const cacheKey = getCacheKey(activeTool!);
+    const cachedEntry = cache[cacheKey];
+    if (cachedEntry) {
+      setResult(cachedEntry.data);
+      setIsFromCache(true);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setResult(null);
+    setIsFromCache(false);
 
     try {
       const response = await fetch(`${BASE_URL}${getEndpoint(activeTool)}`, {
@@ -120,11 +167,24 @@ const TelegramOSINT: React.FC = () => {
 
       const data = await response.json();
       setResult(data);
+      
+      // Store in cache
+      setCache(prev => ({
+        ...prev,
+        [cacheKey]: { data, timestamp: Date.now() }
+      }));
     } catch (err: any) {
       setError(err.message || 'Failed to fetch data');
     } finally {
       setLoading(false);
     }
+  };
+
+  const clearCache = () => {
+    setCache({});
+    localStorage.removeItem(CACHE_KEY);
+    setResult(null);
+    setIsFromCache(false);
   };
 
   const renderBasicInfo = (data: any) => (
@@ -283,6 +343,16 @@ const TelegramOSINT: React.FC = () => {
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Search'}
           </Button>
+          {Object.keys(cache).length > 0 && (
+            <Button
+              onClick={clearCache}
+              variant="outline"
+              className="border-neon-pink text-neon-pink hover:bg-neon-pink/20 px-4"
+              title="Clear all cached results"
+            >
+              <Database size={16} className="mr-1" /> Clear Cache
+            </Button>
+          )}
         </div>
         
         {/* Username Input (conditional) */}
@@ -343,7 +413,14 @@ const TelegramOSINT: React.FC = () => {
       {/* Results */}
       {result && (
         <div className="bg-black/40 border border-neon-green/20 rounded-xl p-4">
-          <h3 className="text-neon-green font-mono mb-4">Results - {currentTool?.label}</h3>
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-neon-green font-mono">Results - {currentTool?.label}</h3>
+            {isFromCache && (
+              <span className="flex items-center gap-1 text-xs bg-neon-purple/20 border border-neon-purple/30 text-neon-purple px-2 py-1 rounded">
+                <Database size={12} /> CACHED (No credits used)
+              </span>
+            )}
+          </div>
           {renderResult()}
         </div>
       )}
