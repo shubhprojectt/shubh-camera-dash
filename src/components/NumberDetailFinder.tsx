@@ -20,6 +20,7 @@ import {
   Zap,
   Search,
   Database,
+  Send,
   LucideIcon
 } from "lucide-react";
 import SearchButton from "./SearchButton";
@@ -27,11 +28,12 @@ import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
+import TelegramOSINT from "./TelegramOSINT";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send
 };
 
 interface VehicleResult {
@@ -542,8 +544,8 @@ const NumberDetailFinder = () => {
             })}
           </div>
           
-          {/* Search Input - Shows when a non-camhack and non-darkdb tab is selected */}
-          {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && (
+          {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram tab is selected */}
+          {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && (
             <div className="relative mt-3 animate-slide-up">
               <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
                 <Input
@@ -595,8 +597,15 @@ const NumberDetailFinder = () => {
         </div>
       )}
 
+      {/* Telegram OSINT Dashboard - shows when telegram tab is active */}
+      {activeButton?.searchType === "telegram" && (
+        <div className="animate-slide-up mt-4">
+          <TelegramOSINT />
+        </div>
+      )}
+
       {/* Results Section */}
-      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && (
+      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && (
         <div>
           {/* Loading */}
           {loading && (
