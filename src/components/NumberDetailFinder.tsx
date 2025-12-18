@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { 
+import { Link } from "react-router-dom";
+import {
   Phone, 
   CreditCard, 
   Car, 
@@ -21,7 +22,8 @@ import {
   Search,
   Database,
   Send,
-  LucideIcon
+  LucideIcon,
+  ArrowRight
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -788,6 +790,16 @@ const NumberDetailFinder = () => {
                 </div>
               );
             })}
+            
+            {/* Next Page Button */}
+            <Link
+              to="/page2"
+              className="animate-bounce-in flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-neon-yellow/50 bg-gradient-to-br from-neon-yellow/10 to-neon-orange/5 hover:from-neon-yellow/20 hover:to-neon-orange/10 transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--neon-yellow)/0.4)] group"
+              style={{ animationDelay: `${enabledTabs.length * 40}ms` }}
+            >
+              <ArrowRight className="w-5 h-5 text-neon-yellow group-hover:translate-x-1 transition-transform" />
+              <span className="text-[10px] font-bold text-neon-yellow uppercase tracking-wider">Next Page</span>
+            </Link>
           </div>
           
           {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram tab is selected */}
