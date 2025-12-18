@@ -18,6 +18,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-green)/0.7),0_0_50px_hsl(var(--neon-green)/0.4),inset_0_0_20px_hsl(var(--neon-green)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-green))]",
+    bottomGlow: "bg-neon-green shadow-[0_0_15px_hsl(var(--neon-green)),0_0_30px_hsl(var(--neon-green)/0.5)]",
   },
   pink: {
     border: "border-neon-pink",
@@ -27,6 +28,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-pink)/0.7),0_0_50px_hsl(var(--neon-pink)/0.4),inset_0_0_20px_hsl(var(--neon-pink)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-pink))]",
+    bottomGlow: "bg-neon-pink shadow-[0_0_15px_hsl(var(--neon-pink)),0_0_30px_hsl(var(--neon-pink)/0.5)]",
   },
   orange: {
     border: "border-neon-orange",
@@ -36,6 +38,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-orange)/0.7),0_0_50px_hsl(var(--neon-orange)/0.4),inset_0_0_20px_hsl(var(--neon-orange)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-orange))]",
+    bottomGlow: "bg-neon-orange shadow-[0_0_15px_hsl(var(--neon-orange)),0_0_30px_hsl(var(--neon-orange)/0.5)]",
   },
   cyan: {
     border: "border-neon-cyan",
@@ -45,6 +48,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-cyan)/0.7),0_0_50px_hsl(var(--neon-cyan)/0.4),inset_0_0_20px_hsl(var(--neon-cyan)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]",
+    bottomGlow: "bg-neon-cyan shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-cyan)/0.5)]",
   },
   red: {
     border: "border-neon-red",
@@ -54,6 +58,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-red)/0.7),0_0_50px_hsl(var(--neon-red)/0.4),inset_0_0_20px_hsl(var(--neon-red)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-red))]",
+    bottomGlow: "bg-neon-red shadow-[0_0_15px_hsl(var(--neon-red)),0_0_30px_hsl(var(--neon-red)/0.5)]",
   },
   purple: {
     border: "border-neon-purple",
@@ -63,6 +68,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-purple)/0.7),0_0_50px_hsl(var(--neon-purple)/0.4),inset_0_0_20px_hsl(var(--neon-purple)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-purple))]",
+    bottomGlow: "bg-neon-purple shadow-[0_0_15px_hsl(var(--neon-purple)),0_0_30px_hsl(var(--neon-purple)/0.5)]",
   },
   yellow: {
     border: "border-neon-yellow",
@@ -72,6 +78,7 @@ const colorClasses = {
     glow: "shadow-[0_0_25px_hsl(var(--neon-yellow)/0.7),0_0_50px_hsl(var(--neon-yellow)/0.4),inset_0_0_20px_hsl(var(--neon-yellow)/0.2)]",
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-yellow))]",
+    bottomGlow: "bg-neon-yellow shadow-[0_0_15px_hsl(var(--neon-yellow)),0_0_30px_hsl(var(--neon-yellow)/0.5)]",
   },
 };
 
@@ -94,6 +101,14 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
       {/* Animated pulse ring on active */}
       {active && (
         <div className="absolute inset-0 rounded-2xl border-2 border-current animate-ping opacity-20" />
+      )}
+      
+      {/* Bottom glow indicator when active */}
+      {active && (
+        <div className={cn(
+          "absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-1 rounded-full",
+          colors.bottomGlow
+        )} />
       )}
       
       {/* Icon */}
