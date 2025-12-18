@@ -45,6 +45,7 @@ export interface AppSettings {
   darkDbBorderWidth: string;
   // Background settings
   backgroundImage: string;
+  backgroundOpacity: string; // 0-100, lower = more visible background
   // Telegram OSINT settings
   telegramOsint: TelegramOsintSettings;
   // CAM HACK session (synced across all devices)
@@ -105,6 +106,7 @@ const defaultSettings: AppSettings = {
   darkDbBorderWidth: "2",
   // Background defaults
   backgroundImage: "",
+  backgroundOpacity: "30", // 30% overlay = 70% visible
   // Telegram OSINT defaults
   telegramOsint: {
     jwtToken: "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiI4MjcwODU1NTI3IiwianRpIjoiNDhiMmFjODktN2VkZS00NTRlLWE5MjAtODE0Nzg0OGEzYWE0IiwiZXhwIjoxNzk3NDQ0NjQ0fQ.SToaZbha-xTT5WDeJrUFoSzgmCVuBKxHVR6mpvGcwjUPXxcfWQFLqwOlqUtO99r9rRnR_ZNd229rg_qbLxUKLdQhQCeHYgwr-fDhesy0QwKJBLCE34hvDXjD9F1_SEsrynx-hBGBKWlZ13MjkYwSQs_vjm7WobIeY9MSMykzp1E",
