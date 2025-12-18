@@ -559,6 +559,24 @@ const NumberDetailFinder = () => {
       {/* DARK DB iframe - shows when darkdb tab is active */}
       {activeButton?.searchType === "darkdb" && (
         <div className="animate-slide-up">
+          {/* Header */}
+          <div className="flex items-center justify-center gap-2 mb-3 py-2">
+            <Database className="w-4 h-4 text-neon-purple animate-pulse" />
+            <span className="text-xs font-bold tracking-[0.15em] text-neon-purple uppercase">
+              Secure OSINT Database
+            </span>
+            <Shield className="w-4 h-4 text-neon-green" />
+          </div>
+          
+          {/* Security Notice */}
+          <div className="mb-3 px-3 py-2 rounded-xl bg-neon-green/5 border border-neon-green/20 flex items-center gap-2">
+            <Shield className="w-3.5 h-3.5 text-neon-green flex-shrink-0" />
+            <p className="text-[10px] text-neon-green/80">
+              Search enabled • Redirects blocked • Safe browsing mode
+            </p>
+          </div>
+          
+          {/* Iframe Container */}
           <div 
             className="relative rounded-2xl overflow-hidden"
             style={{
@@ -573,11 +591,18 @@ const NumberDetailFinder = () => {
             <iframe
               src={settings.darkDbUrl}
               className="w-full bg-background"
-              style={{ height: `${settings.darkDbHeight}vh` }}
-              title="DARK DB"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
+              style={{ height: `${settings.darkDbHeight}vh`, minHeight: '500px' }}
+              title="DARK DB - Secure OSINT"
+              sandbox="allow-scripts allow-forms allow-same-origin"
+              referrerPolicy="no-referrer"
             />
+            
+            {/* Bottom overlay to block footer contact links */}
+            <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background via-background/80 to-transparent pointer-events-auto flex items-end justify-center pb-2">
+              <span className="text-[10px] text-muted-foreground/50 flex items-center gap-1">
+                <Shield className="w-3 h-3" /> External links disabled for security
+              </span>
+            </div>
           </div>
         </div>
       )}
