@@ -392,22 +392,22 @@ const TelegramOSINT: React.FC = () => {
       <h2 className="text-gray-400 text-sm font-mono tracking-widest mb-4">T O O L S</h2>
 
       {/* Tools Grid */}
-      <div className="bg-black/40 border border-gray-800 rounded-xl p-4 mb-6">
-        <div className="grid grid-cols-3 gap-3">
+      <div className="bg-black/40 border border-gray-800 rounded-xl p-3 mb-6">
+        <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2">
           {tools.filter(t => t.enabled).map((tool) => (
             <button
               key={tool.id}
               onClick={() => handleToolClick(tool)}
               className={`
-                flex flex-col items-center justify-center p-4 rounded-lg border-2 transition-all duration-300
+                flex flex-col items-center justify-center p-2 rounded-md border transition-all duration-200 hover:scale-105
                 ${activeTool === tool.id 
-                  ? `${colorClasses[tool.color]} bg-${tool.color === 'green' ? 'neon-green' : tool.color === 'cyan' ? 'neon-cyan' : tool.color === 'pink' ? 'neon-pink' : tool.color === 'yellow' ? 'neon-yellow' : 'neon-purple'}/10` 
-                  : `${colorClasses[tool.color]} bg-transparent`
+                  ? `${colorClasses[tool.color]} bg-white/5 shadow-lg` 
+                  : `border-gray-700/50 hover:border-gray-600 bg-transparent`
                 }
               `}
             >
-              <div className="mb-2">{tool.icon}</div>
-              <span className="text-xs font-mono text-center leading-tight">{tool.label}</span>
+              <div className="mb-1 [&>svg]:w-4 [&>svg]:h-4">{tool.icon}</div>
+              <span className="text-[10px] font-mono text-center leading-tight text-gray-300 line-clamp-2">{tool.label}</span>
             </button>
           ))}
         </div>
