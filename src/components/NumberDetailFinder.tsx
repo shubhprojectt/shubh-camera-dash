@@ -508,19 +508,9 @@ const NumberDetailFinder = () => {
         {/* Animated border glow */}
         <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 blur-sm animate-pulse-glow" />
         
-        <div className="relative rounded-2xl p-3 bg-background/95 backdrop-blur-xl overflow-hidden border border-neon-green/30">
+        <div className="relative rounded-2xl p-3 bg-transparent overflow-hidden border border-neon-green/30">
           {/* Background effects */}
           <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-neon-green/10 rounded-full blur-3xl" />
-          
-          {/* Header */}
-          <div className="relative flex items-center justify-center gap-2 mb-3">
-            <Zap className="w-4 h-4 text-neon-cyan animate-pulse" />
-            <h2 className="text-sm font-display font-bold tracking-[0.2em] text-neon-green text-glow-green">
-              OSINT FINDER
-            </h2>
-            <Zap className="w-4 h-4 text-neon-pink animate-pulse" />
-          </div>
           
           {/* Button Grid - 3 columns */}
           <div className="relative grid grid-cols-3 gap-2">
