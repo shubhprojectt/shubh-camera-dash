@@ -401,16 +401,6 @@ const TelegramOSINT: React.FC = () => {
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Search'}
           </Button>
-          {Object.keys(cache).length > 0 && (
-            <Button
-              onClick={clearCache}
-              variant="outline"
-              className="border-neon-pink text-neon-pink hover:bg-neon-pink/20 px-4"
-              title="Clear all cached results"
-            >
-              <Database size={16} className="mr-1" /> Clear Cache
-            </Button>
-          )}
           <Button
             onClick={() => setShowHistory(!showHistory)}
             variant="outline"
