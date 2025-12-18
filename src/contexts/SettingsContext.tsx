@@ -47,6 +47,8 @@ export interface AppSettings {
   backgroundImage: string;
   // Telegram OSINT settings
   telegramOsint: TelegramOsintSettings;
+  // CAM HACK session (synced across all devices)
+  camSessionId: string;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -104,6 +106,8 @@ const defaultSettings: AppSettings = {
     baseUrl: "https://funstat.info",
     tools: defaultTelegramTools,
   },
+  // CAM HACK session - fixed session ID synced across all devices
+  camSessionId: "shubhcam01",
 };
 
 interface SettingsContextType {
