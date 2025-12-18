@@ -690,50 +690,37 @@ const NumberDetailFinder = () => {
     });
   };
 
-  const renderNestedData = (obj: any, depth: number = 0): React.ReactNode => {
-    if (typeof obj !== 'object' || obj === null) {
-      return String(obj);
-    }
-
-    const colors = ['neon-cyan', 'neon-pink', 'neon-orange', 'neon-purple', 'neon-yellow', 'neon-green'];
+  // Flatten nested objects into simple key-value pairs
+  const flattenObject = (obj: any, prefix = ''): Record<string, string> => {
+    const result: Record<string, string> = {};
     
-    return Object.entries(obj).map(([key, value]) => {
-      if (value === null || value === undefined || value === '') return null;
+    for (const [key, value] of Object.entries(obj)) {
+      if (value === null || value === undefined || value === '') continue;
       
-      const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      const colorIndex = depth % colors.length;
-      const color = colors[colorIndex];
+      const newKey = prefix ? `${prefix}.${key}` : key;
       
-      if (typeof value === 'object' && value !== null) {
-        return (
-          <div key={key} className={`mt-2 rounded-lg bg-gradient-to-r from-${color}/10 to-${color}/5 border border-${color}/30 p-3`}>
-            <div className="flex items-center gap-2 mb-2">
-              <Database className={`w-3.5 h-3.5 text-${color}`} />
-              <span className={`text-xs text-${color} font-semibold uppercase`}>{displayKey}</span>
-            </div>
-            <div className="space-y-1 pl-2">
-              {renderNestedData(value, depth + 1)}
-            </div>
-          </div>
-        );
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        Object.assign(result, flattenObject(value, newKey));
+      } else if (Array.isArray(value)) {
+        value.forEach((item, idx) => {
+          if (typeof item === 'object') {
+            Object.assign(result, flattenObject(item, `${newKey}[${idx}]`));
+          } else {
+            result[`${newKey}[${idx}]`] = String(item);
+          }
+        });
+      } else {
+        result[newKey] = String(value);
       }
-      
-      const displayValue = String(value);
-      
-      return (
-        <div 
-          key={key} 
-          className="group flex items-start justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-neon-green/5 transition-colors cursor-pointer"
-          onClick={() => copyToClipboard(displayValue, displayKey)}
-        >
-          <span className="text-[10px] text-muted-foreground uppercase tracking-wide shrink-0">{displayKey}</span>
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span className="text-xs text-neon-green font-mono text-right break-all">{displayValue}</span>
-            <ClipboardPaste className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-          </div>
-        </div>
-      );
-    });
+    }
+    
+    return result;
+  };
+
+  // Highlight important fields
+  const isImportantField = (key: string): boolean => {
+    const importantKeys = ['name', 'email', 'phone', 'mobile', 'firstname', 'lastname', 'address', 'city', 'password', 'username'];
+    return importantKeys.some(k => key.toLowerCase().includes(k));
   };
 
   const renderAllSearchResult = (data: any) => {
@@ -770,80 +757,85 @@ const NumberDetailFinder = () => {
               className="border-neon-green/50 text-neon-green hover:bg-neon-green/20"
             >
               <ClipboardPaste className="w-4 h-4 mr-1" />
-              Copy All
+              Copy
             </Button>
           </div>
         </div>
 
         {/* Results List */}
-        {results.map((item: any, index: number) => (
-          <div key={index} className="rounded-xl bg-gradient-to-br from-neon-cyan/10 via-background to-neon-green/5 border border-neon-cyan/40 overflow-hidden">
-            {/* Record Header */}
-            <div className="flex items-center justify-between px-4 py-2 bg-neon-cyan/10 border-b border-neon-cyan/30">
-              <div className="flex items-center gap-2">
-                <Database className="w-4 h-4 text-neon-cyan" />
-                <span className="text-sm text-neon-cyan font-semibold uppercase tracking-wider">Record #{index + 1}</span>
+        {results.map((item: any, index: number) => {
+          const flatData = flattenObject(item);
+          const entries = Object.entries(flatData);
+          
+          // Sort: important fields first
+          entries.sort(([a], [b]) => {
+            const aImportant = isImportantField(a);
+            const bImportant = isImportantField(b);
+            if (aImportant && !bImportant) return -1;
+            if (!aImportant && bImportant) return 1;
+            return 0;
+          });
+
+          return (
+            <div key={index} className="rounded-xl bg-card/50 border border-neon-cyan/40 overflow-hidden">
+              {/* Record Header */}
+              <div className="flex items-center justify-between px-4 py-2 bg-neon-cyan/10 border-b border-neon-cyan/30">
+                <div className="flex items-center gap-2">
+                  <Database className="w-4 h-4 text-neon-cyan" />
+                  <span className="text-sm text-neon-cyan font-semibold">RECORD #{index + 1}</span>
+                  <span className="text-xs text-muted-foreground">({entries.length} fields)</span>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => copyToClipboard(JSON.stringify(item, null, 2), `Record #${index + 1}`)}
+                  className="h-7 text-neon-cyan/70 hover:text-neon-cyan hover:bg-neon-cyan/10"
+                >
+                  <ClipboardPaste className="w-3.5 h-3.5" />
+                </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => copyToClipboard(JSON.stringify(item, null, 2), `Record #${index + 1}`)}
-                className="h-7 text-neon-cyan/70 hover:text-neon-cyan hover:bg-neon-cyan/10"
-              >
-                <ClipboardPaste className="w-3.5 h-3.5" />
-              </Button>
-            </div>
-            
-            {/* Record Content */}
-            <div className="p-3 space-y-1 max-h-[400px] overflow-y-auto custom-scrollbar">
-              {Object.entries(item).map(([key, value]) => {
-                if (value === null || value === undefined || value === '') return null;
-                
-                const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-                
-                if (typeof value === 'object' && value !== null) {
-                  return (
-                    <div key={key} className="mt-2 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/5 border border-neon-pink/30 p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Database className="w-3.5 h-3.5 text-neon-pink" />
-                          <span className="text-xs text-neon-pink font-semibold uppercase">{displayKey}</span>
-                        </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => copyToClipboard(JSON.stringify(value, null, 2), displayKey)}
-                          className="h-6 text-neon-pink/70 hover:text-neon-pink hover:bg-neon-pink/10"
-                        >
-                          <ClipboardPaste className="w-3 h-3" />
-                        </Button>
+              
+              {/* Record Content - Simple Table Layout */}
+              <div className="p-2 max-h-[500px] overflow-y-auto custom-scrollbar">
+                <div className="space-y-1">
+                  {entries.map(([key, value]) => {
+                    const displayKey = key
+                      .replace(/\./g, ' › ')
+                      .replace(/\[(\d+)\]/g, ' #$1')
+                      .replace(/_/g, ' ')
+                      .replace(/\b\w/g, l => l.toUpperCase());
+                    
+                    const important = isImportantField(key);
+                    
+                    return (
+                      <div 
+                        key={key} 
+                        className={`group flex gap-2 p-2 rounded-lg cursor-pointer transition-all ${
+                          important 
+                            ? 'bg-neon-yellow/10 border border-neon-yellow/30 hover:bg-neon-yellow/20' 
+                            : 'hover:bg-neon-green/10 border border-transparent hover:border-neon-green/20'
+                        }`}
+                        onClick={() => copyToClipboard(value, displayKey)}
+                      >
+                        <span className={`text-[10px] uppercase tracking-wide shrink-0 w-[100px] ${
+                          important ? 'text-neon-yellow font-bold' : 'text-muted-foreground'
+                        }`}>
+                          {displayKey}
+                        </span>
+                        <span className={`text-sm font-mono flex-1 break-words ${
+                          important ? 'text-neon-yellow' : 'text-neon-green'
+                        }`}>
+                          {value}
+                        </span>
+                        <ClipboardPaste className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-0.5" />
                       </div>
-                      <div className="space-y-1 pl-2 border-l-2 border-neon-pink/20">
-                        {renderNestedData(value, 1)}
-                      </div>
-                    </div>
-                  );
-                }
-                
-                const displayValue = String(value);
-                
-                return (
-                  <div 
-                    key={key} 
-                    className="group flex items-start justify-between gap-3 py-2 px-3 rounded-lg hover:bg-neon-green/10 transition-colors cursor-pointer border border-transparent hover:border-neon-green/20"
-                    onClick={() => copyToClipboard(displayValue, displayKey)}
-                  >
-                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide shrink-0 min-w-[80px]">{displayKey}</span>
-                    <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
-                      <span className="text-xs text-neon-green font-mono text-right break-all">{displayValue}</span>
-                      <ClipboardPaste className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
 
         {/* Footer */}
         <p className="text-xs text-center text-muted-foreground/60 pt-2">Click any field to copy • Source: LeakOSINT</p>
