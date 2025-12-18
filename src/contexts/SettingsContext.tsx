@@ -82,6 +82,7 @@ const defaultTabs: TabConfig[] = [
   { id: "shubh", label: "CAM HACK", icon: "Sparkles", color: "cyan", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
   { id: "darkdb", label: "DARK DB", icon: "Database", color: "purple", placeholder: "", searchType: "darkdb", apiUrl: "https://2info.vercel.app", enabled: true },
   { id: "telegram", label: "Telegram OSI", icon: "Send", color: "cyan", placeholder: "", searchType: "telegram", apiUrl: "", enabled: true },
+  { id: "allsearch", label: "All Search", icon: "Globe", color: "red", placeholder: "Enter phone / email / name...", searchType: "allsearch", apiUrl: "https://lek-steel.vercel.app/api/search?q=", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
