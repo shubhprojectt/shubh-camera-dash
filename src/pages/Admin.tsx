@@ -525,13 +525,25 @@ const Admin = () => {
         {activeSection === "darkdb" && (
           <div className="space-y-4">
             <h2 className="text-lg font-display text-neon-purple mb-4 flex items-center gap-2">
-              <Database className="w-5 h-5" /> DARK DB Configuration
+              <Database className="w-5 h-5" /> Hard Bomber Configuration
             </h2>
+
+            {/* Tab Name Setting */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-yellow">Tab Name</h3>
+              <p className="text-xs text-muted-foreground">Change the display name for this tab</p>
+              <Input
+                value={settings.tabs.find(t => t.searchType === "darkdb")?.label || "Hard Bomber"}
+                onChange={(e) => updateTab("darkdb", { label: e.target.value })}
+                placeholder="Hard Bomber"
+                className="text-sm"
+              />
+            </div>
             
             {/* URL Setting */}
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
               <h3 className="font-bold text-neon-cyan">Website URL</h3>
-              <p className="text-xs text-muted-foreground">Enter the URL to load in DARK DB iframe</p>
+              <p className="text-xs text-muted-foreground">Enter the URL to load in iframe</p>
               <Input
                 value={settings.darkDbUrl}
                 onChange={(e) => updateSettings({ darkDbUrl: e.target.value })}
