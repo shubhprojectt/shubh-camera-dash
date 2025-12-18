@@ -82,10 +82,6 @@ const Page2 = () => {
         }}
       />
       
-      {/* Moving Scanlines */}
-      <div className="fixed inset-0 opacity-[0.03] pointer-events-none bg-[linear-gradient(transparent_50%,hsl(var(--neon-yellow)/0.08)_50%)] bg-[length:100%_4px]" 
-        style={{ animation: 'scanline 8s linear infinite' }}
-      />
       
       {/* Multiple Floating Orbs */}
       <div className="fixed top-10 left-10 w-40 h-40 bg-neon-yellow/15 rounded-full blur-3xl animate-pulse" />
