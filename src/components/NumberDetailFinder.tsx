@@ -93,6 +93,10 @@ interface PhoneResult {
   };
 }
 
+interface AllSearchResult {
+  [key: string]: any;
+}
+
 interface AadharResult {
   name?: string;
   gender?: string;
@@ -227,6 +231,39 @@ const NumberDetailFinder = () => {
         }
       } catch (err) {
         console.error("Aadhar search error:", err);
+        setError("Failed to fetch data. Please try again.");
+        toast({
+          title: "Error",
+          description: "Failed to fetch data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // All Search API (LeakOSINT)
+    if (activeButton?.searchType === "allsearch") {
+      try {
+        const response = await fetch(`https://lek-steel.vercel.app/api/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        const data = await response.json();
+        
+        if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+          setResult({ type: "allsearch", data });
+          toast({
+            title: "LeakOSINT Results",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } else {
+          setError("No information found for this query");
+          toast({
+            title: "Not Found",
+            description: "No information found",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
         setError("Failed to fetch data. Please try again.");
         toast({
           title: "Error",
@@ -642,6 +679,55 @@ const NumberDetailFinder = () => {
     );
   };
 
+  const renderAllSearchResult = (data: any) => {
+    const results = Array.isArray(data) ? data : [data];
+    
+    return (
+      <div className="space-y-3 animate-slide-up">
+        {/* Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-red/20 via-neon-orange/10 to-neon-red/5 border border-neon-red/50 p-4">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-neon-red/10 rounded-full blur-2xl" />
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-neon-red/20 border border-neon-red/50">
+              <Globe className="w-6 h-6 text-neon-red" />
+            </div>
+            <div>
+              <p className="text-xs text-neon-red/70 uppercase tracking-wider">LeakOSINT Database</p>
+              <p className="text-lg font-display font-bold text-neon-red">{results.length} Record(s) Found</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Results List */}
+        {results.map((item: any, index: number) => (
+          <div key={index} className="rounded-xl bg-gradient-to-r from-neon-cyan/10 to-neon-green/5 border border-neon-cyan/30 p-3 space-y-2">
+            <div className="flex items-center gap-2 mb-2">
+              <Database className="w-4 h-4 text-neon-cyan" />
+              <span className="text-xs text-neon-cyan/70 uppercase">Record #{index + 1}</span>
+            </div>
+            
+            {Object.entries(item).map(([key, value]) => {
+              if (value === null || value === undefined || value === '') return null;
+              
+              const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
+              
+              return (
+                <div key={key} className="flex justify-between items-start gap-2 py-1 border-b border-border/30 last:border-0">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wide min-w-[100px]">{displayKey}</span>
+                  <span className="text-sm text-neon-green font-mono text-right break-all">{displayValue}</span>
+                </div>
+              );
+            })}
+          </div>
+        ))}
+
+        {/* Source */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: LeakOSINT Database</p>
+      </div>
+    );
+  };
+
   const renderDefaultResult = () => (
     <div className="border border-neon-green/30 rounded-lg p-4 bg-muted/30 animate-slide-up">
       <div className="flex items-center justify-between mb-3">
@@ -809,16 +895,17 @@ const NumberDetailFinder = () => {
             </div>
           )}
 
-          {/* Results */}
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
               <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : "📊 RESULTS"}
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "🔍 LEAKOSINT" : "📊 RESULTS"}
               </h3>
               {activeButton?.searchType === "vehicle" 
                 ? renderVehicleResult(result) 
                 : activeButton?.searchType === "aadhar"
                 ? renderAadharResult(result.data)
+                : activeButton?.searchType === "allsearch"
+                ? renderAllSearchResult(result.data)
                 : (result?.type === "phone" ? renderPhoneResult(result.data) : renderDefaultResult())}
             </div>
           )}
