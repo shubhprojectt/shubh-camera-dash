@@ -1,4 +1,4 @@
-import { Wifi, Settings } from "lucide-react";
+import { Wifi, Settings, ClipboardPaste } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
 import * as Icons from "lucide-react";
@@ -50,13 +50,21 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Admin Link */}
-      <Link 
-        to="/admin" 
-        className="absolute top-2 right-2 p-2 rounded-lg border border-neon-orange/50 text-neon-orange hover:bg-neon-orange/10 transition-all hover:shadow-[0_0_10px_hsl(var(--neon-orange)/0.5)]"
-      >
-        <Settings className="w-4 h-4" />
-      </Link>
+      {/* Page2 & Admin Links */}
+      <div className="absolute top-2 right-2 flex items-center gap-2">
+        <Link 
+          to="/page2" 
+          className="p-2 rounded-lg border border-neon-yellow/50 text-neon-yellow hover:bg-neon-yellow/10 transition-all hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.5)]"
+        >
+          <ClipboardPaste className="w-4 h-4" />
+        </Link>
+        <Link 
+          to="/admin" 
+          className="p-2 rounded-lg border border-neon-orange/50 text-neon-orange hover:bg-neon-orange/10 transition-all hover:shadow-[0_0_10px_hsl(var(--neon-orange)/0.5)]"
+        >
+          <Settings className="w-4 h-4" />
+        </Link>
+      </div>
       
       {/* Logo */}
       <div className={`relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-${settings.headerColor1} mb-3 overflow-hidden`}>

@@ -120,7 +120,8 @@ const NumberDetailFinder = () => {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const enabledTabs = settings.tabs.filter(tab => tab.enabled);
+  // Filter out manual tab - it's on Page2 now
+  const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
