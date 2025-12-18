@@ -42,8 +42,6 @@ const Index = () => {
         <div className="fixed top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-neon-cyan/30 to-transparent animate-pulse" style={{ animationDuration: '3s' }} />
         <div className="fixed top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-neon-pink/20 to-transparent animate-pulse" style={{ animationDuration: '4s', animationDelay: '1s' }} />
         
-        {/* Scanline effect */}
-        <div className="fixed inset-0 scanline pointer-events-none z-50" />
         
         {/* Noise texture overlay */}
         <div className="fixed inset-0 opacity-[0.03] bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 256 256%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E')]" />
