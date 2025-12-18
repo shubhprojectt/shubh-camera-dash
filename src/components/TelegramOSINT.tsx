@@ -400,14 +400,15 @@ const TelegramOSINT: React.FC = () => {
               onClick={() => handleToolClick(tool)}
               className={`
                 flex flex-col items-center justify-center p-2 rounded-md border transition-all duration-200 hover:scale-105
+                ${colorClasses[tool.color]}
                 ${activeTool === tool.id 
-                  ? `${colorClasses[tool.color]} bg-white/5 shadow-lg` 
-                  : `border-gray-700/50 hover:border-gray-600 bg-transparent`
+                  ? `bg-white/10 shadow-[0_0_10px_currentColor]` 
+                  : `bg-black/30 hover:bg-white/5`
                 }
               `}
             >
               <div className="mb-1 [&>svg]:w-4 [&>svg]:h-4">{tool.icon}</div>
-              <span className="text-[10px] font-mono text-center leading-tight text-gray-300 line-clamp-2">{tool.label}</span>
+              <span className="text-[10px] font-mono text-center leading-tight line-clamp-2">{tool.label}</span>
             </button>
           ))}
         </div>
