@@ -19,8 +19,11 @@ const Index = () => {
           <div className="fixed inset-0 bg-black" />
         )}
         
-        {/* Dark overlay for readability */}
-        <div className="fixed inset-0 bg-black/50" />
+        {/* Dark overlay for readability - dynamic opacity */}
+        <div 
+          className="fixed inset-0 bg-black"
+          style={{ opacity: (parseInt(settings.backgroundOpacity || "30") / 100) }}
+        />
         
         {/* Animated mesh gradient */}
         <div className="fixed inset-0 opacity-40">

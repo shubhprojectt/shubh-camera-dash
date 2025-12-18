@@ -453,6 +453,34 @@ const Admin = () => {
                 </label>
               )}
             </div>
+
+            {/* Background Opacity Slider */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-pink flex items-center gap-2">
+                <Eye className="w-4 h-4" /> Background Visibility
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Adjust how visible the background image is. Lower overlay = more visible background.
+              </p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-neon-cyan">Dark Overlay: {settings.backgroundOpacity || "30"}%</span>
+                  <span className="text-sm text-neon-green">Background Visible: {100 - parseInt(settings.backgroundOpacity || "30")}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="80"
+                  value={settings.backgroundOpacity || "30"}
+                  onChange={(e) => updateSettings({ backgroundOpacity: e.target.value })}
+                  className="w-full h-2 bg-card rounded-lg appearance-none cursor-pointer accent-neon-pink"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>Max Visible</span>
+                  <span>More Dark</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
