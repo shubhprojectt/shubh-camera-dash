@@ -693,6 +693,24 @@ const Admin = () => {
                 ))}
               </div>
             </div>
+
+            {/* Clear Cache */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-red flex items-center gap-2">
+                <Database className="w-4 h-4" /> Cache Management
+              </h3>
+              <p className="text-xs text-muted-foreground">Clear cached Telegram OSINT search results</p>
+              <Button
+                onClick={() => {
+                  localStorage.removeItem('telegram_osint_cache');
+                  toast({ title: "Cache Cleared", description: "Telegram OSINT cache has been cleared" });
+                }}
+                variant="outline"
+                className="border-neon-red text-neon-red hover:bg-neon-red/10"
+              >
+                <Trash2 className="w-4 h-4 mr-2" /> Clear Telegram Cache
+              </Button>
+            </div>
           </div>
         )}
 
