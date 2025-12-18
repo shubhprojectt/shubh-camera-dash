@@ -682,51 +682,171 @@ const NumberDetailFinder = () => {
     );
   };
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied!",
+      description: `${label} copied to clipboard`,
+    });
+  };
+
+  const renderNestedData = (obj: any, depth: number = 0): React.ReactNode => {
+    if (typeof obj !== 'object' || obj === null) {
+      return String(obj);
+    }
+
+    const colors = ['neon-cyan', 'neon-pink', 'neon-orange', 'neon-purple', 'neon-yellow', 'neon-green'];
+    
+    return Object.entries(obj).map(([key, value]) => {
+      if (value === null || value === undefined || value === '') return null;
+      
+      const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const colorIndex = depth % colors.length;
+      const color = colors[colorIndex];
+      
+      if (typeof value === 'object' && value !== null) {
+        return (
+          <div key={key} className={`mt-2 rounded-lg bg-gradient-to-r from-${color}/10 to-${color}/5 border border-${color}/30 p-3`}>
+            <div className="flex items-center gap-2 mb-2">
+              <Database className={`w-3.5 h-3.5 text-${color}`} />
+              <span className={`text-xs text-${color} font-semibold uppercase`}>{displayKey}</span>
+            </div>
+            <div className="space-y-1 pl-2">
+              {renderNestedData(value, depth + 1)}
+            </div>
+          </div>
+        );
+      }
+      
+      const displayValue = String(value);
+      
+      return (
+        <div 
+          key={key} 
+          className="group flex items-start justify-between gap-2 py-1.5 px-2 rounded-lg hover:bg-neon-green/5 transition-colors cursor-pointer"
+          onClick={() => copyToClipboard(displayValue, displayKey)}
+        >
+          <span className="text-[10px] text-muted-foreground uppercase tracking-wide shrink-0">{displayKey}</span>
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-xs text-neon-green font-mono text-right break-all">{displayValue}</span>
+            <ClipboardPaste className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+          </div>
+        </div>
+      );
+    });
+  };
+
   const renderAllSearchResult = (data: any) => {
     const results = Array.isArray(data) ? data : [data];
+    
+    const copyAllData = () => {
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr);
+      toast({
+        title: "All Data Copied!",
+        description: "Complete JSON data copied to clipboard",
+      });
+    };
     
     return (
       <div className="space-y-3 animate-slide-up">
         {/* Header */}
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-red/20 via-neon-orange/10 to-neon-red/5 border border-neon-red/50 p-4">
           <div className="absolute top-0 right-0 w-20 h-20 bg-neon-red/10 rounded-full blur-2xl" />
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-neon-red/20 border border-neon-red/50">
-              <Globe className="w-6 h-6 text-neon-red" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-neon-red/20 border border-neon-red/50">
+                <Search className="w-6 h-6 text-neon-red" />
+              </div>
+              <div>
+                <p className="text-xs text-neon-red/70 uppercase tracking-wider">LeakOSINT Database</p>
+                <p className="text-lg font-display font-bold text-neon-red">{results.length} Record(s) Found</p>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-neon-red/70 uppercase tracking-wider">LeakOSINT Database</p>
-              <p className="text-lg font-display font-bold text-neon-red">{results.length} Record(s) Found</p>
-            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyAllData}
+              className="border-neon-green/50 text-neon-green hover:bg-neon-green/20"
+            >
+              <ClipboardPaste className="w-4 h-4 mr-1" />
+              Copy All
+            </Button>
           </div>
         </div>
 
         {/* Results List */}
         {results.map((item: any, index: number) => (
-          <div key={index} className="rounded-xl bg-gradient-to-r from-neon-cyan/10 to-neon-green/5 border border-neon-cyan/30 p-3 space-y-2">
-            <div className="flex items-center gap-2 mb-2">
-              <Database className="w-4 h-4 text-neon-cyan" />
-              <span className="text-xs text-neon-cyan/70 uppercase">Record #{index + 1}</span>
+          <div key={index} className="rounded-xl bg-gradient-to-br from-neon-cyan/10 via-background to-neon-green/5 border border-neon-cyan/40 overflow-hidden">
+            {/* Record Header */}
+            <div className="flex items-center justify-between px-4 py-2 bg-neon-cyan/10 border-b border-neon-cyan/30">
+              <div className="flex items-center gap-2">
+                <Database className="w-4 h-4 text-neon-cyan" />
+                <span className="text-sm text-neon-cyan font-semibold uppercase tracking-wider">Record #{index + 1}</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(JSON.stringify(item, null, 2), `Record #${index + 1}`)}
+                className="h-7 text-neon-cyan/70 hover:text-neon-cyan hover:bg-neon-cyan/10"
+              >
+                <ClipboardPaste className="w-3.5 h-3.5" />
+              </Button>
             </div>
             
-            {Object.entries(item).map(([key, value]) => {
-              if (value === null || value === undefined || value === '') return null;
-              
-              const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-              const displayValue = typeof value === 'object' ? JSON.stringify(value) : String(value);
-              
-              return (
-                <div key={key} className="flex justify-between items-start gap-2 py-1 border-b border-border/30 last:border-0">
-                  <span className="text-xs text-muted-foreground uppercase tracking-wide min-w-[100px]">{displayKey}</span>
-                  <span className="text-sm text-neon-green font-mono text-right break-all">{displayValue}</span>
-                </div>
-              );
-            })}
+            {/* Record Content */}
+            <div className="p-3 space-y-1 max-h-[400px] overflow-y-auto custom-scrollbar">
+              {Object.entries(item).map(([key, value]) => {
+                if (value === null || value === undefined || value === '') return null;
+                
+                const displayKey = key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+                
+                if (typeof value === 'object' && value !== null) {
+                  return (
+                    <div key={key} className="mt-2 rounded-lg bg-gradient-to-r from-neon-pink/10 to-neon-purple/5 border border-neon-pink/30 p-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Database className="w-3.5 h-3.5 text-neon-pink" />
+                          <span className="text-xs text-neon-pink font-semibold uppercase">{displayKey}</span>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(JSON.stringify(value, null, 2), displayKey)}
+                          className="h-6 text-neon-pink/70 hover:text-neon-pink hover:bg-neon-pink/10"
+                        >
+                          <ClipboardPaste className="w-3 h-3" />
+                        </Button>
+                      </div>
+                      <div className="space-y-1 pl-2 border-l-2 border-neon-pink/20">
+                        {renderNestedData(value, 1)}
+                      </div>
+                    </div>
+                  );
+                }
+                
+                const displayValue = String(value);
+                
+                return (
+                  <div 
+                    key={key} 
+                    className="group flex items-start justify-between gap-3 py-2 px-3 rounded-lg hover:bg-neon-green/10 transition-colors cursor-pointer border border-transparent hover:border-neon-green/20"
+                    onClick={() => copyToClipboard(displayValue, displayKey)}
+                  >
+                    <span className="text-[10px] text-muted-foreground uppercase tracking-wide shrink-0 min-w-[80px]">{displayKey}</span>
+                    <div className="flex items-center gap-2 min-w-0 flex-1 justify-end">
+                      <span className="text-xs text-neon-green font-mono text-right break-all">{displayValue}</span>
+                      <ClipboardPaste className="w-3.5 h-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         ))}
 
-        {/* Source */}
-        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: LeakOSINT Database</p>
+        {/* Footer */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Click any field to copy • Source: LeakOSINT</p>
       </div>
     );
   };
