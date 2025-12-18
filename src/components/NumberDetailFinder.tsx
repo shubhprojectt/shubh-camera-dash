@@ -503,14 +503,9 @@ const NumberDetailFinder = () => {
 
   return (
     <div className="space-y-3">
-      {/* Main Card with Neon Border Effect */}
+      {/* Main Card */}
       <div className="relative">
-        {/* Animated border glow */}
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 blur-sm animate-pulse-glow" />
-        
-        <div className="relative rounded-2xl p-3 bg-transparent overflow-hidden border border-neon-green/30">
-          {/* Background effects */}
-          <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
+        <div className="relative rounded-2xl p-3 overflow-hidden border border-neon-green/30">
           
           {/* Button Grid - 3 columns */}
           <div className="relative grid grid-cols-3 gap-2">
