@@ -17,6 +17,8 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   const handleUnlock = () => {
     if (password === settings.sitePassword) {
       setIsUnlocked(true);
+      // Set session flag so Page2 knows user came through main page
+      sessionStorage.setItem("site_unlocked", "true");
       toast({
         title: "Access Granted",
         description: "Welcome to SHUBH OSINT",

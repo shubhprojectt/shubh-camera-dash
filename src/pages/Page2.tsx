@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { 
   ClipboardPaste, 
   Search, 
@@ -9,20 +9,39 @@ import {
   Sparkles,
   Globe,
   Database,
-  Wifi
+  Wifi,
+  Lock
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Page2 = () => {
   const { settings } = useSettings();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("manual");
+  const [hasAccess, setHasAccess] = useState(false);
+
+  // Check if user came through main page with password
+  useEffect(() => {
+    const isUnlocked = sessionStorage.getItem("site_unlocked");
+    if (isUnlocked === "true") {
+      setHasAccess(true);
+    } else {
+      // Redirect to main page if not unlocked
+      toast({
+        title: "Access Denied",
+        description: "Pehle main page se password enter karein",
+        variant: "destructive",
+      });
+      navigate("/");
+    }
+  }, [navigate]);
 
   const manualTab = settings.tabs.find(tab => tab.searchType === "manual");
 
@@ -59,6 +78,15 @@ const Page2 = () => {
       description: `Opening search for: ${searchQuery}`,
     });
   };
+
+  // Show nothing while checking access or if no access
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-neon-yellow animate-spin" />
+      </div>
+    );
+  }
 
   if (!manualTab?.enabled) {
     return (
