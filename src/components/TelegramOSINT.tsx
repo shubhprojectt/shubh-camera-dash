@@ -337,14 +337,8 @@ const TelegramOSINT: React.FC = () => {
 
   return (
     <div className="w-full max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="text-center mb-6">
-        <h1 className="text-3xl font-bold text-neon-cyan font-mono tracking-wider">OSINT FINDER</h1>
-        <p className="text-gray-400 text-sm mt-1">TELEGRAM INTELLIGENCE TOOLS • SINGLE SCREEN DASHBOARD</p>
-      </div>
-
       {/* User ID Input */}
-      <div className="bg-black/40 border border-neon-cyan/20 rounded-xl p-4 mb-6">
+      <div className="bg-black/40 border border-neon-cyan/20 rounded-xl p-4 mb-4">
         <label className="text-gray-400 text-sm mb-2 block">Telegram User ID</label>
         <div className="flex gap-3">
           <Input
