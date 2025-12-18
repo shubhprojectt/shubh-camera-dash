@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker, UserPlus, Loader2, ExternalLink, Lock, AlertTriangle, Database } from 'lucide-react';
+import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker, UserPlus, Loader2, ExternalLink, Lock, AlertTriangle, Database, Clock, Trash2, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
 
 const CACHE_KEY = 'telegram_osint_cache';
+const SEARCH_HISTORY_KEY = 'telegram_osint_search_history';
 
 interface ToolButton {
   id: string;
@@ -18,6 +19,11 @@ interface ToolButton {
 
 interface CacheEntry {
   data: any;
+  timestamp: number;
+}
+
+interface SearchHistoryEntry {
+  userId: string;
   timestamp: number;
 }
 
@@ -56,6 +62,8 @@ const TelegramOSINT: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isFromCache, setIsFromCache] = useState(false);
   const [cache, setCache] = useState<Record<string, CacheEntry>>({});
+  const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Get JWT token and base URL from settings
   const JWT_TOKEN = settings.telegramOsint?.jwtToken || "";
@@ -84,6 +92,16 @@ const TelegramOSINT: React.FC = () => {
         console.error('Failed to load cache:', e);
       }
     }
+    
+    // Load search history
+    const savedHistory = localStorage.getItem(SEARCH_HISTORY_KEY);
+    if (savedHistory) {
+      try {
+        setSearchHistory(JSON.parse(savedHistory));
+      } catch (e) {
+        console.error('Failed to load search history:', e);
+      }
+    }
   }, []);
 
   // Save cache to localStorage whenever it changes
@@ -92,6 +110,29 @@ const TelegramOSINT: React.FC = () => {
       localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
     }
   }, [cache]);
+
+  // Save search history to localStorage
+  useEffect(() => {
+    localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory));
+  }, [searchHistory]);
+
+  const addToSearchHistory = (id: string) => {
+    setSearchHistory(prev => {
+      // Remove if already exists to avoid duplicates
+      const filtered = prev.filter(entry => entry.userId !== id);
+      // Add to beginning
+      return [{ userId: id, timestamp: Date.now() }, ...filtered].slice(0, 50); // Keep last 50
+    });
+  };
+
+  const removeFromHistory = (id: string) => {
+    setSearchHistory(prev => prev.filter(entry => entry.userId !== id));
+  };
+
+  const clearSearchHistory = () => {
+    setSearchHistory([]);
+    localStorage.removeItem(SEARCH_HISTORY_KEY);
+  };
 
   const getCacheKey = (toolId: string): string => {
     const tool = tools.find(t => t.id === toolId);
@@ -185,6 +226,11 @@ const TelegramOSINT: React.FC = () => {
 
       const data = await response.json();
       setResult(data);
+      
+      // Add to search history
+      if (userId && !tool.needsUsername) {
+        addToSearchHistory(userId);
+      }
       
       // Store in cache
       setCache(prev => ({
@@ -365,6 +411,14 @@ const TelegramOSINT: React.FC = () => {
               <Database size={16} className="mr-1" /> Clear Cache
             </Button>
           )}
+          <Button
+            onClick={() => setShowHistory(!showHistory)}
+            variant="outline"
+            className={`border-neon-purple text-neon-purple hover:bg-neon-purple/20 px-4 ${showHistory ? 'bg-neon-purple/20' : ''}`}
+            title="Search History"
+          >
+            <Clock size={16} className="mr-1" /> History
+          </Button>
         </div>
         
         {/* Username Input (conditional) */}
@@ -381,6 +435,66 @@ const TelegramOSINT: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Search History Panel */}
+      {showHistory && (
+        <div className="bg-black/40 border border-neon-purple/20 rounded-xl p-4 mb-4">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-neon-purple font-mono text-sm flex items-center gap-2">
+              <Clock size={16} /> SEARCH HISTORY
+            </h3>
+            {searchHistory.length > 0 && (
+              <Button
+                onClick={clearSearchHistory}
+                variant="ghost"
+                size="sm"
+                className="text-red-400 hover:text-red-300 hover:bg-red-500/10 text-xs"
+              >
+                <Trash2 size={14} className="mr-1" /> Clear All
+              </Button>
+            )}
+          </div>
+          {searchHistory.length === 0 ? (
+            <p className="text-gray-500 text-sm text-center py-4">No search history yet</p>
+          ) : (
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {searchHistory.map((entry) => (
+                <div
+                  key={entry.userId}
+                  className="flex items-center justify-between bg-black/50 border border-gray-700 rounded-lg p-2 hover:border-neon-purple/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-neon-cyan font-mono">{entry.userId}</span>
+                    <span className="text-gray-500 text-xs">
+                      {new Date(entry.timestamp).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={() => {
+                        setUserId(entry.userId);
+                        setShowHistory(false);
+                      }}
+                      size="sm"
+                      className="bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 text-xs px-3"
+                    >
+                      <Search size={12} className="mr-1" /> Search
+                    </Button>
+                    <Button
+                      onClick={() => removeFromHistory(entry.userId)}
+                      size="sm"
+                      variant="ghost"
+                      className="text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2"
+                    >
+                      <Trash2 size={14} />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Tools Label */}
       <h2 className="text-gray-400 text-sm font-mono tracking-widest mb-4">T O O L S</h2>
