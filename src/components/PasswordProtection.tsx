@@ -62,8 +62,8 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
           {/* Title */}
           <div className="text-center space-y-2">
             <h1 className="text-2xl font-display font-bold">
-              <span className="text-neon-green">WEBSITE</span>{" "}
-              <span className="text-neon-pink">LOCKED</span>
+              <span className="text-neon-green">DARK</span>{" "}
+              <span className="text-neon-pink">OSINT</span>
             </h1>
             <p className="text-neon-pink/80 text-sm">
               Access karne ke liye password enter karein
