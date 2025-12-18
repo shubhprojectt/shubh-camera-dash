@@ -1023,7 +1023,7 @@ const NumberDetailFinder = () => {
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
               <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "🔍 LEAKOSINT" : "📊 RESULTS"}
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "👄 NUMBER TO DETAIL" : "📊 RESULTS"}
               </h3>
               {activeButton?.searchType === "vehicle" 
                 ? renderVehicleResult(result) 
