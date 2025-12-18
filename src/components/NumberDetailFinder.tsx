@@ -202,11 +202,14 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Aadhar search API
+    // Aadhar search API (via edge function to avoid CORS)
     if (activeButton?.searchType === "aadhar") {
       try {
-        const response = await fetch(`http://zionix.rf.gd/land.php?type=id_number&term=${encodeURIComponent(searchQuery.trim())}`);
-        const data = await response.json();
+        const { data, error: fnError } = await supabase.functions.invoke('aadhar-search', {
+          body: { term: searchQuery.trim() }
+        });
+        
+        if (fnError) throw fnError;
         
         if (data && Object.keys(data).length > 0 && !data.error) {
           setResult({ type: "aadhar", data });
@@ -215,14 +218,15 @@ const NumberDetailFinder = () => {
             description: `Results found for: ${searchQuery}`,
           });
         } else {
-          setError("No information found for this Aadhar number");
+          setError(data?.error || "No information found for this Aadhar number");
           toast({
             title: "Not Found",
-            description: "No information found",
+            description: data?.error || "No information found",
             variant: "destructive",
           });
         }
       } catch (err) {
+        console.error("Aadhar search error:", err);
         setError("Failed to fetch data. Please try again.");
         toast({
           title: "Error",
