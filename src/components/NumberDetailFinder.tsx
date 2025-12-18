@@ -93,6 +93,21 @@ interface PhoneResult {
   };
 }
 
+interface AadharResult {
+  name?: string;
+  gender?: string;
+  dob?: string;
+  address?: string;
+  state?: string;
+  district?: string;
+  pincode?: string;
+  aadhaar_number?: string;
+  mobile?: string;
+  email?: string;
+  father_name?: string;
+  [key: string]: any;
+}
+
 const NumberDetailFinder = () => {
   const { settings } = useSettings();
   const [searchQuery, setSearchQuery] = useState("");
@@ -168,6 +183,39 @@ const NumberDetailFinder = () => {
           });
         } else {
           setError("No information found for this number");
+          toast({
+            title: "Not Found",
+            description: "No information found",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        setError("Failed to fetch data. Please try again.");
+        toast({
+          title: "Error",
+          description: "Failed to fetch data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // Aadhar search API
+    if (activeButton?.searchType === "aadhar") {
+      try {
+        const response = await fetch(`http://zionix.rf.gd/land.php?type=id_number&term=${encodeURIComponent(searchQuery.trim())}`);
+        const data = await response.json();
+        
+        if (data && Object.keys(data).length > 0 && !data.error) {
+          setResult({ type: "aadhar", data });
+          toast({
+            title: "Aadhar Found",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } else {
+          setError("No information found for this Aadhar number");
           toast({
             title: "Not Found",
             description: "No information found",
@@ -468,6 +516,128 @@ const NumberDetailFinder = () => {
     );
   };
 
+  const renderAadharResult = (data: AadharResult) => {
+    return (
+      <div className="space-y-3 animate-slide-up">
+        {/* Header Card */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-pink/20 via-neon-purple/10 to-neon-pink/5 border border-neon-pink/50 p-4">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-neon-pink/10 rounded-full blur-2xl" />
+          <div className="flex items-center gap-3">
+            <div className="p-3 rounded-xl bg-neon-pink/20 border border-neon-pink/50">
+              <CreditCard className="w-6 h-6 text-neon-pink" />
+            </div>
+            <div>
+              <p className="text-xs text-neon-pink/70 uppercase tracking-wider">Aadhar Number</p>
+              <p className="text-xl font-display font-bold text-neon-pink">{data.aadhaar_number || data.id_number || "N/A"}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Name Info */}
+        {data.name && (
+          <div className="rounded-xl bg-gradient-to-r from-neon-cyan/15 to-neon-green/10 border border-neon-cyan/40 p-3">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-neon-cyan" />
+              <span className="text-xs text-neon-cyan/70 uppercase">Name</span>
+            </div>
+            <p className="mt-1 font-semibold text-neon-cyan text-lg">{data.name}</p>
+            {data.father_name && (
+              <p className="text-xs text-muted-foreground mt-1">Father: {data.father_name}</p>
+            )}
+          </div>
+        )}
+
+        {/* Grid Info Cards */}
+        <div className="grid grid-cols-2 gap-2">
+          {data.gender && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-purple/15 to-neon-pink/10 border border-neon-purple/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-neon-purple" />
+                <span className="text-[10px] text-neon-purple/70 uppercase">Gender</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-purple">{data.gender}</p>
+            </div>
+          )}
+          
+          {data.dob && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-orange/15 to-neon-yellow/10 border border-neon-orange/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-neon-orange" />
+                <span className="text-[10px] text-neon-orange/70 uppercase">DOB</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-orange">{data.dob}</p>
+            </div>
+          )}
+
+          {data.state && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-green/15 to-neon-cyan/10 border border-neon-green/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-[10px] text-neon-green/70 uppercase">State</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-green truncate">{data.state}</p>
+            </div>
+          )}
+
+          {data.district && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-cyan/15 to-neon-green/10 border border-neon-cyan/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <MapPin className="w-3.5 h-3.5 text-neon-cyan" />
+                <span className="text-[10px] text-neon-cyan/70 uppercase">District</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-cyan truncate">{data.district}</p>
+            </div>
+          )}
+
+          {data.pincode && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-yellow/15 to-neon-orange/10 border border-neon-yellow/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5 text-neon-yellow" />
+                <span className="text-[10px] text-neon-yellow/70 uppercase">Pincode</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-yellow">{data.pincode}</p>
+            </div>
+          )}
+
+          {data.mobile && (
+            <div className="rounded-xl bg-gradient-to-br from-neon-red/15 to-neon-pink/10 border border-neon-red/40 p-3">
+              <div className="flex items-center gap-1.5">
+                <Phone className="w-3.5 h-3.5 text-neon-red" />
+                <span className="text-[10px] text-neon-red/70 uppercase">Mobile</span>
+              </div>
+              <p className="mt-1 text-sm font-medium text-neon-red">{data.mobile}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Address */}
+        {data.address && (
+          <div className="rounded-xl bg-gradient-to-r from-neon-orange/15 to-neon-yellow/10 border border-neon-orange/40 p-3">
+            <div className="flex items-center gap-2 mb-2">
+              <MapPin className="w-4 h-4 text-neon-orange" />
+              <span className="text-xs text-neon-orange/70 uppercase">Address</span>
+            </div>
+            <p className="text-sm text-neon-orange">{data.address}</p>
+          </div>
+        )}
+
+        {/* Email */}
+        {data.email && (
+          <div className="rounded-xl bg-muted/50 border border-border/50 p-3">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground uppercase">Email</span>
+            </div>
+            <p className="mt-1 text-sm text-foreground">{data.email}</p>
+          </div>
+        )}
+
+        {/* Source */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT</p>
+      </div>
+    );
+  };
+
   const renderDefaultResult = () => (
     <div className="border border-neon-green/30 rounded-lg p-4 bg-muted/30 animate-slide-up">
       <div className="flex items-center justify-between mb-3">
@@ -639,10 +809,12 @@ const NumberDetailFinder = () => {
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
               <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : "📊 RESULTS"}
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : "📊 RESULTS"}
               </h3>
               {activeButton?.searchType === "vehicle" 
                 ? renderVehicleResult(result) 
+                : activeButton?.searchType === "aadhar"
+                ? renderAadharResult(result.data)
                 : (result?.type === "phone" ? renderPhoneResult(result.data) : renderDefaultResult())}
             </div>
           )}
