@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SettingsProvider } from "@/contexts/SettingsContext";
 import Index from "./pages/Index";
 import Capture from "./pages/Capture";
+import CustomCapture from "./pages/CustomCapture";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
@@ -21,6 +22,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/capture" element={<Capture />} />
+            <Route path="/custom-capture" element={<CustomCapture />} />
             <Route path="/admin" element={<Admin />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

