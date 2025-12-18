@@ -402,7 +402,7 @@ const TelegramOSINT: React.FC = () => {
                 flex flex-col items-center justify-center p-2 rounded-md border transition-all duration-200 hover:scale-105
                 ${colorClasses[tool.color]}
                 ${activeTool === tool.id 
-                  ? `bg-white/10 shadow-[0_0_10px_currentColor]` 
+                  ? `bg-white/10 animate-glow-pulse` 
                   : `bg-black/30 hover:bg-white/5`
                 }
               `}
