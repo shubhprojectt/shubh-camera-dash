@@ -23,7 +23,8 @@ import {
   Database,
   Send,
   LucideIcon,
-  ArrowRight
+  ArrowRight,
+  Lock
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -33,6 +34,12 @@ import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "./ui/dialog";
 
 const iconMap: Record<string, LucideIcon> = {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send
@@ -121,12 +128,27 @@ const NumberDetailFinder = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  // ALL SEARCH access key states
+  const [showAccessKeyDialog, setShowAccessKeyDialog] = useState(false);
+  const [accessKeyInput, setAccessKeyInput] = useState("");
+  const [allSearchUnlocked, setAllSearchUnlocked] = useState(false);
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
 
   // Filter out manual tab - it's on Page2 now
   const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
+    const clickedTab = enabledTabs.find(t => t.label === label);
+    
+    // Check if clicking on ALL SEARCH tab and access key is required
+    if (clickedTab?.searchType === "allsearch" && settings.allSearchAccessKey && !allSearchUnlocked) {
+      setPendingTab(label);
+      setShowAccessKeyDialog(true);
+      return;
+    }
+    
     if (activeTab === label) {
       setActiveTab(null);
     } else {
@@ -134,6 +156,35 @@ const NumberDetailFinder = () => {
       setSearchQuery("");
       setResult(null);
       setError(null);
+    }
+  };
+
+  const handleAccessKeySubmit = () => {
+    if (accessKeyInput === settings.allSearchAccessKey) {
+      setAllSearchUnlocked(true);
+      setShowAccessKeyDialog(false);
+      setAccessKeyInput("");
+      
+      // Open the tab now
+      if (pendingTab) {
+        setActiveTab(pendingTab);
+        setSearchQuery("");
+        setResult(null);
+        setError(null);
+        setPendingTab(null);
+      }
+      
+      toast({
+        title: "Access Granted",
+        description: "ALL SEARCH unlocked successfully!",
+      });
+    } else {
+      toast({
+        title: "Access Denied",
+        description: "Wrong access key. Try again.",
+        variant: "destructive",
+      });
+      setAccessKeyInput("");
     }
   };
 
@@ -877,7 +928,40 @@ const NumberDetailFinder = () => {
   );
 
   return (
-    <div className="space-y-3">
+    <>
+      {/* Access Key Dialog for ALL SEARCH */}
+      <Dialog open={showAccessKeyDialog} onOpenChange={setShowAccessKeyDialog}>
+        <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-2 border-neon-red/50">
+          <DialogHeader>
+            <DialogTitle className="text-center text-neon-red flex items-center justify-center gap-2">
+              <Lock className="w-5 h-5" />
+              Enter Access Key
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <Input
+              type="password"
+              value={accessKeyInput}
+              onChange={(e) => setAccessKeyInput(e.target.value)}
+              placeholder="Enter access key..."
+              className="bg-background/50 border-neon-red/30 text-center font-mono"
+              onKeyDown={(e) => e.key === "Enter" && handleAccessKeySubmit()}
+            />
+            <Button 
+              onClick={handleAccessKeySubmit}
+              className="w-full bg-gradient-to-r from-neon-red to-neon-orange text-background font-bold"
+            >
+              <Lock className="w-4 h-4 mr-2" />
+              Unlock ALL SEARCH
+            </Button>
+            <p className="text-xs text-center text-muted-foreground">
+              This feature requires an access key
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <div className="space-y-3">
       {/* Main Card */}
       <div className="relative">
         <div className="relative rounded-2xl p-3 overflow-hidden border border-neon-green/30">
@@ -1037,6 +1121,7 @@ const NumberDetailFinder = () => {
         </div>
       )}
     </div>
+    </>
   );
 };
 

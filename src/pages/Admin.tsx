@@ -82,6 +82,7 @@ const Admin = () => {
   const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
+  const [showAllSearchKey, setShowAllSearchKey] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState("");
@@ -89,6 +90,7 @@ const Admin = () => {
   // Local state for editing
   const [localSitePassword, setLocalSitePassword] = useState(settings.sitePassword);
   const [localAdminPassword, setLocalAdminPassword] = useState(settings.adminPassword);
+  const [localAllSearchKey, setLocalAllSearchKey] = useState(settings.allSearchAccessKey || "");
 
 
   useEffect(() => {
@@ -129,9 +131,10 @@ const Admin = () => {
   const savePasswords = () => {
     updateSettings({ 
       sitePassword: localSitePassword, 
-      adminPassword: localAdminPassword 
+      adminPassword: localAdminPassword,
+      allSearchAccessKey: localAllSearchKey
     });
-    toast({ title: "Saved", description: "Passwords updated successfully" });
+    toast({ title: "Saved", description: "Passwords & Access Keys updated successfully" });
   };
 
   if (!isAuthenticated) {
@@ -1003,8 +1006,32 @@ const Admin = () => {
               <p className="text-xs text-muted-foreground">This password is required to access this admin panel</p>
             </div>
 
+            {/* ALL SEARCH Access Key */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-red flex items-center gap-2">
+                <Key className="w-4 h-4" /> ALL SEARCH Access Key
+              </h3>
+              <div className="relative">
+                <Input
+                  type={showAllSearchKey ? "text" : "password"}
+                  value={localAllSearchKey}
+                  onChange={(e) => setLocalAllSearchKey(e.target.value)}
+                  placeholder="Set access key for ALL SEARCH..."
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowAllSearchKey(!showAllSearchKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {showAllSearchKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">This key is required to access the ALL SEARCH feature. Leave empty to disable protection.</p>
+            </div>
+
             <Button onClick={savePasswords} className="w-full bg-neon-green text-background font-bold">
-              <Save className="w-4 h-4 mr-2" /> Save Passwords
+              <Save className="w-4 h-4 mr-2" /> Save Passwords & Keys
             </Button>
           </div>
         )}
