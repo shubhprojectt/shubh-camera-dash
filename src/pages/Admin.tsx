@@ -83,6 +83,7 @@ const Admin = () => {
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showAllSearchKey, setShowAllSearchKey] = useState(false);
+  const [showTelegramKey, setShowTelegramKey] = useState(false);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [adminPasswordInput, setAdminPasswordInput] = useState("");
@@ -91,6 +92,7 @@ const Admin = () => {
   const [localSitePassword, setLocalSitePassword] = useState(settings.sitePassword);
   const [localAdminPassword, setLocalAdminPassword] = useState(settings.adminPassword);
   const [localAllSearchKey, setLocalAllSearchKey] = useState(settings.allSearchAccessKey || "");
+  const [localTelegramKey, setLocalTelegramKey] = useState(settings.telegramOsintAccessKey || "");
 
 
   useEffect(() => {
@@ -132,7 +134,8 @@ const Admin = () => {
     updateSettings({ 
       sitePassword: localSitePassword, 
       adminPassword: localAdminPassword,
-      allSearchAccessKey: localAllSearchKey
+      allSearchAccessKey: localAllSearchKey,
+      telegramOsintAccessKey: localTelegramKey
     });
     toast({ title: "Saved", description: "Passwords & Access Keys updated successfully" });
   };
@@ -1028,6 +1031,30 @@ const Admin = () => {
                 </button>
               </div>
               <p className="text-xs text-muted-foreground">This key is required to access the ALL SEARCH feature. Leave empty to disable protection.</p>
+            </div>
+
+            {/* Telegram OSINT Access Key */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+              <h3 className="font-bold text-neon-cyan flex items-center gap-2">
+                <Key className="w-4 h-4" /> Telegram OSINT Access Key
+              </h3>
+              <div className="relative">
+                <Input
+                  type={showTelegramKey ? "text" : "password"}
+                  value={localTelegramKey}
+                  onChange={(e) => setLocalTelegramKey(e.target.value)}
+                  placeholder="Set access key for Telegram OSINT..."
+                  className="pr-10"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTelegramKey(!showTelegramKey)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                >
+                  {showTelegramKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground">This key is required to access Telegram OSINT. Leave empty to disable protection.</p>
             </div>
 
             <Button onClick={savePasswords} className="w-full bg-neon-green text-background font-bold">
