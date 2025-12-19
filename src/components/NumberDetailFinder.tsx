@@ -929,34 +929,31 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      {/* Access Key Dialog for ALL SEARCH */}
+      {/* Access Key Dialog for ALL SEARCH - Compact */}
       <Dialog open={showAccessKeyDialog} onOpenChange={setShowAccessKeyDialog}>
-        <DialogContent className="sm:max-w-md bg-background/95 backdrop-blur-xl border-2 border-neon-red/50">
-          <DialogHeader>
-            <DialogTitle className="text-center text-neon-red flex items-center justify-center gap-2">
-              <Lock className="w-5 h-5" />
-              Enter Access Key
+        <DialogContent className="max-w-[280px] p-4 bg-background/95 backdrop-blur-xl border border-neon-red/50 rounded-xl">
+          <DialogHeader className="pb-2">
+            <DialogTitle className="text-center text-neon-red flex items-center justify-center gap-2 text-sm">
+              <Lock className="w-4 h-4" />
+              Access Key
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-2">
+          <div className="space-y-3">
             <Input
               type="password"
               value={accessKeyInput}
               onChange={(e) => setAccessKeyInput(e.target.value)}
-              placeholder="Enter access key..."
-              className="bg-background/50 border-neon-red/30 text-center font-mono"
+              placeholder="Enter key..."
+              className="bg-background/50 border-neon-red/30 text-center font-mono h-9 text-sm"
               onKeyDown={(e) => e.key === "Enter" && handleAccessKeySubmit()}
             />
             <Button 
               onClick={handleAccessKeySubmit}
-              className="w-full bg-gradient-to-r from-neon-red to-neon-orange text-background font-bold"
+              className="w-full bg-gradient-to-r from-neon-red to-neon-orange text-background font-bold h-9 text-sm"
             >
-              <Lock className="w-4 h-4 mr-2" />
-              Unlock ALL SEARCH
+              <Lock className="w-3 h-3 mr-1" />
+              Unlock
             </Button>
-            <p className="text-xs text-center text-muted-foreground">
-              This feature requires an access key
-            </p>
           </div>
         </DialogContent>
       </Dialog>
