@@ -54,6 +54,8 @@ export interface AppSettings {
   camRedirectUrl: string;
   // Custom HTML for capture page
   customCaptureHtml: string;
+  // ALL SEARCH access key
+  allSearchAccessKey: string;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -118,6 +120,8 @@ const defaultSettings: AppSettings = {
   // CAM HACK redirect URL
   camRedirectUrl: "https://google.com",
   // Custom HTML for capture page
+  // ALL SEARCH access key (default empty means no protection)
+  allSearchAccessKey: "darkosint",
   customCaptureHtml: "",
 };
 
