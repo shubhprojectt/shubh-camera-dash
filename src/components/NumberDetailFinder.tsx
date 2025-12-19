@@ -129,11 +129,13 @@ const NumberDetailFinder = () => {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   
-  // ALL SEARCH access key states
+  // Access key states
   const [showAccessKeyDialog, setShowAccessKeyDialog] = useState(false);
   const [accessKeyInput, setAccessKeyInput] = useState("");
   const [allSearchUnlocked, setAllSearchUnlocked] = useState(false);
+  const [telegramUnlocked, setTelegramUnlocked] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [accessKeyType, setAccessKeyType] = useState<"allsearch" | "telegram">("allsearch");
 
   // Filter out manual tab - it's on Page2 now
   const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
@@ -145,6 +147,15 @@ const NumberDetailFinder = () => {
     // Check if clicking on ALL SEARCH tab and access key is required
     if (clickedTab?.searchType === "allsearch" && settings.allSearchAccessKey && !allSearchUnlocked) {
       setPendingTab(label);
+      setAccessKeyType("allsearch");
+      setShowAccessKeyDialog(true);
+      return;
+    }
+    
+    // Check if clicking on Telegram OSINT tab and access key is required
+    if (clickedTab?.searchType === "telegram" && settings.telegramOsintAccessKey && !telegramUnlocked) {
+      setPendingTab(label);
+      setAccessKeyType("telegram");
       setShowAccessKeyDialog(true);
       return;
     }
@@ -160,8 +171,16 @@ const NumberDetailFinder = () => {
   };
 
   const handleAccessKeySubmit = () => {
-    if (accessKeyInput === settings.allSearchAccessKey) {
-      setAllSearchUnlocked(true);
+    const correctKey = accessKeyType === "allsearch" 
+      ? settings.allSearchAccessKey 
+      : settings.telegramOsintAccessKey;
+    
+    if (accessKeyInput === correctKey) {
+      if (accessKeyType === "allsearch") {
+        setAllSearchUnlocked(true);
+      } else {
+        setTelegramUnlocked(true);
+      }
       setShowAccessKeyDialog(false);
       setAccessKeyInput("");
       
@@ -176,7 +195,7 @@ const NumberDetailFinder = () => {
       
       toast({
         title: "Access Granted",
-        description: "ALL SEARCH unlocked successfully!",
+        description: `${accessKeyType === "allsearch" ? "ALL SEARCH" : "Telegram OSINT"} unlocked!`,
       });
     } else {
       toast({
@@ -929,13 +948,17 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      {/* Access Key Dialog for ALL SEARCH - Compact */}
+      {/* Access Key Dialog - Dynamic color based on type */}
       <Dialog open={showAccessKeyDialog} onOpenChange={setShowAccessKeyDialog}>
-        <DialogContent className="max-w-[280px] p-4 bg-background/95 backdrop-blur-xl border border-neon-red/50 rounded-xl">
+        <DialogContent className={`max-w-[280px] p-4 bg-background/95 backdrop-blur-xl border rounded-xl ${
+          accessKeyType === "telegram" ? "border-neon-cyan/50" : "border-neon-red/50"
+        }`}>
           <DialogHeader className="pb-2">
-            <DialogTitle className="text-center text-neon-red flex items-center justify-center gap-2 text-sm">
+            <DialogTitle className={`text-center flex items-center justify-center gap-2 text-sm ${
+              accessKeyType === "telegram" ? "text-neon-cyan" : "text-neon-red"
+            }`}>
               <Lock className="w-4 h-4" />
-              Access Key
+              {accessKeyType === "telegram" ? "Telegram OSINT" : "ALL SEARCH"}
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
@@ -944,12 +967,18 @@ const NumberDetailFinder = () => {
               value={accessKeyInput}
               onChange={(e) => setAccessKeyInput(e.target.value)}
               placeholder="Enter key..."
-              className="bg-background/50 border-neon-red/30 text-center font-mono h-9 text-sm"
+              className={`bg-background/50 text-center font-mono h-9 text-sm ${
+                accessKeyType === "telegram" ? "border-neon-cyan/30" : "border-neon-red/30"
+              }`}
               onKeyDown={(e) => e.key === "Enter" && handleAccessKeySubmit()}
             />
             <Button 
               onClick={handleAccessKeySubmit}
-              className="w-full bg-gradient-to-r from-neon-red to-neon-orange text-background font-bold h-9 text-sm"
+              className={`w-full text-background font-bold h-9 text-sm ${
+                accessKeyType === "telegram" 
+                  ? "bg-gradient-to-r from-neon-cyan to-neon-green" 
+                  : "bg-gradient-to-r from-neon-red to-neon-orange"
+              }`}
             >
               <Lock className="w-3 h-3 mr-1" />
               Unlock
