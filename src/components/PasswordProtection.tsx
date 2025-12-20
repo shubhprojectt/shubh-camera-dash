@@ -43,7 +43,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
       {/* Background effects */}
       <div className="fixed inset-0 cyber-grid opacity-[0.03]" />
 

@@ -98,7 +98,7 @@ const Page2 = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-[100dvh] bg-background relative overflow-hidden">
       {/* Complex Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
       

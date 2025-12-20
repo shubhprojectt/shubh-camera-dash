@@ -9,7 +9,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-screen bg-black relative overflow-hidden">
+      <div className="min-h-[100dvh] bg-black relative overflow-hidden">
         {/* Custom background image or solid black */}
         {settings.backgroundImage ? (
           <div 
