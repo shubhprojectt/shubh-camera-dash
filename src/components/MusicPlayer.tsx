@@ -90,38 +90,32 @@ const MusicPlayer = ({ musicUrl }: MusicPlayerProps) => {
   const currentTime = audioRef.current?.currentTime || 0;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50">
+    <div className="w-full max-w-md mx-auto mt-6">
       {/* Audio Element */}
       <audio ref={audioRef} src={src} preload="metadata" loop />
 
       {/* Player UI */}
-      <div className="bg-background/95 backdrop-blur-xl border-t-2 border-neon-yellow/50 shadow-[0_-5px_30px_hsl(var(--neon-yellow)/0.2)]">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center gap-4">
+      <div className="bg-background/80 backdrop-blur-xl border-2 border-neon-yellow/50 rounded-2xl shadow-[0_0_30px_hsl(var(--neon-yellow)/0.2)]">
+        <div className="p-4">
+          <div className="flex flex-col items-center gap-4">
             {/* Music Icon */}
             <div className="relative">
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-br from-neon-yellow/30 to-neon-orange/20 flex items-center justify-center border border-neon-yellow/50 ${isPlaying ? "animate-pulse" : ""}`}>
-                <Music className="w-5 h-5 text-neon-yellow" />
+              <div className={`w-16 h-16 rounded-full bg-gradient-to-br from-neon-yellow/30 to-neon-orange/20 flex items-center justify-center border-2 border-neon-yellow/50 ${isPlaying ? "animate-pulse" : ""}`}>
+                <Music className="w-8 h-8 text-neon-yellow" />
               </div>
               {isPlaying && (
                 <div className="absolute inset-0 rounded-full border-2 border-dashed border-neon-orange/40 animate-spin" style={{ animationDuration: "3s" }} />
               )}
             </div>
 
-            {/* Play/Pause Button */}
-            <button
-              onClick={togglePlay}
-              className="w-12 h-12 rounded-full bg-gradient-to-r from-neon-yellow to-neon-orange flex items-center justify-center shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)] hover:scale-105 transition-transform active:scale-95"
-            >
-              {isPlaying ? (
-                <Pause className="w-5 h-5 text-background" />
-              ) : (
-                <Play className="w-5 h-5 text-background ml-0.5" />
-              )}
-            </button>
+            {/* Now Playing Label */}
+            <div className="text-center">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Now Playing</p>
+              <p className="text-sm text-neon-yellow font-bold">Background Music</p>
+            </div>
 
             {/* Progress Bar */}
-            <div className="flex-1 space-y-1">
+            <div className="w-full space-y-1">
               <Slider
                 value={[progress]}
                 onValueChange={handleProgressClick}
@@ -135,8 +129,9 @@ const MusicPlayer = ({ musicUrl }: MusicPlayerProps) => {
               </div>
             </div>
 
-            {/* Volume Control */}
-            <div className="flex items-center gap-2">
+            {/* Controls */}
+            <div className="flex items-center gap-4">
+              {/* Volume Control */}
               <button
                 onClick={toggleMute}
                 className="p-2 rounded-lg border border-neon-cyan/30 text-neon-cyan hover:bg-neon-cyan/10 transition-colors"
@@ -147,7 +142,21 @@ const MusicPlayer = ({ musicUrl }: MusicPlayerProps) => {
                   <Volume2 className="w-4 h-4" />
                 )}
               </button>
-              <div className="w-20 hidden sm:block">
+
+              {/* Play/Pause Button */}
+              <button
+                onClick={togglePlay}
+                className="w-14 h-14 rounded-full bg-gradient-to-r from-neon-yellow to-neon-orange flex items-center justify-center shadow-[0_0_25px_hsl(var(--neon-yellow)/0.5)] hover:scale-105 transition-transform active:scale-95"
+              >
+                {isPlaying ? (
+                  <Pause className="w-6 h-6 text-background" />
+                ) : (
+                  <Play className="w-6 h-6 text-background ml-0.5" />
+                )}
+              </button>
+
+              {/* Volume Slider */}
+              <div className="w-20">
                 <Slider
                   value={[isMuted ? 0 : volume]}
                   onValueChange={(v) => {
@@ -158,12 +167,6 @@ const MusicPlayer = ({ musicUrl }: MusicPlayerProps) => {
                   step={1}
                 />
               </div>
-            </div>
-
-            {/* Now Playing Label */}
-            <div className="hidden md:block text-right">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Now Playing</p>
-              <p className="text-xs text-neon-yellow font-bold truncate max-w-[120px]">Background Music</p>
             </div>
           </div>
         </div>
