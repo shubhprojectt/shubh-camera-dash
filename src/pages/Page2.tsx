@@ -100,11 +100,11 @@ const Page2 = () => {
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-hidden">
       {/* Complex Animated Background */}
-      <div className="fixed inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
       
       {/* Animated Grid */}
       <div 
-        className="fixed inset-0 opacity-[0.04] pointer-events-none animate-pulse"
+        className="absolute inset-0 opacity-[0.04] pointer-events-none animate-pulse"
         style={{
           backgroundImage: `linear-gradient(hsl(var(--neon-yellow)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--neon-yellow)) 1px, transparent 1px)`,
           backgroundSize: '40px 40px'
@@ -126,7 +126,7 @@ const Page2 = () => {
       <div className="fixed bottom-0 right-0 w-40 h-40 border-r-2 border-b-2 border-neon-yellow/40 pointer-events-none" style={{ animation: 'cornerPulse 2s ease-in-out infinite', animationDelay: '1.5s' }} />
       
       {/* Noise Overlay */}
-      <div className="fixed inset-0 opacity-[0.015] pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
+      <div className="absolute inset-0 opacity-[0.015] pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
 
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 py-6 max-w-md min-h-screen flex flex-col">

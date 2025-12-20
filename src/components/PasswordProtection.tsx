@@ -45,7 +45,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   return (
     <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
       {/* Background effects */}
-      <div className="fixed inset-0 cyber-grid opacity-[0.03]" />
+      <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
 
       {/* Lock Dialog */}
       <div className="relative w-full max-w-sm">

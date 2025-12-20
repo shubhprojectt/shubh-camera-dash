@@ -99,6 +99,21 @@
 }
 
 @layer utilities {
+  /* Fix mobile Chrome viewport issues (black strip) */
+  .fixed-viewport {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+  }
+
+  @supports (height: 100dvh) {
+    .fixed-viewport {
+      height: 100dvh;
+    }
+  }
+
   .glow-green {
     box-shadow: 0 0 15px hsl(var(--neon-green) / 0.6),
                 0 0 30px hsl(var(--neon-green) / 0.4),
