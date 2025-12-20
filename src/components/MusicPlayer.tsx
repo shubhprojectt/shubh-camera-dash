@@ -95,7 +95,7 @@ const MusicPlayer = ({ musicUrl }: MusicPlayerProps) => {
       <audio ref={audioRef} src={src} preload="metadata" loop />
 
       {/* Player UI */}
-      <div className="bg-background/80 backdrop-blur-xl border-2 border-neon-yellow/50 rounded-2xl shadow-[0_0_30px_hsl(var(--neon-yellow)/0.2)]">
+      <div className="border-2 border-neon-yellow/50 rounded-2xl shadow-[0_0_30px_hsl(var(--neon-yellow)/0.2)]">
         <div className="p-4">
           <div className="flex flex-col items-center gap-4">
             {/* Music Icon */}
