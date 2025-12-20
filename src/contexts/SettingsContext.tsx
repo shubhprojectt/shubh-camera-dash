@@ -137,6 +137,31 @@ const defaultSettings: AppSettings = {
   telegramKeyEnabled: true,
 };
 
+const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
+  const savedTabIds = tabs?.map((t) => t.id) || [];
+  const newTabs = defaultTabs.filter((t) => !savedTabIds.includes(t.id));
+  return [...(tabs || []), ...newTabs];
+};
+
+const hydrateSettings = (partial?: Partial<AppSettings>): AppSettings => {
+  const merged = { ...defaultSettings, ...(partial || {}) } as AppSettings;
+  return {
+    ...merged,
+    tabs: mergeTabsWithDefaults(partial?.tabs as TabConfig[] | undefined),
+  };
+};
+
+const getInitialSettings = (): AppSettings => {
+  try {
+    const saved = localStorage.getItem("app_settings");
+    if (!saved) return defaultSettings;
+    const parsed = JSON.parse(saved) as Partial<AppSettings>;
+    return hydrateSettings(parsed);
+  } catch {
+    return defaultSettings;
+  }
+};
+
 interface SettingsContextType {
   settings: AppSettings;
   isLoaded: boolean;
@@ -149,8 +174,14 @@ interface SettingsContextType {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
-  const [settings, setSettings] = useState<AppSettings>(defaultSettings);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [settings, setSettings] = useState<AppSettings>(() => getInitialSettings());
+  const [isLoaded, setIsLoaded] = useState(() => {
+    try {
+      return !!localStorage.getItem("app_settings");
+    } catch {
+      return false;
+    }
+  });
 
   // Load settings from Supabase on mount
   useEffect(() => {
@@ -167,18 +198,12 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
           // Fall back to localStorage
           const saved = localStorage.getItem("app_settings");
           if (saved) {
-            const parsed = JSON.parse(saved);
-            const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
-            const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
-            const mergedTabs = [...(parsed.tabs || []), ...newTabs];
-            setSettings({ ...defaultSettings, ...parsed, tabs: mergedTabs });
+            const parsed = JSON.parse(saved) as Partial<AppSettings>;
+            setSettings(hydrateSettings(parsed));
           }
         } else if (data) {
-          const parsed = data.setting_value as unknown as AppSettings;
-          const savedTabIds = parsed.tabs?.map((t: TabConfig) => t.id) || [];
-          const newTabs = defaultTabs.filter(t => !savedTabIds.includes(t.id));
-          const mergedTabs = [...(parsed.tabs || []), ...newTabs];
-          setSettings({ ...defaultSettings, ...parsed, tabs: mergedTabs });
+          const parsed = data.setting_value as unknown as Partial<AppSettings>;
+          setSettings(hydrateSettings(parsed));
         }
       } catch (err) {
         console.error('Error loading settings:', err);
