@@ -20,7 +20,8 @@ import {
   Image,
   Send,
   Camera,
-  Video
+  Video,
+  Music
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -79,7 +80,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "theme" | "password" | "history">("header");
+  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "music" | "theme" | "password" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showAllSearchKey, setShowAllSearchKey] = useState(false);
@@ -214,6 +215,7 @@ const Admin = () => {
             { id: "darkdb", icon: Database, label: "DARK DB" },
             { id: "telegram", icon: Send, label: "Telegram" },
             { id: "camhack", icon: Camera, label: "CAM Hack" },
+            { id: "music", icon: Music, label: "Music" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
             { id: "history", icon: History, label: "History" },
@@ -928,6 +930,57 @@ const Admin = () => {
               >
                 <Trash2 className="w-4 h-4 mr-2" /> Clear All Photos
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Music Section */}
+        {activeSection === "music" && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-display text-neon-cyan mb-4 flex items-center gap-2">
+              <Music className="w-5 h-5" /> Page2 Background Music
+            </h2>
+            
+            {/* Music URL */}
+            <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
+              <h3 className="font-bold text-neon-yellow">Music URL</h3>
+              <p className="text-xs text-muted-foreground">
+                Direct link to MP3 file that will play in the Page2 music player (leave empty for default music)
+              </p>
+              <Input
+                value={settings.page2MusicUrl || ""}
+                onChange={(e) => updateSettings({ page2MusicUrl: e.target.value })}
+                placeholder="https://example.com/music.mp3"
+                className="font-mono text-sm"
+              />
+              {settings.page2MusicUrl && (
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open(settings.page2MusicUrl, '_blank')}
+                    className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-1" /> Test URL
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => updateSettings({ page2MusicUrl: "" })}
+                    className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+                  >
+                    <X className="w-4 h-4 mr-1" /> Clear
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Info */}
+            <div className="border border-neon-yellow/30 rounded-xl p-4 bg-neon-yellow/5">
+              <p className="text-xs text-neon-yellow">
+                <strong>Tip:</strong> You can use direct MP3 links from Google Drive, Dropbox, or any other CDN. 
+                The music will play in a bottom player on Page2 with play/pause and volume controls.
+              </p>
             </div>
           </div>
         )}
