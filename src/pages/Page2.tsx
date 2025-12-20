@@ -98,7 +98,7 @@ const Page2 = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden pb-24">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Complex Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
       
@@ -262,6 +262,9 @@ const Page2 = () => {
               <p className="text-[9px] text-neon-green/70 uppercase tracking-wider font-bold">Secure Search</p>
             </div>
           </div>
+
+          {/* Music Player - Centered */}
+          <MusicPlayer musicUrl={settings.page2MusicUrl} />
         </div>
 
         {/* Footer */}
@@ -287,9 +290,6 @@ const Page2 = () => {
           50% { opacity: 0.8; }
         }
       `}</style>
-
-      {/* Music Player */}
-      <MusicPlayer musicUrl={settings.page2MusicUrl} />
     </div>
   );
 };
