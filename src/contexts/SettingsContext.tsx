@@ -139,6 +139,7 @@ const defaultSettings: AppSettings = {
 
 interface SettingsContextType {
   settings: AppSettings;
+  isLoaded: boolean;
   updateSettings: (newSettings: Partial<AppSettings>) => void;
   updateTab: (tabId: string, updates: Partial<TabConfig>) => void;
   updateTelegramTool: (toolId: string, updates: Partial<TelegramToolConfig>) => void;
@@ -267,7 +268,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <SettingsContext.Provider value={{ settings, updateSettings, updateTab, updateTelegramTool, resetSettings }}>
+    <SettingsContext.Provider value={{ settings, isLoaded, updateSettings, updateTab, updateTelegramTool, resetSettings }}>
       {children}
     </SettingsContext.Provider>
   );
