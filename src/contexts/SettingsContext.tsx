@@ -58,6 +58,10 @@ export interface AppSettings {
   allSearchAccessKey: string;
   // Telegram OSINT access key
   telegramOsintAccessKey: string;
+  // Password protection toggles
+  sitePasswordEnabled: boolean;
+  allSearchKeyEnabled: boolean;
+  telegramKeyEnabled: boolean;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -127,6 +131,10 @@ const defaultSettings: AppSettings = {
   allSearchAccessKey: "darkosint",
   // Telegram OSINT access key
   telegramOsintAccessKey: "darkosint",
+  // Password protection toggles
+  sitePasswordEnabled: true,
+  allSearchKeyEnabled: true,
+  telegramKeyEnabled: true,
 };
 
 interface SettingsContextType {

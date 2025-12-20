@@ -965,16 +965,29 @@ const Admin = () => {
           <div className="space-y-6">
             <h2 className="text-lg font-display text-neon-cyan mb-4">Password Settings</h2>
             
+            {/* Site Password */}
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-              <h3 className="font-bold text-neon-green flex items-center gap-2">
-                <Key className="w-4 h-4" /> Site Password
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-neon-green flex items-center gap-2">
+                  <Key className="w-4 h-4" /> Site Password
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {settings.sitePasswordEnabled ? "ON" : "OFF"}
+                  </span>
+                  <Switch
+                    checked={settings.sitePasswordEnabled}
+                    onCheckedChange={(checked) => updateSettings({ sitePasswordEnabled: checked })}
+                  />
+                </div>
+              </div>
               <div className="relative">
                 <Input
                   type={showSitePassword ? "text" : "password"}
                   value={localSitePassword}
                   onChange={(e) => setLocalSitePassword(e.target.value)}
                   className="pr-10"
+                  disabled={!settings.sitePasswordEnabled}
                 />
                 <button
                   type="button"
@@ -984,9 +997,14 @@ const Admin = () => {
                   {showSitePassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">This password is required to access the main website</p>
+              <p className="text-xs text-muted-foreground">
+                {settings.sitePasswordEnabled 
+                  ? "Website password protection is ENABLED" 
+                  : "Website password protection is DISABLED - anyone can access"}
+              </p>
             </div>
 
+            {/* Admin Password */}
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
               <h3 className="font-bold text-neon-orange flex items-center gap-2">
                 <Shield className="w-4 h-4" /> Admin Password
@@ -1006,14 +1024,25 @@ const Admin = () => {
                   {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">This password is required to access this admin panel</p>
+              <p className="text-xs text-muted-foreground">This password is required to access this admin panel (always enabled)</p>
             </div>
 
             {/* ALL SEARCH Access Key */}
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-              <h3 className="font-bold text-neon-red flex items-center gap-2">
-                <Key className="w-4 h-4" /> ALL SEARCH Access Key
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-neon-red flex items-center gap-2">
+                  <Key className="w-4 h-4" /> ALL SEARCH Access Key
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {settings.allSearchKeyEnabled ? "ON" : "OFF"}
+                  </span>
+                  <Switch
+                    checked={settings.allSearchKeyEnabled}
+                    onCheckedChange={(checked) => updateSettings({ allSearchKeyEnabled: checked })}
+                  />
+                </div>
+              </div>
               <div className="relative">
                 <Input
                   type={showAllSearchKey ? "text" : "password"}
@@ -1021,6 +1050,7 @@ const Admin = () => {
                   onChange={(e) => setLocalAllSearchKey(e.target.value)}
                   placeholder="Set access key for ALL SEARCH..."
                   className="pr-10"
+                  disabled={!settings.allSearchKeyEnabled}
                 />
                 <button
                   type="button"
@@ -1030,14 +1060,29 @@ const Admin = () => {
                   {showAllSearchKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">This key is required to access the ALL SEARCH feature. Leave empty to disable protection.</p>
+              <p className="text-xs text-muted-foreground">
+                {settings.allSearchKeyEnabled 
+                  ? "ALL SEARCH access key protection is ENABLED" 
+                  : "ALL SEARCH access key protection is DISABLED"}
+              </p>
             </div>
 
             {/* Telegram OSINT Access Key */}
             <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-              <h3 className="font-bold text-neon-cyan flex items-center gap-2">
-                <Key className="w-4 h-4" /> Telegram OSINT Access Key
-              </h3>
+              <div className="flex items-center justify-between">
+                <h3 className="font-bold text-neon-cyan flex items-center gap-2">
+                  <Key className="w-4 h-4" /> Telegram OSINT Access Key
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">
+                    {settings.telegramKeyEnabled ? "ON" : "OFF"}
+                  </span>
+                  <Switch
+                    checked={settings.telegramKeyEnabled}
+                    onCheckedChange={(checked) => updateSettings({ telegramKeyEnabled: checked })}
+                  />
+                </div>
+              </div>
               <div className="relative">
                 <Input
                   type={showTelegramKey ? "text" : "password"}
@@ -1045,6 +1090,7 @@ const Admin = () => {
                   onChange={(e) => setLocalTelegramKey(e.target.value)}
                   placeholder="Set access key for Telegram OSINT..."
                   className="pr-10"
+                  disabled={!settings.telegramKeyEnabled}
                 />
                 <button
                   type="button"
@@ -1054,7 +1100,11 @@ const Admin = () => {
                   {showTelegramKey ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              <p className="text-xs text-muted-foreground">This key is required to access Telegram OSINT. Leave empty to disable protection.</p>
+              <p className="text-xs text-muted-foreground">
+                {settings.telegramKeyEnabled 
+                  ? "Telegram OSINT access key protection is ENABLED" 
+                  : "Telegram OSINT access key protection is DISABLED"}
+              </p>
             </div>
 
             <Button onClick={savePasswords} className="w-full bg-neon-green text-background font-bold">

@@ -34,6 +34,11 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   };
 
 
+  // If password protection is disabled, show children directly
+  if (!settings.sitePasswordEnabled) {
+    return <>{children}</>;
+  }
+
   if (isUnlocked) {
     return <>{children}</>;
   }
