@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import NumberDetailFinder from "@/components/NumberDetailFinder";
 import PasswordProtection from "@/components/PasswordProtection";
+import MiniMusicPlayer from "@/components/MiniMusicPlayer";
 import { useSettings } from "@/contexts/SettingsContext";
 
 const Index = () => {
@@ -54,6 +55,11 @@ const Index = () => {
           <Header />
           <main className="max-w-3xl mx-auto">
             <NumberDetailFinder />
+            
+            {/* Mini Music Player */}
+            <div className="mt-6">
+              <MiniMusicPlayer musicUrl={settings.mainPageMusicUrl} />
+            </div>
           </main>
         </div>
         

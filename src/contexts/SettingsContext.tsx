@@ -64,6 +64,8 @@ export interface AppSettings {
   telegramKeyEnabled: boolean;
   // Page2 background music URL
   page2MusicUrl: string;
+  // Main page background music URL
+  mainPageMusicUrl: string;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -139,6 +141,8 @@ const defaultSettings: AppSettings = {
   telegramKeyEnabled: true,
   // Page2 background music
   page2MusicUrl: "",
+  // Main page background music
+  mainPageMusicUrl: "",
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
