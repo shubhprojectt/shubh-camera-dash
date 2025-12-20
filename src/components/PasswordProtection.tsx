@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Lock } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -10,7 +10,7 @@ interface PasswordProtectionProps {
 }
 
 const PasswordProtection = ({ children }: PasswordProtectionProps) => {
-  const { settings } = useSettings();
+  const { settings, isLoaded } = useSettings();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -33,6 +33,16 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
     }
   };
 
+  // Avoid flicker while settings load from backend
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="text-center space-y-2">
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        </div>
+      </div>
+    );
+  }
 
   // If password protection is disabled, show children directly
   if (!settings.sitePasswordEnabled) {
