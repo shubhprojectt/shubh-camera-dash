@@ -83,6 +83,11 @@
     @apply border-border;
   }
 
+  html, body, #root {
+    min-height: 100%;
+    min-height: 100dvh;
+  }
+
   body {
     @apply bg-background text-foreground font-mono;
     font-family: 'Share Tech Mono', monospace;
