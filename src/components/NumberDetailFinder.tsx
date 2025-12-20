@@ -144,16 +144,16 @@ const NumberDetailFinder = () => {
   const handleTabClick = (label: string) => {
     const clickedTab = enabledTabs.find(t => t.label === label);
     
-    // Check if clicking on ALL SEARCH tab and access key is required
-    if (clickedTab?.searchType === "allsearch" && settings.allSearchAccessKey && !allSearchUnlocked) {
+    // Check if clicking on ALL SEARCH tab and access key is required AND enabled
+    if (clickedTab?.searchType === "allsearch" && settings.allSearchKeyEnabled && settings.allSearchAccessKey && !allSearchUnlocked) {
       setPendingTab(label);
       setAccessKeyType("allsearch");
       setShowAccessKeyDialog(true);
       return;
     }
     
-    // Check if clicking on Telegram OSINT tab and access key is required
-    if (clickedTab?.searchType === "telegram" && settings.telegramOsintAccessKey && !telegramUnlocked) {
+    // Check if clicking on Telegram OSINT tab and access key is required AND enabled
+    if (clickedTab?.searchType === "telegram" && settings.telegramKeyEnabled && settings.telegramOsintAccessKey && !telegramUnlocked) {
       setPendingTab(label);
       setAccessKeyType("telegram");
       setShowAccessKeyDialog(true);
