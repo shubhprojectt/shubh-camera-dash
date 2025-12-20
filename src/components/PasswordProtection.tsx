@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Lock } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -6,11 +6,11 @@ import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 
 interface PasswordProtectionProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const PasswordProtection = ({ children }: PasswordProtectionProps) => {
-  const { settings, isLoaded } = useSettings();
+  const { settings } = useSettings();
   const [isUnlocked, setIsUnlocked] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -33,17 +33,6 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
     }
   };
 
-  // Avoid flicker while settings load from backend
-  if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">Loading…</p>
-        </div>
-      </div>
-    );
-  }
-
   // If password protection is disabled, show children directly
   if (!settings.sitePasswordEnabled) {
     return <>{children}</>;
@@ -57,12 +46,12 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       {/* Background effects */}
       <div className="fixed inset-0 cyber-grid opacity-[0.03]" />
-      
+
       {/* Lock Dialog */}
       <div className="relative w-full max-w-sm">
         {/* Outer glow border */}
         <div className="absolute -inset-[2px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-80 blur-sm animate-pulse" />
-        
+
         <div className="relative bg-background border-2 border-neon-green/50 rounded-2xl p-6 space-y-6">
           {/* Lock Icon */}
           <div className="flex justify-center">
