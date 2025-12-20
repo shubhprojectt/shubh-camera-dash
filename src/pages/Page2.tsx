@@ -18,6 +18,7 @@ import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Link, useNavigate } from "react-router-dom";
+import MusicPlayer from "@/components/MusicPlayer";
 
 const Page2 = () => {
   const { settings } = useSettings();
@@ -97,7 +98,7 @@ const Page2 = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden pb-24">
       {/* Complex Animated Background */}
       <div className="fixed inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
       
@@ -286,6 +287,9 @@ const Page2 = () => {
           50% { opacity: 0.8; }
         }
       `}</style>
+
+      {/* Music Player */}
+      <MusicPlayer musicUrl={settings.page2MusicUrl} />
     </div>
   );
 };

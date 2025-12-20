@@ -62,6 +62,8 @@ export interface AppSettings {
   sitePasswordEnabled: boolean;
   allSearchKeyEnabled: boolean;
   telegramKeyEnabled: boolean;
+  // Page2 background music URL
+  page2MusicUrl: string;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -135,6 +137,8 @@ const defaultSettings: AppSettings = {
   sitePasswordEnabled: true,
   allSearchKeyEnabled: true,
   telegramKeyEnabled: true,
+  // Page2 background music
+  page2MusicUrl: "",
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
