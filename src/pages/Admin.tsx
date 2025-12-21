@@ -40,6 +40,7 @@ const colorOptions = [
   { value: "red", label: "Red", color: "bg-neon-red" },
   { value: "purple", label: "Purple", color: "bg-neon-purple" },
   { value: "yellow", label: "Yellow", color: "bg-neon-yellow" },
+  { value: "blue", label: "Blue", color: "bg-neon-blue" },
 ];
 
 const iconOptions = [
