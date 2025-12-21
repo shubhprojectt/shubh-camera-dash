@@ -14,6 +14,48 @@ export type Database = {
   }
   public: {
     Tables: {
+      access_passwords: {
+        Row: {
+          created_at: string
+          device_id: string | null
+          id: string
+          is_enabled: boolean
+          is_used: boolean
+          password_display: string
+          password_hash: string
+          remaining_credits: number
+          total_credits: number
+          updated_at: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_enabled?: boolean
+          is_used?: boolean
+          password_display: string
+          password_hash: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          device_id?: string | null
+          id?: string
+          is_enabled?: boolean
+          is_used?: boolean
+          password_display?: string
+          password_hash?: string
+          remaining_credits?: number
+          total_credits?: number
+          updated_at?: string
+          used_at?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           created_at: string
@@ -65,6 +107,41 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_usage: {
+        Row: {
+          created_at: string
+          credits_used: number
+          id: string
+          password_id: string
+          search_query: string | null
+          search_type: string
+        }
+        Insert: {
+          created_at?: string
+          credits_used: number
+          id?: string
+          password_id: string
+          search_query?: string | null
+          search_type: string
+        }
+        Update: {
+          created_at?: string
+          credits_used?: number
+          id?: string
+          password_id?: string
+          search_query?: string | null
+          search_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "credit_usage_password_id_fkey"
+            columns: ["password_id"]
+            isOneToOne: false
+            referencedRelation: "access_passwords"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       search_history: {
         Row: {
           id: string
@@ -88,6 +165,44 @@ export type Database = {
           searched_at?: string
         }
         Relationships: []
+      }
+      user_sessions: {
+        Row: {
+          created_at: string
+          device_id: string
+          id: string
+          is_active: boolean
+          last_active_at: string
+          password_id: string
+          session_token: string
+        }
+        Insert: {
+          created_at?: string
+          device_id: string
+          id?: string
+          is_active?: boolean
+          last_active_at?: string
+          password_id: string
+          session_token: string
+        }
+        Update: {
+          created_at?: string
+          device_id?: string
+          id?: string
+          is_active?: boolean
+          last_active_at?: string
+          password_id?: string
+          session_token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_sessions_password_id_fkey"
+            columns: ["password_id"]
+            isOneToOne: false
+            referencedRelation: "access_passwords"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
