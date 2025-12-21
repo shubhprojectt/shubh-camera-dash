@@ -35,6 +35,7 @@ import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   Dialog,
   DialogContent,
@@ -124,6 +125,7 @@ interface AadharResult {
 
 const NumberDetailFinder = () => {
   const { settings } = useSettings();
+  const { credits, deductCredits, isAuthenticated } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -224,6 +226,27 @@ const NumberDetailFinder = () => {
       toast({
         title: "Error",
         description: "Please enter a value to search",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check if user has credits
+    if (credits <= 0) {
+      toast({
+        title: "No Credits",
+        description: "Credits finished! Contact admin for more.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Deduct 1 credit for search
+    const deductResult = await deductCredits(activeButton?.searchType || "search", searchQuery.trim());
+    if (!deductResult.success) {
+      toast({
+        title: "Credit Error",
+        description: deductResult.error || "Failed to deduct credits",
         variant: "destructive",
       });
       return;
