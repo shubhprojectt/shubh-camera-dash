@@ -487,7 +487,7 @@ const TelegramOSINT: React.FC = () => {
       )}
 
       {/* Tools Label */}
-      <h2 className="text-gray-400 text-sm font-mono tracking-widest mb-4">T O O L S</h2>
+      <h2 className="text-gray-400 text-lg font-semibold mb-4">tele dark</h2>
 
       {/* Tools Grid */}
       <div className="bg-black/40 border border-gray-800 rounded-xl p-3 mb-6">
