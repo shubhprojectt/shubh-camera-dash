@@ -74,6 +74,20 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
             </p>
           </div>
 
+          {/* Description */}
+          <div className="bg-card/50 border border-neon-cyan/30 rounded-xl p-3 space-y-2">
+            <p className="text-xs text-neon-cyan font-medium text-center">
+              Sirf number daalo aur paao complete details
+            </p>
+            <p className="text-[10px] text-muted-foreground text-center">
+              Humari API ye sab details fetch karti hai:
+            </p>
+            <div className="flex items-start gap-2 text-[10px] text-neon-green">
+              <span>1️⃣</span>
+              <span><span className="font-bold">Number Info:</span> Name, Father Name, Complete Address, ID Number & Operator</span>
+            </div>
+          </div>
+
           {/* Password Input */}
           <div className="space-y-4">
             <div className="relative">
