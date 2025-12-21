@@ -143,7 +143,7 @@ const defaultSettings: AppSettings = {
   // Page2 background music
   page2MusicUrl: "",
   // Main page background music
-  mainPageMusicUrl: "",
+  mainPageMusicUrl: "https://drive.google.com/uc?export=download&id=1sj6vS9SH4pkJYRbZ5ILHokVSGPQ0l_l5",
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
