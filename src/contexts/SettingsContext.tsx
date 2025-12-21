@@ -147,9 +147,19 @@ const defaultSettings: AppSettings = {
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
+  // Always use colors from defaultTabs to ensure unique colors
+  const colorMap = new Map(defaultTabs.map(t => [t.id, t.color]));
+  
   const savedTabIds = tabs?.map((t) => t.id) || [];
   const newTabs = defaultTabs.filter((t) => !savedTabIds.includes(t.id));
-  return [...(tabs || []), ...newTabs];
+  
+  // Update existing tabs with correct colors from defaults
+  const updatedTabs = (tabs || []).map(tab => ({
+    ...tab,
+    color: colorMap.get(tab.id) || tab.color
+  }));
+  
+  return [...updatedTabs, ...newTabs];
 };
 
 const hydrateSettings = (partial?: Partial<AppSettings>): AppSettings => {
