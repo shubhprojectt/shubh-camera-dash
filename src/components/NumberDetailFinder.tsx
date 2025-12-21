@@ -24,7 +24,8 @@ import {
   Send,
   LucideIcon,
   ArrowRight,
-  Lock
+  Lock,
+  MessageCircle
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -42,7 +43,7 @@ import {
 } from "./ui/dialog";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle
 };
 
 interface VehicleResult {
@@ -345,6 +346,49 @@ const NumberDetailFinder = () => {
         });
       } finally {
         setLoading(false);
+      }
+      return;
+    }
+
+    // Tg To Num search
+    if (activeButton?.searchType === "tgtonum") {
+      if (activeButton.apiUrl) {
+        try {
+          const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`);
+          const data = await response.json();
+          
+          if (data && !data.error) {
+            setResult({ type: "tgtonum", data });
+            toast({
+              title: "Tg To Num Results",
+              description: `Results found for: ${searchQuery}`,
+            });
+          } else {
+            setError(data?.error || "No information found");
+            toast({
+              title: "Not Found",
+              description: data?.error || "No information found",
+              variant: "destructive",
+            });
+          }
+        } catch (err) {
+          setError("Failed to fetch data. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to fetch data",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+        setError("API not configured. Please set API URL in Admin panel.");
+        toast({
+          title: "API Not Set",
+          description: "Configure API URL in Admin panel",
+          variant: "destructive",
+        });
       }
       return;
     }
