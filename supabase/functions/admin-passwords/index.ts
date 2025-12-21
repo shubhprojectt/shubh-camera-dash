@@ -36,17 +36,19 @@ serve(async (req) => {
 
     const { action, adminPassword, ...params } = await req.json();
 
-    // Verify admin password (from app_settings)
+    // Verify admin password (from app_settings - stored in main_settings)
     const { data: adminSetting } = await supabase
       .from('app_settings')
       .select('setting_value')
-      .eq('setting_key', 'admin_password')
+      .eq('setting_key', 'main_settings')
       .single();
 
-    const storedAdminPassword = adminSetting?.setting_value?.password || 'admin123';
+    // Extract adminPassword from settings (it's stored in main_settings JSON)
+    const settingsValue = adminSetting?.setting_value as any;
+    const storedAdminPassword = settingsValue?.adminPassword || 'dark';
     
     if (adminPassword !== storedAdminPassword) {
-      console.log('Invalid admin password');
+      console.log('Invalid admin password. Received:', adminPassword, 'Expected:', storedAdminPassword);
       return new Response(
         JSON.stringify({ error: 'Invalid admin password' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
