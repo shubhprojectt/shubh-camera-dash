@@ -154,6 +154,91 @@ const Admin = () => {
     }
   };
 
+  // Credit Password Management Functions
+  const fetchPasswords = async () => {
+    setIsLoadingPasswords(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-passwords', {
+        body: { action: 'list', adminPassword: settings.adminPassword }
+      });
+      if (error) throw error;
+      setPasswordRecords(data.passwords || []);
+    } catch (err) {
+      console.error('Error fetching passwords:', err);
+      toast({ title: "Error", description: "Failed to fetch passwords", variant: "destructive" });
+    } finally {
+      setIsLoadingPasswords(false);
+    }
+  };
+
+  const createPassword = async () => {
+    const credits = parseInt(newCredits);
+    if (isNaN(credits) || credits < 1) {
+      toast({ title: "Error", description: "Credits must be at least 1", variant: "destructive" });
+      return;
+    }
+    setIsCreating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('admin-passwords', {
+        body: { action: 'create', adminPassword: settings.adminPassword, credits }
+      });
+      if (error) throw error;
+      toast({ title: "Password Created", description: `Password: ${data.password.password_display}` });
+      fetchPasswords();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to create password", variant: "destructive" });
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
+  const updatePassword = async (passwordId: string, updates: { credits?: number; isEnabled?: boolean }) => {
+    try {
+      const { error } = await supabase.functions.invoke('admin-passwords', {
+        body: { action: 'update', adminPassword: settings.adminPassword, passwordId, ...updates }
+      });
+      if (error) throw error;
+      toast({ title: "Updated", description: "Password updated successfully" });
+      fetchPasswords();
+      setEditingId(null);
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to update", variant: "destructive" });
+    }
+  };
+
+  const deletePassword = async (passwordId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('admin-passwords', {
+        body: { action: 'delete', adminPassword: settings.adminPassword, passwordId }
+      });
+      if (error) throw error;
+      toast({ title: "Deleted", description: "Password deleted" });
+      fetchPasswords();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
+    }
+  };
+
+  const resetPassword = async (passwordId: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('admin-passwords', {
+        body: { action: 'reset', adminPassword: settings.adminPassword, passwordId }
+      });
+      if (error) throw error;
+      toast({ title: "Reset", description: "Password reset - can be used on new device" });
+      fetchPasswords();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to reset", variant: "destructive" });
+    }
+  };
+
+  // Load passwords when credits section is active
+  useEffect(() => {
+    if (isAuthenticated && activeSection === 'credits') {
+      fetchPasswords();
+    }
+  }, [isAuthenticated, activeSection]);
+
   const handleAdminLogin = () => {
     if (adminPasswordInput === settings.adminPassword) {
       setIsAuthenticated(true);
@@ -250,6 +335,7 @@ const Admin = () => {
             { id: "music", icon: Music, label: "Music" },
             { id: "theme", icon: Palette, label: "Theme" },
             { id: "password", icon: Key, label: "Password" },
+            { id: "credits", icon: Coins, label: "Credits" },
             { id: "history", icon: History, label: "History" },
           ].map((section) => (
             <Button
@@ -1229,6 +1315,220 @@ const Admin = () => {
             <Button onClick={savePasswords} className="w-full bg-neon-green text-background font-bold">
               <Save className="w-4 h-4 mr-2" /> Save Passwords & Keys
             </Button>
+          </div>
+        )}
+
+        {/* Credits Section */}
+        {activeSection === "credits" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-display text-neon-cyan flex items-center gap-2">
+                <Coins className="w-5 h-5" /> Credit Password Management
+              </h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={fetchPasswords} 
+                className="border-neon-cyan/50 text-neon-cyan"
+                disabled={isLoadingPasswords}
+              >
+                <RefreshCw className={`w-4 h-4 mr-1 ${isLoadingPasswords ? 'animate-spin' : ''}`} /> Refresh
+              </Button>
+            </div>
+
+            {/* Generate New Password */}
+            <div className="border border-neon-green/50 rounded-xl p-4 bg-neon-green/5 space-y-4">
+              <h3 className="font-bold text-neon-green flex items-center gap-2">
+                <Plus className="w-4 h-4" /> Generate New Password
+              </h3>
+              <div className="flex gap-3">
+                <div className="flex-1">
+                  <label className="text-xs text-muted-foreground mb-1 block">Credits</label>
+                  <Input
+                    type="number"
+                    value={newCredits}
+                    onChange={(e) => setNewCredits(e.target.value)}
+                    placeholder="50"
+                    className="h-12 text-lg font-mono"
+                    min="1"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <Button
+                    onClick={createPassword}
+                    disabled={isCreating}
+                    className="h-12 px-6 bg-neon-green text-background font-bold hover:bg-neon-green/80"
+                  >
+                    {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5 mr-2" /> Generate</>}
+                  </Button>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                {[10, 50, 100, 500].map((c) => (
+                  <Button
+                    key={c}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setNewCredits(c.toString())}
+                    className={`border-neon-green/50 ${newCredits === c.toString() ? 'bg-neon-green/20 text-neon-green' : 'text-neon-green/70'}`}
+                  >
+                    {c} Credits
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* Password List */}
+            <div className="space-y-3">
+              {isLoadingPasswords ? (
+                <div className="text-center py-12">
+                  <Loader2 className="w-8 h-8 mx-auto animate-spin text-neon-cyan" />
+                  <p className="text-muted-foreground mt-2">Loading passwords...</p>
+                </div>
+              ) : passwordRecords.length === 0 ? (
+                <div className="text-center py-12 text-muted-foreground">
+                  <Key className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No passwords generated yet</p>
+                </div>
+              ) : (
+                passwordRecords.map((record) => (
+                  <div 
+                    key={record.id} 
+                    className={`border rounded-xl p-4 transition-all ${
+                      record.is_enabled 
+                        ? 'border-neon-cyan/30 bg-card/50' 
+                        : 'border-red-500/30 bg-red-500/5 opacity-60'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xl font-mono font-bold text-neon-cyan tracking-widest">
+                          {record.password_display}
+                        </span>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => {
+                            navigator.clipboard.writeText(record.password_display);
+                            toast({ title: "Copied!", description: "Password copied to clipboard" });
+                          }}
+                          className="text-neon-green hover:bg-neon-green/10"
+                        >
+                          <Save className="w-4 h-4" />
+                        </Button>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded ${record.is_used ? 'bg-neon-yellow/20 text-neon-yellow' : 'bg-neon-green/20 text-neon-green'}`}>
+                          {record.is_used ? 'USED' : 'AVAILABLE'}
+                        </span>
+                        <Switch
+                          checked={record.is_enabled}
+                          onCheckedChange={(checked) => updatePassword(record.id, { isEnabled: checked })}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                      <div className="bg-black/30 rounded-lg p-2">
+                        <span className="text-[10px] text-muted-foreground block">Total</span>
+                        <span className="text-neon-green font-mono font-bold">{record.total_credits}</span>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-2">
+                        <span className="text-[10px] text-muted-foreground block">Remaining</span>
+                        <span className={`font-mono font-bold ${record.remaining_credits > 0 ? 'text-neon-cyan' : 'text-red-500'}`}>
+                          {record.remaining_credits}
+                        </span>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-2">
+                        <span className="text-[10px] text-muted-foreground block">Used</span>
+                        <span className="text-neon-pink font-mono font-bold">{record.total_credits - record.remaining_credits}</span>
+                      </div>
+                      <div className="bg-black/30 rounded-lg p-2">
+                        <span className="text-[10px] text-muted-foreground block">Device</span>
+                        <span className="text-xs text-muted-foreground truncate">{record.device_id ? '🔒 Bound' : '🔓 Free'}</span>
+                      </div>
+                    </div>
+
+                    {/* Edit Credits */}
+                    {editingId === record.id ? (
+                      <div className="flex gap-2 mb-3">
+                        <Input
+                          type="number"
+                          value={editCredits}
+                          onChange={(e) => setEditCredits(e.target.value)}
+                          className="h-9"
+                          placeholder="New credits"
+                        />
+                        <Button
+                          size="sm"
+                          onClick={() => updatePassword(record.id, { credits: parseInt(editCredits) })}
+                          className="bg-neon-green text-background"
+                        >
+                          Save
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    ) : null}
+
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          setEditingId(record.id);
+                          setEditCredits(record.remaining_credits.toString());
+                        }}
+                        className="border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10"
+                      >
+                        <Coins className="w-3 h-3 mr-1" /> Edit Credits
+                      </Button>
+                      {record.is_used && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => resetPassword(record.id)}
+                          className="border-neon-yellow/50 text-neon-yellow hover:bg-neon-yellow/10"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" /> Reset Device
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => deletePassword(record.id)}
+                        className="border-red-500/50 text-red-500 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" /> Delete
+                      </Button>
+                    </div>
+
+                    <div className="mt-3 text-[10px] text-muted-foreground">
+                      Created: {new Date(record.created_at).toLocaleString()}
+                      {record.used_at && ` • First used: ${new Date(record.used_at).toLocaleString()}`}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Credit Costs Info */}
+            <div className="border border-neon-purple/30 rounded-xl p-4 bg-neon-purple/5">
+              <h3 className="font-bold text-neon-purple mb-3">Credit Costs</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                <div className="flex justify-between"><span className="text-muted-foreground">Phone:</span><span className="text-neon-green">1 credit</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Vehicle:</span><span className="text-neon-cyan">2 credits</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Instagram:</span><span className="text-neon-pink">3 credits</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Telegram:</span><span className="text-neon-yellow">3 credits</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">Aadhaar:</span><span className="text-neon-orange">5 credits</span></div>
+                <div className="flex justify-between"><span className="text-muted-foreground">DarkDB:</span><span className="text-neon-purple">5 credits</span></div>
+              </div>
+            </div>
           </div>
         )}
 
