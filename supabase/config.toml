@@ -1,1 +1,16 @@
 project_id = "qetbvgvdsgetkkupbbse"
+
+[functions.auth-login]
+verify_jwt = false
+
+[functions.auth-verify]
+verify_jwt = false
+
+[functions.credits-deduct]
+verify_jwt = false
+
+[functions.admin-passwords]
+verify_jwt = false
+
+[functions.aadhar-search]
+verify_jwt = false

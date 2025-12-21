@@ -1,6 +1,7 @@
 import { Wifi, Settings, Shield, Activity, Signal } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
+import CreditDisplay from "./CreditDisplay";
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -53,13 +54,16 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Admin Link - Compact */}
-      <Link 
-        to="/admin" 
-        className="absolute top-2 right-2 p-1.5 rounded-lg border border-neon-orange/50 text-neon-orange bg-neon-orange/10 hover:bg-neon-orange/20 transition-all duration-200 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.5)] backdrop-blur-sm"
-      >
-        <Settings className="w-3.5 h-3.5" />
-      </Link>
+      {/* Credit Display & Admin Link */}
+      <div className="absolute top-2 right-2 flex items-center gap-2">
+        <CreditDisplay />
+        <Link 
+          to="/admin" 
+          className="p-1.5 rounded-lg border border-neon-orange/50 text-neon-orange bg-neon-orange/10 hover:bg-neon-orange/20 transition-all duration-200 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.5)] backdrop-blur-sm"
+        >
+          <Settings className="w-3.5 h-3.5" />
+        </Link>
+      </div>
       
       {/* Compact Logo Container */}
       <div className="relative inline-block mb-2">

@@ -21,7 +21,12 @@ import {
   Send,
   Camera,
   Video,
-  Music
+  Music,
+  Coins,
+  Plus,
+  Power,
+  RotateCcw,
+  Loader2
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +36,24 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
+
+interface PasswordRecord {
+  id: string;
+  password_display: string;
+  total_credits: number;
+  remaining_credits: number;
+  is_enabled: boolean;
+  is_used: boolean;
+  device_id: string | null;
+  created_at: string;
+  used_at: string | null;
+  credit_usage?: Array<{
+    id: string;
+    search_type: string;
+    credits_used: number;
+    created_at: string;
+  }>;
+}
 
 const colorOptions = [
   { value: "green", label: "Green", color: "bg-neon-green" },
@@ -81,7 +104,7 @@ interface SearchHistoryItem {
 const Admin = () => {
   const navigate = useNavigate();
   const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings } = useSettings();
-  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "music" | "theme" | "password" | "history">("header");
+  const [activeSection, setActiveSection] = useState<"header" | "background" | "tabs" | "darkdb" | "telegram" | "camhack" | "music" | "theme" | "password" | "credits" | "history">("header");
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showAllSearchKey, setShowAllSearchKey] = useState(false);
@@ -95,6 +118,14 @@ const Admin = () => {
   const [localAdminPassword, setLocalAdminPassword] = useState(settings.adminPassword);
   const [localAllSearchKey, setLocalAllSearchKey] = useState(settings.allSearchAccessKey || "");
   const [localTelegramKey, setLocalTelegramKey] = useState(settings.telegramOsintAccessKey || "");
+
+  // Credit Password Management State
+  const [passwordRecords, setPasswordRecords] = useState<PasswordRecord[]>([]);
+  const [isLoadingPasswords, setIsLoadingPasswords] = useState(false);
+  const [newCredits, setNewCredits] = useState("50");
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editCredits, setEditCredits] = useState("");
 
 
   useEffect(() => {
