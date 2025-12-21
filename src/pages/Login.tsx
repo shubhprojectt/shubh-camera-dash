@@ -91,9 +91,9 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated cyber grid background - smaller grid */}
-      <div className="absolute inset-0 opacity-30" style={{
-        backgroundImage: 'linear-gradient(hsl(var(--neon-cyan) / 0.15) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--neon-purple) / 0.15) 1px, transparent 1px)',
-        backgroundSize: '20px 20px'
+      <div className="absolute inset-0 opacity-25" style={{
+        backgroundImage: 'linear-gradient(hsl(var(--neon-cyan) / 0.12) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--neon-purple) / 0.12) 1px, transparent 1px)',
+        backgroundSize: '12px 12px'
       }} />
       
       {/* Floating orbs */}
