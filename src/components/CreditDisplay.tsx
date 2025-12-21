@@ -1,10 +1,10 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Coins, LogOut, RefreshCw } from "lucide-react";
+import { Coins, LogOut, RefreshCw, Infinity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const CreditDisplay = () => {
-  const { credits, totalCredits, logout, refreshCredits, isAuthenticated } = useAuth();
+  const { credits, totalCredits, isUnlimited, logout, refreshCredits, isAuthenticated } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   if (!isAuthenticated) return null;
@@ -15,28 +15,35 @@ const CreditDisplay = () => {
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  const creditPercentage = totalCredits > 0 ? (credits / totalCredits) * 100 : 0;
   const isLow = credits <= 5;
   const isEmpty = credits === 0;
 
   return (
     <div className="flex items-center gap-2">
-      {/* Simple Credit Display */}
+      {/* Credit Display */}
       <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border backdrop-blur-sm transition-all duration-300 ${
-        isEmpty 
-          ? 'bg-red-500/10 border-red-500/50' 
-          : isLow 
-            ? 'bg-neon-yellow/10 border-neon-yellow/50'
-            : 'bg-neon-green/10 border-neon-green/50'
+        isUnlimited 
+          ? 'bg-neon-purple/10 border-neon-purple/50'
+          : isEmpty 
+            ? 'bg-red-500/10 border-red-500/50' 
+            : isLow 
+              ? 'bg-neon-yellow/10 border-neon-yellow/50'
+              : 'bg-neon-green/10 border-neon-green/50'
       }`}>
-        <Coins className={`w-4 h-4 ${
-          isEmpty ? 'text-red-500' : isLow ? 'text-neon-yellow' : 'text-neon-green'
-        }`} />
+        {isUnlimited ? (
+          <Infinity className="w-4 h-4 text-neon-purple" />
+        ) : (
+          <Coins className={`w-4 h-4 ${
+            isEmpty ? 'text-red-500' : isLow ? 'text-neon-yellow' : 'text-neon-green'
+          }`} />
+        )}
         
         <span className={`font-mono font-bold text-base ${
-          isEmpty ? 'text-red-500' : isLow ? 'text-neon-yellow' : 'text-neon-green'
+          isUnlimited 
+            ? 'text-neon-purple'
+            : isEmpty ? 'text-red-500' : isLow ? 'text-neon-yellow' : 'text-neon-green'
         }`}>
-          {credits}
+          {isUnlimited ? '∞' : credits}
         </span>
 
         {/* Refresh button */}

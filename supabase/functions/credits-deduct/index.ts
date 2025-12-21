@@ -58,6 +58,32 @@ serve(async (req) => {
     // All searches cost 1 credit
     const creditCost = CREDIT_COST;
     const currentCredits = session.access_passwords.remaining_credits;
+    const isUnlimited = session.access_passwords.is_unlimited || false;
+
+    // If unlimited, skip credit check and deduction
+    if (isUnlimited) {
+      console.log('Unlimited credits - skipping deduction');
+      
+      // Log the usage but don't deduct
+      await supabase
+        .from('credit_usage')
+        .insert({
+          password_id: session.access_passwords.id,
+          search_type: searchType,
+          credits_used: 0,
+          search_query: searchQuery || null
+        });
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          creditsUsed: 0,
+          remainingCredits: currentCredits,
+          unlimited: true
+        }),
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     // Check if user has enough credits
     if (currentCredits < creditCost) {

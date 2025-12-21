@@ -44,6 +44,7 @@ interface PasswordRecord {
   remaining_credits: number;
   is_enabled: boolean;
   is_used: boolean;
+  is_unlimited: boolean;
   device_id: string | null;
   created_at: string;
   used_at: string | null;
@@ -192,7 +193,7 @@ const Admin = () => {
     }
   };
 
-  const updatePassword = async (passwordId: string, updates: { credits?: number; isEnabled?: boolean }) => {
+  const updatePassword = async (passwordId: string, updates: { credits?: number; isEnabled?: boolean; isUnlimited?: boolean }) => {
     try {
       const { error } = await supabase.functions.invoke('admin-passwords', {
         body: { action: 'update', adminPassword: settings.adminPassword, passwordId, ...updates }
@@ -1418,6 +1419,11 @@ const Admin = () => {
                         </Button>
                       </div>
                       <div className="flex items-center gap-2">
+                        {record.is_unlimited && (
+                          <span className="text-xs px-2 py-1 rounded bg-neon-purple/20 text-neon-purple font-bold">
+                            ∞ UNLIMITED
+                          </span>
+                        )}
                         <span className={`text-xs px-2 py-1 rounded ${record.is_used ? 'bg-neon-yellow/20 text-neon-yellow' : 'bg-neon-green/20 text-neon-green'}`}>
                           {record.is_used ? 'USED' : 'AVAILABLE'}
                         </span>
@@ -1476,7 +1482,15 @@ const Admin = () => {
                       </div>
                     ) : null}
 
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => updatePassword(record.id, { isUnlimited: !record.is_unlimited })}
+                        className={`${record.is_unlimited ? 'border-neon-purple bg-neon-purple/20 text-neon-purple' : 'border-neon-purple/50 text-neon-purple hover:bg-neon-purple/10'}`}
+                      >
+                        {record.is_unlimited ? '∞ Unlimited ON' : '∞ Make Unlimited'}
+                      </Button>
                       <Button
                         size="sm"
                         variant="outline"

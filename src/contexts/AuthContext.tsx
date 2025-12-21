@@ -5,6 +5,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   credits: number;
   totalCredits: number;
+  isUnlimited: boolean;
   isLoading: boolean;
   login: (password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
@@ -31,6 +32,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [credits, setCredits] = useState(0);
   const [totalCredits, setTotalCredits] = useState(0);
+  const [isUnlimited, setIsUnlimited] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   // Verify session on mount
@@ -55,6 +57,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setIsAuthenticated(true);
           setCredits(data.credits);
           setTotalCredits(data.totalCredits);
+          setIsUnlimited(data.isUnlimited || false);
         }
       } catch (err) {
         console.error('Session verification error:', err);
@@ -100,6 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsAuthenticated(false);
     setCredits(0);
     setTotalCredits(0);
+    setIsUnlimited(false);
   }, []);
 
   const deductCredits = async (searchType: string, searchQuery?: string): Promise<{ success: boolean; error?: string; remainingCredits?: number }> => {
@@ -146,6 +150,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (!error && data?.valid) {
         setCredits(data.credits);
         setTotalCredits(data.totalCredits);
+        setIsUnlimited(data.isUnlimited || false);
       }
     } catch (err) {
       console.error('Refresh credits error:', err);
@@ -157,6 +162,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated,
       credits,
       totalCredits,
+      isUnlimited,
       isLoading,
       login,
       logout,
