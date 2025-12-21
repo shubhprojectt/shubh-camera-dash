@@ -63,15 +63,23 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
 
     if (audio.paused) {
       try {
+        if (audio.readyState === 0) audio.load();
         await audio.play();
         setIsPlaying(true);
       } catch (err: any) {
         setIsPlaying(false);
+
+        const rawMsg = String(err?.message || "");
+        const isNotSupported =
+          err?.name === "NotSupportedError" ||
+          rawMsg.toLowerCase().includes("supported sources");
+
         toast({
           title: "Music play nahi ho raha",
-          description:
-            err?.message ||
-            "Browser ne playback block kiya ya file load nahi hui. Try refresh.",
+          description: isNotSupported
+            ? "Audio decode nahi ho pa raha. नीचे 'Test audio source' pe click karke check karo ki file actually download/play hoti hai ya nahi."
+            : rawMsg ||
+              "Browser ne playback block kiya ya file load nahi hui. Try refresh.",
           variant: "destructive",
         });
       }
@@ -105,14 +113,25 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
         preload="metadata"
         loop
         onError={() => {
+          const code = audioRef.current?.error?.code;
           toast({
             title: "Music load nahi ho raha",
-            description: "Audio file open nahi hui. Try refresh ya URL change karo.",
+            description: `Audio error code: ${code ?? "unknown"}. नीचे 'Test audio source' pe click karke file open karke dekho.` ,
             variant: "destructive",
           });
         }}
       />
 
+      <div className="mt-2 text-center text-[10px] text-muted-foreground">
+        <a
+          href={src}
+          target="_blank"
+          rel="noreferrer"
+          className="underline underline-offset-2 hover:text-neon-cyan"
+        >
+          Test audio source
+        </a>
+      </div>
       {/* Compact Player UI */}
       <div className="border border-neon-green/30 rounded-xl p-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
