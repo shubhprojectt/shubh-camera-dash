@@ -70,7 +70,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
               <span className="text-neon-pink">OSINT</span>
             </h1>
             <p className="text-neon-pink/80 text-sm">
-              Access karne ke liye password enter karein
+              Password Ke Liye Telegram Msg Kare Id= @xyzd4rkhu
             </p>
           </div>
 
@@ -84,7 +84,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
             </p>
             <div className="flex items-start gap-2 text-[10px] text-neon-green">
               <span>1️⃣</span>
-              <span><span className="font-bold">Number Info:</span> Name, Father Name, Complete Address, ID Number & Operator</span>
+              <span><span className="font-bold">Number Info:</span> Name, Father Name, Complete Address, ID Number & Family Link Number</span>
             </div>
           </div>
 
