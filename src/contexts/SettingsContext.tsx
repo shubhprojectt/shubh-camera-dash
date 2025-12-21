@@ -154,8 +154,19 @@ const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
 
 const hydrateSettings = (partial?: Partial<AppSettings>): AppSettings => {
   const merged = { ...defaultSettings, ...(partial || {}) } as AppSettings;
+
+  const mainPageMusicUrl = merged.mainPageMusicUrl?.trim()
+    ? merged.mainPageMusicUrl
+    : defaultSettings.mainPageMusicUrl;
+
+  const page2MusicUrl = merged.page2MusicUrl?.trim()
+    ? merged.page2MusicUrl
+    : defaultSettings.page2MusicUrl;
+
   return {
     ...merged,
+    mainPageMusicUrl,
+    page2MusicUrl,
     tabs: mergeTabsWithDefaults(partial?.tabs as TabConfig[] | undefined),
   };
 };
