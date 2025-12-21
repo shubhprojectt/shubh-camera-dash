@@ -10,39 +10,59 @@ import {
   Globe,
   Database,
   Wifi,
-  Lock
+  Terminal,
+  Fingerprint
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import MusicPlayer from "@/components/MusicPlayer";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Page2 = () => {
   const { settings } = useSettings();
-  const navigate = useNavigate();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string | null>("manual");
-  const [hasAccess, setHasAccess] = useState(false);
+  const [glitchText, setGlitchText] = useState("PAGE 2");
 
-  // Check if user came through main page with password
+  // Glitch effect for title
   useEffect(() => {
-    const isUnlocked = sessionStorage.getItem("site_unlocked");
-    if (isUnlocked === "true") {
-      setHasAccess(true);
-    } else {
-      // Redirect to main page if not unlocked
-      toast({
-        title: "Access Denied",
-        description: "Pehle main page se password enter karein",
-        variant: "destructive",
-      });
-      navigate("/");
-    }
-  }, [navigate]);
+    const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+    const originalText = "PAGE 2";
+    let interval: NodeJS.Timeout;
+
+    const startGlitch = () => {
+      let iterations = 0;
+      interval = setInterval(() => {
+        setGlitchText(
+          originalText
+            .split("")
+            .map((char, index) => {
+              if (index < iterations) return char;
+              return glitchChars[Math.floor(Math.random() * glitchChars.length)];
+            })
+            .join("")
+        );
+        iterations += 1 / 3;
+        if (iterations >= originalText.length) {
+          clearInterval(interval);
+          setGlitchText(originalText);
+        }
+      }, 50);
+    };
+
+    startGlitch();
+    const repeatInterval = setInterval(startGlitch, 6000);
+    return () => {
+      clearInterval(interval);
+      clearInterval(repeatInterval);
+    };
+  }, []);
 
   const manualTab = settings.tabs.find(tab => tab.searchType === "manual");
 
@@ -80,14 +100,16 @@ const Page2 = () => {
     });
   };
 
-  // Show nothing while checking access or if no access
-  if (!hasAccess) {
+  // Show loading while checking auth
+  if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-neon-yellow animate-spin" />
+        <Loader2 className="w-8 h-8 text-neon-purple animate-spin" />
       </div>
     );
   }
+
+  // Redirect handled by ProtectedRoute in App.tsx
 
   if (!manualTab?.enabled) {
     return (
@@ -99,197 +121,209 @@ const Page2 = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-hidden">
-      {/* Complex Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background via-neon-yellow/5 to-neon-orange/5 pointer-events-none" />
+      {/* Animated cyber grid background */}
+      <div className="absolute inset-0 cyber-grid opacity-30" />
       
-      {/* Animated Grid */}
-      <div 
-        className="absolute inset-0 opacity-[0.04] pointer-events-none animate-pulse"
-        style={{
-          backgroundImage: `linear-gradient(hsl(var(--neon-yellow)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--neon-yellow)) 1px, transparent 1px)`,
-          backgroundSize: '40px 40px'
-        }}
-      />
-      
-      
-      {/* Multiple Floating Orbs */}
-      <div className="fixed top-10 left-10 w-40 h-40 bg-neon-yellow/15 rounded-full blur-3xl animate-pulse" />
-      <div className="fixed top-40 right-20 w-32 h-32 bg-neon-orange/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
-      <div className="fixed bottom-20 left-1/4 w-48 h-48 bg-neon-cyan/5 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-      <div className="fixed bottom-40 right-10 w-36 h-36 bg-neon-pink/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.5s' }} />
-      <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-neon-yellow/5 rounded-full blur-3xl" />
+      {/* Scan line effect */}
+      <div className="absolute inset-0 scanline opacity-40" />
+
+      {/* Floating orbs with purple/cyan theme */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[5%] left-[10%] w-72 h-72 bg-neon-purple/25 rounded-full blur-[100px] animate-pulse" />
+        <div className="absolute bottom-[15%] right-[5%] w-96 h-96 bg-neon-cyan/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[40%] left-[60%] w-[400px] h-[400px] bg-neon-pink/15 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-[60%] left-[20%] w-48 h-48 bg-neon-orange/20 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="absolute top-[20%] right-[30%] w-40 h-40 bg-neon-green/15 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '1.5s' }} />
+      </div>
       
       {/* Animated Corner Decorations */}
-      <div className="fixed top-0 left-0 w-40 h-40 border-l-2 border-t-2 border-neon-yellow/40 pointer-events-none" style={{ animation: 'cornerPulse 2s ease-in-out infinite' }} />
-      <div className="fixed top-0 right-0 w-40 h-40 border-r-2 border-t-2 border-neon-orange/40 pointer-events-none" style={{ animation: 'cornerPulse 2s ease-in-out infinite', animationDelay: '0.5s' }} />
-      <div className="fixed bottom-0 left-0 w-40 h-40 border-l-2 border-b-2 border-neon-orange/40 pointer-events-none" style={{ animation: 'cornerPulse 2s ease-in-out infinite', animationDelay: '1s' }} />
-      <div className="fixed bottom-0 right-0 w-40 h-40 border-r-2 border-b-2 border-neon-yellow/40 pointer-events-none" style={{ animation: 'cornerPulse 2s ease-in-out infinite', animationDelay: '1.5s' }} />
-      
-      {/* Noise Overlay */}
-      <div className="absolute inset-0 opacity-[0.015] pointer-events-none bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIvPjwvc3ZnPg==')]" />
+      <div className="fixed top-0 left-0 w-32 h-32 pointer-events-none">
+        <div className="absolute top-4 left-4 w-16 h-[2px] bg-gradient-to-r from-neon-purple to-transparent" />
+        <div className="absolute top-4 left-4 w-[2px] h-16 bg-gradient-to-b from-neon-purple to-transparent" />
+      </div>
+      <div className="fixed top-0 right-0 w-32 h-32 pointer-events-none">
+        <div className="absolute top-4 right-4 w-16 h-[2px] bg-gradient-to-l from-neon-cyan to-transparent" />
+        <div className="absolute top-4 right-4 w-[2px] h-16 bg-gradient-to-b from-neon-cyan to-transparent" />
+      </div>
+      <div className="fixed bottom-0 left-0 w-32 h-32 pointer-events-none">
+        <div className="absolute bottom-4 left-4 w-16 h-[2px] bg-gradient-to-r from-neon-pink to-transparent" />
+        <div className="absolute bottom-4 left-4 w-[2px] h-16 bg-gradient-to-t from-neon-pink to-transparent" />
+      </div>
+      <div className="fixed bottom-0 right-0 w-32 h-32 pointer-events-none">
+        <div className="absolute bottom-4 right-4 w-16 h-[2px] bg-gradient-to-l from-neon-orange to-transparent" />
+        <div className="absolute bottom-4 right-4 w-[2px] h-16 bg-gradient-to-t from-neon-orange to-transparent" />
+      </div>
+
+      {/* Floating status indicators */}
+      <div className="absolute top-4 left-4 flex items-center gap-2 text-neon-purple/70 text-xs font-mono animate-pulse z-20">
+        <Wifi className="w-3 h-3" />
+        <span>CONNECTED</span>
+      </div>
+      <div className="absolute top-4 right-16 flex items-center gap-2 text-neon-cyan/70 text-xs font-mono animate-pulse z-20" style={{ animationDelay: '0.5s' }}>
+        <Database className="w-3 h-3" />
+        <span>READY</span>
+      </div>
 
       {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 py-6 max-w-md min-h-screen flex flex-col">
         
-        {/* Header Section - Like Main Page */}
+        {/* Header Section */}
         <header className="relative py-4 text-center mb-4">
-          {/* Status indicators */}
-          <div className="absolute top-2 left-0 flex flex-col gap-1 text-[10px] font-mono">
-            <div className="flex items-center gap-1.5 text-neon-yellow">
-              <div className="w-1.5 h-1.5 bg-neon-yellow rounded-full animate-pulse" />
-              <span>PAGE 2</span>
-            </div>
-            <div className="flex items-center gap-1.5 text-neon-cyan">
-              <Wifi className="w-2.5 h-2.5" />
-              <span>ACTIVE</span>
-            </div>
-          </div>
-
-          {/* Back Button */}
+          {/* Back Button with glow */}
           <Link 
             to="/" 
-            className="absolute top-2 right-0 p-2 rounded-lg border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all hover:shadow-[0_0_10px_hsl(var(--neon-cyan)/0.5)]"
+            className="absolute top-2 right-0 p-2.5 rounded-xl border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)] group"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           </Link>
           
-          {/* Logo */}
-          <div className="relative inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-neon-yellow mb-3 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-neon-yellow/20 to-neon-orange/10" />
-            <ClipboardPaste className="w-8 h-8 text-neon-yellow animate-pulse relative z-10" />
-            {/* Rotating ring */}
-            <div className="absolute inset-0 rounded-full border-2 border-dashed border-neon-orange/30 animate-spin" style={{ animationDuration: '10s' }} />
+          {/* Logo with animated ring */}
+          <div className="relative inline-flex items-center justify-center w-20 h-20 mb-4">
+            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/30 via-neon-cyan/20 to-neon-pink/30 rounded-full blur-xl animate-pulse" />
+            <div className="absolute inset-1 rounded-full border-2 border-neon-purple/40" />
+            <div className="absolute inset-0 rounded-full border-2 border-dashed border-neon-cyan/30 animate-spin" style={{ animationDuration: '15s' }} />
+            <ClipboardPaste className="w-10 h-10 text-neon-purple relative z-10" />
           </div>
           
-          {/* Title */}
-          <h1 className="text-2xl md:text-3xl font-black tracking-wider">
-            <span className="text-neon-yellow text-glow-yellow">{manualTab.label}</span>
-            <span className="text-neon-orange ml-2">TOOLS</span>
+          {/* Glitch title */}
+          <h1 className="text-2xl md:text-3xl font-black tracking-wider mb-2">
+            <span className="bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink bg-clip-text text-transparent">
+              {glitchText}
+            </span>
           </h1>
+          
+          {/* Subtitle with terminal effect */}
+          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
+            <Terminal className="w-3 h-3" />
+            <span className="font-mono tracking-wider">{manualTab.label} TOOLS</span>
+          </div>
         </header>
 
-        {/* Tab Section - Like Main Page */}
-        <div className="space-y-3">
-          <div className="relative">
-            <div className="relative rounded-2xl p-3 overflow-hidden border border-neon-yellow/30 bg-card/50 backdrop-blur-sm">
-              
-              {/* Tab Grid */}
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                {/* Manual Tab */}
-                <button
-                  onClick={() => setActiveTab("manual")}
-                  className={`flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-300 animate-bounce-in ${
-                    activeTab === "manual"
-                      ? 'border-neon-yellow bg-neon-yellow/20 shadow-[0_0_20px_hsl(var(--neon-yellow)/0.4)]'
-                      : 'border-neon-yellow/30 bg-neon-yellow/5 hover:bg-neon-yellow/10'
-                  }`}
-                >
-                  <ClipboardPaste className={`w-5 h-5 ${activeTab === "manual" ? 'text-neon-yellow animate-pulse' : 'text-neon-yellow/70'}`} />
-                  <span className={`text-[10px] font-bold uppercase tracking-wider ${activeTab === "manual" ? 'text-neon-yellow' : 'text-neon-yellow/70'}`}>
-                    {manualTab.label}
-                  </span>
-                </button>
+        {/* Main Card with animated border */}
+        <div className="relative mb-4">
+          {/* Animated rainbow border */}
+          <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan via-neon-pink via-neon-orange to-neon-purple bg-[length:400%_100%] animate-gradient-shift opacity-70" />
+          <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan via-neon-pink via-neon-orange to-neon-purple bg-[length:400%_100%] animate-gradient-shift blur-xl opacity-30" />
+          
+          <div className="relative rounded-2xl p-4 bg-background/95 backdrop-blur-xl border border-transparent">
+            {/* Tab Grid */}
+            <div className="grid grid-cols-3 gap-2 mb-4">
+              {/* Manual Tab */}
+              <button
+                onClick={() => setActiveTab("manual")}
+                className={`relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl transition-all duration-300 overflow-hidden group ${
+                  activeTab === "manual"
+                    ? 'bg-gradient-to-br from-neon-purple/20 to-neon-cyan/10'
+                    : 'bg-background/50 hover:bg-neon-purple/10'
+                }`}
+              >
+                {activeTab === "manual" && (
+                  <div className="absolute inset-0 border-2 border-neon-purple rounded-xl shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]" />
+                )}
+                <ClipboardPaste className={`w-6 h-6 ${activeTab === "manual" ? 'text-neon-purple' : 'text-neon-purple/60'} group-hover:scale-110 transition-transform`} />
+                <span className={`text-[9px] font-bold uppercase tracking-wider ${activeTab === "manual" ? 'text-neon-purple' : 'text-neon-purple/60'}`}>
+                  {manualTab.label}
+                </span>
+              </button>
 
-                {/* Coming Soon Tab 1 */}
-                <div className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-neon-purple/20 bg-neon-purple/5 opacity-50 cursor-not-allowed animate-bounce-in" style={{ animationDelay: '50ms' }}>
-                  <Database className="w-5 h-5 text-neon-purple/50" />
-                  <span className="text-[10px] font-bold text-neon-purple/50 uppercase tracking-wider">Soon</span>
-                </div>
-
-                {/* Coming Soon Tab 2 */}
-                <div className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-neon-cyan/20 bg-neon-cyan/5 opacity-50 cursor-not-allowed animate-bounce-in" style={{ animationDelay: '100ms' }}>
-                  <Globe className="w-5 h-5 text-neon-cyan/50" />
-                  <span className="text-[10px] font-bold text-neon-cyan/50 uppercase tracking-wider">Soon</span>
-                </div>
-
-                {/* Back to Main Button */}
-                <Link
-                  to="/"
-                  className="flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-neon-green/50 bg-gradient-to-br from-neon-green/10 to-neon-cyan/5 hover:from-neon-green/20 hover:to-neon-cyan/10 transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] group animate-bounce-in col-span-3"
-                  style={{ animationDelay: '150ms' }}
-                >
-                  <div className="flex items-center gap-2">
-                    <ArrowLeft className="w-4 h-4 text-neon-green group-hover:-translate-x-1 transition-transform" />
-                    <span className="text-[10px] font-bold text-neon-green uppercase tracking-wider">Back to Main Page</span>
-                  </div>
-                </Link>
+              {/* Coming Soon Tab 1 */}
+              <div className="relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-background/30 opacity-40 cursor-not-allowed">
+                <Database className="w-6 h-6 text-neon-cyan/50" />
+                <span className="text-[9px] font-bold text-neon-cyan/50 uppercase tracking-wider">Soon</span>
               </div>
-              
-              {/* Search Input Section */}
-              {activeTab === "manual" && (
-                <div className="relative animate-slide-up">
-                  <div className="flex gap-2 p-2 rounded-xl bg-background/80 border-2 border-neon-yellow/40 shadow-[0_0_15px_hsl(var(--neon-yellow)/0.2)]">
+
+              {/* Coming Soon Tab 2 */}
+              <div className="relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-background/30 opacity-40 cursor-not-allowed">
+                <Globe className="w-6 h-6 text-neon-pink/50" />
+                <span className="text-[9px] font-bold text-neon-pink/50 uppercase tracking-wider">Soon</span>
+              </div>
+            </div>
+            
+            {/* Search Input Section */}
+            {activeTab === "manual" && (
+              <div className="relative animate-slide-up">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink rounded-xl opacity-0 group-focus-within:opacity-70 blur transition-opacity duration-300" />
+                  <div className="relative flex gap-2 p-2 rounded-xl bg-background/80 border border-neon-purple/30 group-focus-within:border-transparent">
                     <div className="flex-1 flex items-center gap-2 px-2">
-                      <ClipboardPaste className="w-4 h-4 text-neon-yellow/70" />
+                      <ClipboardPaste className="w-4 h-4 text-neon-purple/60" />
                       <Input
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder={manualTab.placeholder || "Enter number..."}
-                        className="flex-1 bg-transparent border-0 text-neon-yellow placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm font-mono"
+                        className="flex-1 bg-transparent border-0 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm font-mono"
                         onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                       />
                     </div>
                     <Button 
                       onClick={handleSearch}
                       disabled={loading}
-                      className="bg-gradient-to-r from-neon-yellow to-neon-orange text-background font-bold px-6 h-10 hover:opacity-90 text-xs shadow-[0_0_15px_hsl(var(--neon-yellow)/0.5)] transition-all active:scale-95"
-                      style={{ backgroundSize: '200% 100%', animation: 'shimmer 3s linear infinite' }}
+                      className="relative bg-transparent border-0 overflow-hidden group/btn px-6 h-10"
                     >
-                      {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                      <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink opacity-90 group-hover/btn:opacity-100 transition-opacity" />
+                      <div className="absolute inset-[2px] bg-background/80 group-hover/btn:bg-background/60 transition-colors rounded-md" />
+                      <span className="relative z-10">
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin text-neon-cyan" /> : <Search className="w-4 h-4 text-neon-purple" />}
+                      </span>
                     </Button>
                   </div>
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
+            )}
 
-          {/* Info Section */}
-          <div className="grid grid-cols-2 gap-2 animate-fade-in" style={{ animationDelay: '200ms' }}>
-            <div className="p-3 rounded-xl bg-neon-yellow/5 border border-neon-yellow/20 text-center">
-              <Zap className="w-5 h-5 text-neon-yellow mx-auto mb-1.5 animate-pulse" />
-              <p className="text-[9px] text-neon-yellow/70 uppercase tracking-wider font-bold">Fast Results</p>
-            </div>
-            <div className="p-3 rounded-xl bg-neon-orange/5 border border-neon-orange/20 text-center">
-              <Shield className="w-5 h-5 text-neon-orange mx-auto mb-1.5" />
-              <p className="text-[9px] text-neon-orange/70 uppercase tracking-wider font-bold">Opens New Tab</p>
-            </div>
-            <div className="p-3 rounded-xl bg-neon-cyan/5 border border-neon-cyan/20 text-center">
-              <Sparkles className="w-5 h-5 text-neon-cyan mx-auto mb-1.5 animate-bounce" style={{ animationDelay: '0.3s' }} />
-              <p className="text-[9px] text-neon-cyan/70 uppercase tracking-wider font-bold">External API</p>
-            </div>
-            <div className="p-3 rounded-xl bg-neon-green/5 border border-neon-green/20 text-center">
-              <Database className="w-5 h-5 text-neon-green mx-auto mb-1.5" />
-              <p className="text-[9px] text-neon-green/70 uppercase tracking-wider font-bold">Secure Search</p>
-            </div>
+            {/* Back to Main Button */}
+            <Link
+              to="/"
+              className="mt-4 flex items-center justify-center gap-2 p-3 rounded-xl border border-neon-green/30 bg-neon-green/5 hover:bg-neon-green/10 transition-all hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.3)] group"
+            >
+              <ArrowLeft className="w-4 h-4 text-neon-green group-hover:-translate-x-1 transition-transform" />
+              <span className="text-xs font-bold text-neon-green uppercase tracking-wider">Back to Main</span>
+            </Link>
           </div>
-
-          {/* Music Player - Centered */}
-          <MusicPlayer musicUrl={settings.page2MusicUrl} />
         </div>
+
+        {/* Info Cards Grid */}
+        <div className="grid grid-cols-2 gap-3 mb-4">
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple to-neon-cyan rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
+            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-purple/20 text-center">
+              <Zap className="w-5 h-5 text-neon-purple mx-auto mb-2 animate-pulse" />
+              <p className="text-[10px] text-neon-purple/80 uppercase tracking-wider font-bold">Fast Results</p>
+            </div>
+          </div>
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
+            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-cyan/20 text-center">
+              <Shield className="w-5 h-5 text-neon-cyan mx-auto mb-2" />
+              <p className="text-[10px] text-neon-cyan/80 uppercase tracking-wider font-bold">New Tab Opens</p>
+            </div>
+          </div>
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-orange rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
+            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-pink/20 text-center">
+              <Sparkles className="w-5 h-5 text-neon-pink mx-auto mb-2 animate-bounce" style={{ animationDelay: '0.3s' }} />
+              <p className="text-[10px] text-neon-pink/80 uppercase tracking-wider font-bold">External API</p>
+            </div>
+          </div>
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-orange to-neon-green rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
+            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-orange/20 text-center">
+              <Fingerprint className="w-5 h-5 text-neon-orange mx-auto mb-2" />
+              <p className="text-[10px] text-neon-orange/80 uppercase tracking-wider font-bold">Secure Search</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Music Player */}
+        <MusicPlayer musicUrl={settings.page2MusicUrl} />
 
         {/* Footer */}
         <div className="mt-auto pt-6 text-center">
-          <p className="text-[10px] text-muted-foreground/40 font-mono">
-            POWERED BY <span className="text-neon-yellow animate-pulse">SHUBH</span> <span className="text-neon-orange">OSINT</span>
+          <p className="text-[10px] text-muted-foreground/30 font-mono tracking-widest">
+            SHUBH OSINT v2.0 • <span className="text-neon-purple">PAGE 2</span>
           </p>
         </div>
       </div>
-
-      {/* Custom Animations */}
-      <style>{`
-        @keyframes shimmer {
-          0% { background-position: 200% 0; }
-          100% { background-position: -200% 0; }
-        }
-        @keyframes scanline {
-          0% { background-position: 0 0; }
-          100% { background-position: 0 100%; }
-        }
-        @keyframes cornerPulse {
-          0%, 100% { opacity: 0.4; }
-          50% { opacity: 0.8; }
-        }
-      `}</style>
     </div>
   );
 };
