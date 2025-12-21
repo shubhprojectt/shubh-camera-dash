@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX, Music2 } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
+import { toast } from "@/hooks/use-toast";
 
 interface MiniMusicPlayerProps {
   musicUrl?: string;
@@ -14,6 +15,17 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
   const [progress, setProgress] = useState(0);
 
   const src = musicUrl || "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3";
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // Reset playback when source changes
+    audio.pause();
+    setIsPlaying(false);
+    setProgress(0);
+    audio.load();
+  }, [src]);
 
   useEffect(() => {
     if (audioRef.current) {
@@ -45,15 +57,29 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
     };
   }, []);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
+  const togglePlay = async () => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(() => {});
+    if (audio.paused) {
+      try {
+        await audio.play();
+        setIsPlaying(true);
+      } catch (err: any) {
+        setIsPlaying(false);
+        toast({
+          title: "Music play nahi ho raha",
+          description:
+            err?.message ||
+            "Browser ne playback block kiya ya file load nahi hui. Try refresh.",
+          variant: "destructive",
+        });
+      }
+      return;
     }
-    setIsPlaying(!isPlaying);
+
+    audio.pause();
+    setIsPlaying(false);
   };
 
   const toggleMute = () => {
@@ -73,7 +99,19 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
 
   return (
     <div className="w-full max-w-xs mx-auto">
-      <audio ref={audioRef} src={src} preload="metadata" loop />
+      <audio
+        ref={audioRef}
+        src={src}
+        preload="metadata"
+        loop
+        onError={() => {
+          toast({
+            title: "Music load nahi ho raha",
+            description: "Audio file open nahi hui. Try refresh ya URL change karo.",
+            variant: "destructive",
+          });
+        }}
+      />
 
       {/* Compact Player UI */}
       <div className="border border-neon-green/30 rounded-xl p-3 backdrop-blur-sm">
@@ -130,8 +168,15 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
           <Slider
             value={[isMuted ? 0 : volume]}
             onValueChange={(v) => {
-              setVolume(v[0]);
-              if (v[0] > 0 && isMuted) setIsMuted(false);
+              const next = v[0] ?? 0;
+              setVolume(next);
+
+              if (audioRef.current) {
+                if (next > 0 && isMuted) {
+                  audioRef.current.muted = false;
+                  setIsMuted(false);
+                }
+              }
             }}
             max={100}
             step={1}
