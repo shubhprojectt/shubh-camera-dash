@@ -99,74 +99,41 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-2.5 p-4 rounded-2xl border-2 transition-all duration-300",
-        "active:scale-90 min-h-[90px] backdrop-blur-sm",
+        "group relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition-all duration-200",
+        "active:scale-90 min-h-[56px] backdrop-blur-sm",
         colors.border,
         colors.text,
         colors.hoverGlow,
-        "hover:scale-[1.05]",
-        active ? [colors.activeBg, colors.glow, "scale-[1.03]"] : [colors.bg, "border-opacity-60 hover:border-opacity-100"]
+        "hover:scale-[1.03]",
+        active ? [colors.activeBg, colors.glow, "scale-[1.02] border-2"] : [colors.bg, "border-opacity-50 hover:border-opacity-100"]
       )}
     >
-      {/* Background gradient effect */}
-      <div className={cn(
-        "absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300",
-        "bg-gradient-to-br from-current/10 via-transparent to-current/5",
-        active && "opacity-100",
-        "group-hover:opacity-50"
-      )} />
-      
       {/* Animated pulse ring on active */}
       {active && (
-        <>
-          <div className="absolute inset-0 rounded-2xl border-2 border-current animate-ping opacity-20" />
-          <div className="absolute inset-[-2px] rounded-2xl border border-current opacity-40 animate-pulse" />
-        </>
-      )}
-      
-      {/* Top glow line when active */}
-      {active && (
-        <div className={cn(
-          "absolute top-0 left-1/2 -translate-x-1/2 w-2/3 h-0.5 rounded-full",
-          colors.bottomGlow
-        )} />
+        <div className="absolute inset-0 rounded-xl border border-current animate-ping opacity-20" />
       )}
       
       {/* Bottom glow indicator when active */}
       {active && (
         <div className={cn(
-          "absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-1 rounded-full",
+          "absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-0.5 rounded-full",
           colors.bottomGlow
         )} />
       )}
       
-      {/* Icon container with glow */}
-      <div className={cn(
-        "relative p-2 rounded-xl transition-all duration-300",
-        active ? "bg-current/20" : "bg-current/10 group-hover:bg-current/15"
-      )}>
-        <Icon className={cn(
-          "w-6 h-6 transition-all duration-300",
-          active ? colors.iconGlow : "group-hover:scale-110"
-        )} />
-        {active && (
-          <div className="absolute inset-0 rounded-xl bg-current/30 blur-md" />
-        )}
-      </div>
+      {/* Icon */}
+      <Icon className={cn(
+        "w-4 h-4 transition-all duration-200",
+        active ? colors.iconGlow : "group-hover:scale-110"
+      )} />
       
-      {/* Label with enhanced styling */}
+      {/* Label */}
       <span className={cn(
-        "text-[11px] font-bold tracking-wider uppercase text-center leading-tight relative z-10",
-        active && "drop-shadow-[0_0_10px_currentColor]"
+        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
+        active && "drop-shadow-[0_0_6px_currentColor]"
       )}>
         {label}
       </span>
-      
-      {/* Corner accents */}
-      <div className="absolute top-1 left-1 w-2 h-2 border-l border-t border-current opacity-40 rounded-tl" />
-      <div className="absolute top-1 right-1 w-2 h-2 border-r border-t border-current opacity-40 rounded-tr" />
-      <div className="absolute bottom-1 left-1 w-2 h-2 border-l border-b border-current opacity-40 rounded-bl" />
-      <div className="absolute bottom-1 right-1 w-2 h-2 border-r border-b border-current opacity-40 rounded-br" />
     </button>
   );
 };

@@ -1031,20 +1031,20 @@ const NumberDetailFinder = () => {
         </DialogContent>
       </Dialog>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
       {/* Main Card */}
       <div className="relative">
-        <div className="relative rounded-2xl p-3 overflow-hidden border border-neon-green/30">
+        <div className="relative rounded-xl p-2 overflow-hidden border border-neon-green/30 bg-card/30 backdrop-blur-sm">
           
-          {/* Button Grid - 3 columns */}
-          <div className="relative grid grid-cols-3 gap-2">
+          {/* Button Grid - 4 columns for compact view */}
+          <div className="relative grid grid-cols-4 gap-1.5">
             {enabledTabs.map((tab, index) => {
               const IconComponent = iconMap[tab.icon] || Sparkles;
               return (
                 <div
                   key={tab.id}
                   className="animate-bounce-in"
-                  style={{ animationDelay: `${index * 40}ms` }}
+                  style={{ animationDelay: `${index * 30}ms` }}
                 >
                   <SearchButton
                     icon={IconComponent}
@@ -1060,31 +1060,31 @@ const NumberDetailFinder = () => {
             {/* Next Page Button */}
             <Link
               to="/page2"
-              className="animate-bounce-in flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border-2 border-neon-yellow/50 bg-gradient-to-br from-neon-yellow/10 to-neon-orange/5 hover:from-neon-yellow/20 hover:to-neon-orange/10 transition-all duration-300 hover:shadow-[0_0_15px_hsl(var(--neon-yellow)/0.4)] group"
-              style={{ animationDelay: `${enabledTabs.length * 40}ms` }}
+              className="animate-bounce-in flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[56px]"
+              style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
             >
-              <ArrowRight className="w-5 h-5 text-neon-yellow group-hover:translate-x-1 transition-transform" />
-              <span className="text-[10px] font-bold text-neon-yellow uppercase tracking-wider">Next Page</span>
+              <ArrowRight className="w-4 h-4 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
+              <span className="text-[8px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
             </Link>
           </div>
           
           {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram tab is selected */}
           {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && (
-            <div className="relative mt-3 animate-slide-up">
-              <div className="flex gap-2 p-1.5 rounded-xl bg-background/80 border-2 border-neon-cyan/40 shadow-[0_0_15px_hsl(var(--neon-cyan)/0.2)]">
+            <div className="relative mt-2 animate-slide-up">
+              <div className="flex gap-1.5 p-1 rounded-lg bg-background/80 border border-neon-cyan/40 shadow-[0_0_10px_hsl(var(--neon-cyan)/0.15)]">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={activeButton.placeholder}
-                  className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-9 text-xs font-mono"
+                  className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 text-xs font-mono"
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <Button 
                   onClick={handleSearch}
                   disabled={loading}
-                  className="bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-4 h-9 hover:opacity-90 text-xs shadow-[0_0_10px_hsl(var(--neon-cyan)/0.5)] transition-all active:scale-95"
+                  className="bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-3 h-8 hover:opacity-90 text-xs shadow-[0_0_8px_hsl(var(--neon-cyan)/0.4)] transition-all active:scale-95"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
                 </Button>
               </div>
             </div>
