@@ -72,32 +72,18 @@ serve(async (req) => {
       );
     }
 
-    // Check if password is already used by another device
-    if (passwordRecord.is_used && passwordRecord.device_id !== deviceId) {
-      console.log('Password already used by another device');
-      return new Response(
-        JSON.stringify({ error: 'This password is already in use on another device' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    // If first time use, bind to this device
+    // Mark password as used (no device binding - same password works on all devices)
     if (!passwordRecord.is_used) {
       const { error: updateError } = await supabase
         .from('access_passwords')
         .update({
           is_used: true,
-          device_id: deviceId,
           used_at: new Date().toISOString()
         })
         .eq('id', passwordRecord.id);
 
       if (updateError) {
-        console.error('Error binding device:', updateError);
-        return new Response(
-          JSON.stringify({ error: 'Failed to bind device' }),
-          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
+        console.error('Error updating password:', updateError);
       }
     }
 
