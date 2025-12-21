@@ -77,7 +77,7 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
         toast({
           title: "Music play nahi ho raha",
           description: isNotSupported
-            ? "Audio decode nahi ho pa raha. नीचे 'Test audio source' pe click karke check karo ki file actually download/play hoti hai ya nahi."
+            ? "Audio decode nahi ho pa raha (file MP3 nahi hai ya server HTML bhej raha hai)."
             : rawMsg ||
               "Browser ne playback block kiya ya file load nahi hui. Try refresh.",
           variant: "destructive",
@@ -116,7 +116,7 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
           const code = audioRef.current?.error?.code;
           toast({
             title: "Music load nahi ho raha",
-            description: `Audio error code: ${code ?? "unknown"}. नीचे 'Test audio source' pe click karke file open karke dekho.` ,
+            description: `Audio error code: ${code ?? "unknown"}. File open nahi hui.`,
             variant: "destructive",
           });
         }}
