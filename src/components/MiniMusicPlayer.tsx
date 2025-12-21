@@ -122,16 +122,6 @@ const MiniMusicPlayer = ({ musicUrl }: MiniMusicPlayerProps) => {
         }}
       />
 
-      <div className="mt-2 text-center text-[10px] text-muted-foreground">
-        <a
-          href={src}
-          target="_blank"
-          rel="noreferrer"
-          className="underline underline-offset-2 hover:text-neon-cyan"
-        >
-          Test audio source
-        </a>
-      </div>
       {/* Compact Player UI */}
       <div className="border border-neon-green/30 rounded-xl p-3 backdrop-blur-sm">
         <div className="flex items-center gap-3">
