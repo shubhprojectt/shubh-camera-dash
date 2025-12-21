@@ -6,17 +6,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Credit costs for different search types
-const CREDIT_COSTS: Record<string, number> = {
-  'phone': 1,
-  'aadhaar': 5,
-  'vehicle': 2,
-  'instagram': 3,
-  'telegram': 3,
-  'darkdb': 5,
-  'shubh': 2,
-  'default': 1
-};
+// Credit costs - All searches cost 1 credit
+const CREDIT_COST = 1;
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -64,8 +55,8 @@ serve(async (req) => {
       );
     }
 
-    // Calculate credit cost
-    const creditCost = CREDIT_COSTS[searchType] || CREDIT_COSTS['default'];
+    // All searches cost 1 credit
+    const creditCost = CREDIT_COST;
     const currentCredits = session.access_passwords.remaining_credits;
 
     // Check if user has enough credits
