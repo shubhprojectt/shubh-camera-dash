@@ -29,8 +29,8 @@ const Index = () => {
         {/* Simple gradient overlay - lightweight */}
         <div className="absolute inset-0 bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5" />
         
-        {/* Simple cyber grid - no animation */}
-        <div className="absolute inset-0 cyber-grid opacity-20" />
+        {/* Neon glowing cyber grid */}
+        <div className="absolute inset-0 cyber-grid-glow opacity-40" />
         
         {/* Static corner accents - no blur/animation */}
         <div className="absolute top-0 left-0 w-40 h-40 bg-neon-green/10 rounded-full" style={{ filter: 'blur(60px)' }} />
