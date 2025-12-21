@@ -382,29 +382,41 @@ const TelegramOSINT: React.FC = () => {
   const currentTool = tools.find(t => t.id === activeTool);
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto relative">
+      {/* Background glow effects */}
+      <div className="absolute -top-20 -left-20 w-40 h-40 bg-neon-cyan/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -top-10 -right-20 w-32 h-32 bg-neon-pink/10 rounded-full blur-3xl pointer-events-none" />
+      
       {/* User ID Input */}
-      <div className="bg-black/40 border border-neon-cyan/20 rounded-xl p-4 mb-4">
-        <label className="text-gray-400 text-sm mb-2 block">Telegram User ID</label>
+      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-cyan/5 border border-neon-cyan/30 rounded-xl p-4 mb-4 backdrop-blur-sm shadow-[0_0_20px_hsl(var(--neon-cyan)/0.1)]">
+        {/* Corner accents */}
+        <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan rounded-tl-lg" />
+        <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-neon-pink rounded-tr-lg" />
+        <div className="absolute bottom-0 left-0 w-3 h-3 border-b-2 border-l-2 border-neon-pink rounded-bl-lg" />
+        <div className="absolute bottom-0 right-0 w-3 h-3 border-b-2 border-r-2 border-neon-cyan rounded-br-lg" />
+        
+        <label className="text-neon-cyan/80 text-sm mb-2 block font-medium flex items-center gap-2">
+          <User size={14} /> Telegram User ID
+        </label>
         <div className="flex gap-3">
           <Input
             type="text"
             placeholder="123456789"
             value={userId}
             onChange={(e) => setUserId(e.target.value.replace(/\D/g, ''))}
-            className="bg-black/60 border-gray-700 text-white placeholder:text-gray-500"
+            className="bg-black/60 border-neon-cyan/30 text-white placeholder:text-gray-500 focus:border-neon-cyan focus:ring-neon-cyan/20"
           />
           <Button
             onClick={fetchData}
             disabled={loading || !activeTool}
-            className="bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 px-6"
+            className="bg-gradient-to-r from-neon-cyan/20 to-neon-green/20 border border-neon-cyan text-neon-cyan hover:from-neon-cyan/30 hover:to-neon-green/30 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)] px-6 transition-all duration-300"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Search'}
           </Button>
           <Button
             onClick={() => setShowHistory(!showHistory)}
             variant="outline"
-            className={`border-neon-purple text-neon-purple hover:bg-neon-purple/20 px-4 ${showHistory ? 'bg-neon-purple/20' : ''}`}
+            className={`border-neon-purple text-neon-purple hover:bg-neon-purple/20 hover:shadow-[0_0_10px_hsl(var(--neon-purple)/0.3)] px-4 transition-all duration-300 ${showHistory ? 'bg-neon-purple/20 shadow-[0_0_15px_hsl(var(--neon-purple)/0.2)]' : ''}`}
             title="Search History"
           >
             <Clock size={16} className="mr-1" /> History
@@ -414,13 +426,15 @@ const TelegramOSINT: React.FC = () => {
         {/* Username Input (conditional) */}
         {currentTool?.needsUsername && (
           <div className="mt-3">
-            <label className="text-gray-400 text-sm mb-2 block">Username (without @)</label>
+            <label className="text-neon-pink/80 text-sm mb-2 block font-medium flex items-center gap-2">
+              <AtSign size={14} /> Username (without @)
+            </label>
             <Input
               type="text"
               placeholder="username"
               value={username}
               onChange={(e) => setUsername(e.target.value.replace('@', ''))}
-              className="bg-black/60 border-gray-700 text-white placeholder:text-gray-500"
+              className="bg-black/60 border-neon-pink/30 text-white placeholder:text-gray-500 focus:border-neon-pink focus:ring-neon-pink/20"
             />
           </div>
         )}
@@ -428,7 +442,11 @@ const TelegramOSINT: React.FC = () => {
 
       {/* Search History Panel */}
       {showHistory && (
-        <div className="bg-black/40 border border-neon-purple/20 rounded-xl p-4 mb-4">
+        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-purple/5 border border-neon-purple/30 rounded-xl p-4 mb-4 backdrop-blur-sm shadow-[0_0_20px_hsl(var(--neon-purple)/0.1)]">
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-purple rounded-tl-lg" />
+          <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />
+          
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-neon-purple font-mono text-sm flex items-center gap-2">
               <Clock size={16} /> SEARCH HISTORY
@@ -451,7 +469,7 @@ const TelegramOSINT: React.FC = () => {
               {searchHistory.map((entry) => (
                 <div
                   key={entry.userId}
-                  className="flex items-center justify-between bg-black/50 border border-gray-700 rounded-lg p-2 hover:border-neon-purple/50 transition-colors"
+                  className="flex items-center justify-between bg-gradient-to-r from-black/60 to-neon-purple/5 border border-neon-purple/20 rounded-lg p-2 hover:border-neon-purple/50 hover:shadow-[0_0_10px_hsl(var(--neon-purple)/0.2)] transition-all duration-300"
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-neon-cyan font-mono">{entry.userId}</span>
@@ -466,7 +484,7 @@ const TelegramOSINT: React.FC = () => {
                         setShowHistory(false);
                       }}
                       size="sm"
-                      className="bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 text-xs px-3"
+                      className="bg-neon-cyan/20 border border-neon-cyan text-neon-cyan hover:bg-neon-cyan/30 hover:shadow-[0_0_10px_hsl(var(--neon-cyan)/0.3)] text-xs px-3 transition-all duration-300"
                     >
                       <Search size={12} className="mr-1" /> Search
                     </Button>
@@ -487,21 +505,30 @@ const TelegramOSINT: React.FC = () => {
       )}
 
       {/* Tools Label */}
-      <p className="text-green-500 text-base font-normal mb-4">Telegram Id Dalo Or Nikalo Bnda Kon kon group me join hai bnde ka msg bahut kuchh try</p>
+      <p className="text-neon-green/80 text-sm font-normal mb-3 flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
+        Telegram Id Dalo Or Nikalo Bnda Kon kon group me join hai bnde ka msg bahut kuchh try
+      </p>
 
       {/* Tools Grid */}
-      <div className="bg-black/40 border border-gray-800 rounded-xl p-3 mb-6">
+      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/20 rounded-xl p-3 mb-6 backdrop-blur-sm shadow-[inset_0_0_30px_hsl(var(--neon-green)/0.03)]">
+        {/* Corner accents */}
+        <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green rounded-tl-lg" />
+        <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />
+        <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-pink rounded-bl-lg" />
+        <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-purple rounded-br-lg" />
+        
         <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-7 gap-2">
           {tools.filter(t => t.enabled).map((tool) => (
             <button
               key={tool.id}
               onClick={() => handleToolClick(tool)}
               className={`
-                flex flex-col items-center justify-center p-2 rounded-md border transition-all duration-200 hover:scale-105
+                flex flex-col items-center justify-center p-2 rounded-md border transition-all duration-300
                 ${colorClasses[tool.color]}
                 ${activeTool === tool.id 
-                  ? `bg-white/10 animate-glow-pulse` 
-                  : `bg-black/30 hover:bg-white/5`
+                  ? `bg-white/10 animate-glow-pulse scale-105` 
+                  : `bg-black/40 hover:bg-white/5`
                 }
               `}
             >
@@ -514,26 +541,38 @@ const TelegramOSINT: React.FC = () => {
 
       {/* Cost Warning */}
       {currentTool && currentTool.cost !== 'FREE' && (
-        <div className="flex items-center gap-2 text-neon-yellow text-sm mb-4 bg-neon-yellow/10 border border-neon-yellow/30 rounded-lg p-3">
-          <AlertTriangle size={16} />
+        <div className="flex items-center gap-2 text-neon-yellow text-sm mb-4 bg-gradient-to-r from-neon-yellow/10 to-neon-orange/10 border border-neon-yellow/30 rounded-lg p-3 shadow-[0_0_15px_hsl(var(--neon-yellow)/0.1)]">
+          <AlertTriangle size={16} className="animate-pulse" />
           <span>This action costs {currentTool.cost}</span>
         </div>
       )}
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-4 text-red-400">
-          {error}
+        <div className="bg-gradient-to-r from-red-500/10 to-red-600/10 border border-red-500/40 rounded-lg p-4 mb-4 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.1)]">
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} />
+            {error}
+          </div>
         </div>
       )}
 
       {/* Results */}
       {result && (
-        <div className="bg-black/40 border border-neon-green/20 rounded-xl p-4">
+        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/30 rounded-xl p-4 backdrop-blur-sm shadow-[0_0_25px_hsl(var(--neon-green)/0.1)]">
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green rounded-tl-lg" />
+          <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />
+          <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-neon-pink rounded-bl-lg" />
+          <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-neon-purple rounded-br-lg" />
+          
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-neon-green font-mono">Results - {currentTool?.label}</h3>
+            <h3 className="text-neon-green font-mono flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+              Results - {currentTool?.label}
+            </h3>
             {isFromCache && (
-              <span className="flex items-center gap-1 text-xs bg-neon-purple/20 border border-neon-purple/30 text-neon-purple px-2 py-1 rounded">
+              <span className="flex items-center gap-1 text-xs bg-neon-purple/20 border border-neon-purple/30 text-neon-purple px-2 py-1 rounded shadow-[0_0_10px_hsl(var(--neon-purple)/0.2)]">
                 <Database size={12} /> CACHED (No credits used)
               </span>
             )}
