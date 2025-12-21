@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface SearchButtonProps {
   icon: LucideIcon;
   label: string;
-  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow";
+  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue";
   active?: boolean;
   onClick?: () => void;
 }
@@ -79,6 +79,16 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-yellow))]",
     bottomGlow: "bg-neon-yellow shadow-[0_0_15px_hsl(var(--neon-yellow)),0_0_30px_hsl(var(--neon-yellow)/0.5)]",
+  },
+  blue: {
+    border: "border-neon-blue",
+    text: "text-neon-blue",
+    bg: "bg-neon-blue/10",
+    activeBg: "bg-neon-blue/25",
+    glow: "shadow-[0_0_25px_hsl(var(--neon-blue)/0.7),0_0_50px_hsl(var(--neon-blue)/0.4),inset_0_0_20px_hsl(var(--neon-blue)/0.2)]",
+    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-blue)/0.5)]",
+    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-blue))]",
+    bottomGlow: "bg-neon-blue shadow-[0_0_15px_hsl(var(--neon-blue)),0_0_30px_hsl(var(--neon-blue)/0.5)]",
   },
 };
 
