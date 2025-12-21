@@ -43,14 +43,16 @@ const Header = () => {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60" />
       
       {/* Left side - Status indicators & Credit Display */}
-      <div className="absolute top-2 left-2 flex items-center gap-2">
-        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30 backdrop-blur-sm">
-          <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
-          <span className="text-[8px] font-bold text-neon-green">LIVE</span>
-        </div>
-        <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 backdrop-blur-sm">
-          <Shield className="w-2 h-2 text-neon-cyan" />
-          <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
+      <div className="absolute top-2 left-2 flex flex-col gap-1.5">
+        <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30 backdrop-blur-sm">
+            <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
+            <span className="text-[8px] font-bold text-neon-green">LIVE</span>
+          </div>
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 backdrop-blur-sm">
+            <Shield className="w-2 h-2 text-neon-cyan" />
+            <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
+          </div>
         </div>
         <CreditDisplay />
       </div>
