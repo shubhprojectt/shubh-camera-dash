@@ -125,7 +125,7 @@ interface AadharResult {
 
 const NumberDetailFinder = () => {
   const { settings } = useSettings();
-  const { credits, deductCredits, isAuthenticated } = useAuth();
+  const { credits, deductCredits, isAuthenticated, isUnlimited } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -231,8 +231,8 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Check if user has credits
-    if (credits <= 0) {
+    // Check if user has credits (skip for unlimited)
+    if (!isUnlimited && credits <= 0) {
       toast({
         title: "No Credits",
         description: "Credits finished! Contact admin for more.",

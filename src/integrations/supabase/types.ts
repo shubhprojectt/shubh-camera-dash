@@ -20,6 +20,7 @@ export type Database = {
           device_id: string | null
           id: string
           is_enabled: boolean
+          is_unlimited: boolean
           is_used: boolean
           password_display: string
           password_hash: string
@@ -33,6 +34,7 @@ export type Database = {
           device_id?: string | null
           id?: string
           is_enabled?: boolean
+          is_unlimited?: boolean
           is_used?: boolean
           password_display: string
           password_hash: string
@@ -46,6 +48,7 @@ export type Database = {
           device_id?: string | null
           id?: string
           is_enabled?: boolean
+          is_unlimited?: boolean
           is_used?: boolean
           password_display?: string
           password_hash?: string

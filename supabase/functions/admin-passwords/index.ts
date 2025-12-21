@@ -110,7 +110,7 @@ serve(async (req) => {
       }
 
       case 'update': {
-        const { passwordId, credits, isEnabled } = params;
+        const { passwordId, credits, isEnabled, isUnlimited } = params;
         
         if (!passwordId) {
           return new Response(
@@ -125,6 +125,9 @@ serve(async (req) => {
         }
         if (isEnabled !== undefined) {
           updateData.is_enabled = isEnabled;
+        }
+        if (isUnlimited !== undefined) {
+          updateData.is_unlimited = isUnlimited;
         }
 
         const { data, error } = await supabase

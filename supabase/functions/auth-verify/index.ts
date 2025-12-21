@@ -59,7 +59,8 @@ serve(async (req) => {
       JSON.stringify({
         valid: true,
         credits: session.access_passwords.remaining_credits,
-        totalCredits: session.access_passwords.total_credits
+        totalCredits: session.access_passwords.total_credits,
+        isUnlimited: session.access_passwords.is_unlimited || false
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
