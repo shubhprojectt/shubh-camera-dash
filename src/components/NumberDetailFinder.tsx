@@ -24,7 +24,7 @@ import {
   Send,
   LucideIcon,
   ArrowRight,
-  Lock,
+  
   MessageCircle
 } from "lucide-react";
 import SearchButton from "./SearchButton";
@@ -36,12 +36,6 @@ import TelegramOSINT from "./TelegramOSINT";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "./ui/dialog";
 
 const iconMap: Record<string, LucideIcon> = {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle
@@ -132,37 +126,11 @@ const NumberDetailFinder = () => {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
   
-  // Access key states
-  const [showAccessKeyDialog, setShowAccessKeyDialog] = useState(false);
-  const [accessKeyInput, setAccessKeyInput] = useState("");
-  const [allSearchUnlocked, setAllSearchUnlocked] = useState(false);
-  const [telegramUnlocked, setTelegramUnlocked] = useState(false);
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
-  const [accessKeyType, setAccessKeyType] = useState<"allsearch" | "telegram">("allsearch");
-
   // Filter out manual tab - it's on Page2 now
   const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
-    const clickedTab = enabledTabs.find(t => t.label === label);
-    
-    // Check if clicking on ALL SEARCH tab and access key is required AND enabled
-    if (clickedTab?.searchType === "allsearch" && settings.allSearchKeyEnabled && settings.allSearchAccessKey && !allSearchUnlocked) {
-      setPendingTab(label);
-      setAccessKeyType("allsearch");
-      setShowAccessKeyDialog(true);
-      return;
-    }
-    
-    // Check if clicking on Telegram OSINT tab and access key is required AND enabled
-    if (clickedTab?.searchType === "telegram" && settings.telegramKeyEnabled && settings.telegramOsintAccessKey && !telegramUnlocked) {
-      setPendingTab(label);
-      setAccessKeyType("telegram");
-      setShowAccessKeyDialog(true);
-      return;
-    }
-    
     if (activeTab === label) {
       setActiveTab(null);
     } else {
@@ -170,43 +138,6 @@ const NumberDetailFinder = () => {
       setSearchQuery("");
       setResult(null);
       setError(null);
-    }
-  };
-
-  const handleAccessKeySubmit = () => {
-    const correctKey = accessKeyType === "allsearch" 
-      ? settings.allSearchAccessKey 
-      : settings.telegramOsintAccessKey;
-    
-    if (accessKeyInput === correctKey) {
-      if (accessKeyType === "allsearch") {
-        setAllSearchUnlocked(true);
-      } else {
-        setTelegramUnlocked(true);
-      }
-      setShowAccessKeyDialog(false);
-      setAccessKeyInput("");
-      
-      // Open the tab now
-      if (pendingTab) {
-        setActiveTab(pendingTab);
-        setSearchQuery("");
-        setResult(null);
-        setError(null);
-        setPendingTab(null);
-      }
-      
-      toast({
-        title: "Access Granted",
-        description: `${accessKeyType === "allsearch" ? "ALL SEARCH" : "Telegram OSINT"} unlocked!`,
-      });
-    } else {
-      toast({
-        title: "Access Denied",
-        description: "Wrong access key. Try again.",
-        variant: "destructive",
-      });
-      setAccessKeyInput("");
     }
   };
 
@@ -1015,45 +946,6 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      {/* Access Key Dialog - Dynamic color based on type */}
-      <Dialog open={showAccessKeyDialog} onOpenChange={setShowAccessKeyDialog}>
-        <DialogContent className={`max-w-[280px] p-4 bg-background/95 backdrop-blur-xl border rounded-xl ${
-          accessKeyType === "telegram" ? "border-neon-cyan/50" : "border-neon-red/50"
-        }`}>
-          <DialogHeader className="pb-2">
-            <DialogTitle className={`text-center flex items-center justify-center gap-2 text-sm ${
-              accessKeyType === "telegram" ? "text-neon-cyan" : "text-neon-red"
-            }`}>
-              <Lock className="w-4 h-4" />
-              {accessKeyType === "telegram" ? "Telegram OSINT" : "ALL SEARCH"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-3">
-            <Input
-              type="password"
-              value={accessKeyInput}
-              onChange={(e) => setAccessKeyInput(e.target.value)}
-              placeholder="Enter key..."
-              className={`bg-background/50 text-center font-mono h-9 text-sm ${
-                accessKeyType === "telegram" ? "border-neon-cyan/30" : "border-neon-red/30"
-              }`}
-              onKeyDown={(e) => e.key === "Enter" && handleAccessKeySubmit()}
-            />
-            <Button 
-              onClick={handleAccessKeySubmit}
-              className={`w-full text-background font-bold h-9 text-sm ${
-                accessKeyType === "telegram" 
-                  ? "bg-gradient-to-r from-neon-cyan to-neon-green" 
-                  : "bg-gradient-to-r from-neon-red to-neon-orange"
-              }`}
-            >
-              <Lock className="w-3 h-3 mr-1" />
-              Unlock
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       <div className="space-y-2">
       {/* Main Card */}
       <div className="relative">
