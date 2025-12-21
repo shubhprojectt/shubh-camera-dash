@@ -42,8 +42,8 @@ const Header = () => {
       {/* Animated top bar */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60" />
       
-      {/* Compact Status indicators */}
-      <div className="absolute top-2 left-2 flex gap-1">
+      {/* Left side - Status indicators & Credit Display */}
+      <div className="absolute top-2 left-2 flex items-center gap-2">
         <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30 backdrop-blur-sm">
           <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
           <span className="text-[8px] font-bold text-neon-green">LIVE</span>
@@ -52,11 +52,11 @@ const Header = () => {
           <Shield className="w-2 h-2 text-neon-cyan" />
           <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
         </div>
+        <CreditDisplay />
       </div>
 
-      {/* Credit Display & Admin Link */}
+      {/* Right side - Admin Link */}
       <div className="absolute top-2 right-2 flex items-center gap-2">
-        <CreditDisplay />
         <Link 
           to="/admin" 
           className="p-1.5 rounded-lg border border-neon-orange/50 text-neon-orange bg-neon-orange/10 hover:bg-neon-orange/20 transition-all duration-200 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.5)] backdrop-blur-sm"
