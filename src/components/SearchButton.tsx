@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface SearchButtonProps {
   icon: LucideIcon;
   label: string;
-  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue";
+  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue" | "white" | "teal" | "lime";
   active?: boolean;
   onClick?: () => void;
 }
@@ -89,6 +89,36 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-blue)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-blue))]",
     bottomGlow: "bg-neon-blue shadow-[0_0_15px_hsl(var(--neon-blue)),0_0_30px_hsl(var(--neon-blue)/0.5)]",
+  },
+  white: {
+    border: "border-white",
+    text: "text-white",
+    bg: "bg-white/10",
+    activeBg: "bg-white/25",
+    glow: "shadow-[0_0_25px_hsl(0_0%_100%/0.7),0_0_50px_hsl(0_0%_100%/0.4),inset_0_0_20px_hsl(0_0%_100%/0.2)]",
+    hoverGlow: "hover:shadow-[0_0_20px_hsl(0_0%_100%/0.5)]",
+    iconGlow: "drop-shadow-[0_0_10px_hsl(0_0%_100%)]",
+    bottomGlow: "bg-white shadow-[0_0_15px_hsl(0_0%_100%),0_0_30px_hsl(0_0%_100%/0.5)]",
+  },
+  teal: {
+    border: "border-teal-400",
+    text: "text-teal-400",
+    bg: "bg-teal-400/10",
+    activeBg: "bg-teal-400/25",
+    glow: "shadow-[0_0_25px_hsl(171_77%_64%/0.7),0_0_50px_hsl(171_77%_64%/0.4),inset_0_0_20px_hsl(171_77%_64%/0.2)]",
+    hoverGlow: "hover:shadow-[0_0_20px_hsl(171_77%_64%/0.5)]",
+    iconGlow: "drop-shadow-[0_0_10px_hsl(171_77%_64%)]",
+    bottomGlow: "bg-teal-400 shadow-[0_0_15px_hsl(171_77%_64%),0_0_30px_hsl(171_77%_64%/0.5)]",
+  },
+  lime: {
+    border: "border-lime-400",
+    text: "text-lime-400",
+    bg: "bg-lime-400/10",
+    activeBg: "bg-lime-400/25",
+    glow: "shadow-[0_0_25px_hsl(82_85%_67%/0.7),0_0_50px_hsl(82_85%_67%/0.4),inset_0_0_20px_hsl(82_85%_67%/0.2)]",
+    hoverGlow: "hover:shadow-[0_0_20px_hsl(82_85%_67%/0.5)]",
+    iconGlow: "drop-shadow-[0_0_10px_hsl(82_85%_67%)]",
+    bottomGlow: "bg-lime-400 shadow-[0_0_15px_hsl(82_85%_67%),0_0_30px_hsl(82_85%_67%/0.5)]",
   },
 };
 
