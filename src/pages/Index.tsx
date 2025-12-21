@@ -56,23 +56,23 @@ const Index = () => {
         <div className="absolute inset-0 pointer-events-none scanline opacity-30" />
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 pb-12">
+        <div className="relative z-10 container mx-auto px-3 pb-6">
           <Header />
           
-          {/* Stats Bar */}
-          <div className="max-w-3xl mx-auto mb-6">
-            <div className="flex items-center justify-center gap-4 md:gap-8 flex-wrap">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-neon-green/30 backdrop-blur-sm">
-                <Database className="w-3.5 h-3.5 text-neon-green" />
-                <span className="text-xs font-mono text-neon-green">1B+ Records</span>
+          {/* Compact Stats Bar */}
+          <div className="max-w-3xl mx-auto mb-3">
+            <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-green/30 backdrop-blur-sm">
+                <Database className="w-3 h-3 text-neon-green" />
+                <span className="text-[10px] font-mono text-neon-green">1B+ Records</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-neon-cyan/30 backdrop-blur-sm">
-                <Zap className="w-3.5 h-3.5 text-neon-cyan" />
-                <span className="text-xs font-mono text-neon-cyan">Fast Search</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-cyan/30 backdrop-blur-sm">
+                <Zap className="w-3 h-3 text-neon-cyan" />
+                <span className="text-[10px] font-mono text-neon-cyan">Fast</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-card/50 border border-neon-pink/30 backdrop-blur-sm">
-                <Sparkles className="w-3.5 h-3.5 text-neon-pink" />
-                <span className="text-xs font-mono text-neon-pink">AI Powered</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-pink/30 backdrop-blur-sm">
+                <Sparkles className="w-3 h-3 text-neon-pink" />
+                <span className="text-[10px] font-mono text-neon-pink">AI</span>
               </div>
             </div>
           </div>
