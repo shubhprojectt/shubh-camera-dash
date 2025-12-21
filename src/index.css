@@ -285,9 +285,29 @@
 
   .cyber-grid {
     background-image: 
-      linear-gradient(hsl(var(--neon-green) / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--neon-green) / 0.05) 1px, transparent 1px);
+      linear-gradient(hsl(var(--neon-cyan) / 0.15) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--neon-purple) / 0.15) 1px, transparent 1px);
     background-size: 50px 50px;
+  }
+
+  .cyber-grid-glow {
+    position: relative;
+    background-image: 
+      linear-gradient(hsl(var(--neon-cyan) / 0.2) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(var(--neon-purple) / 0.2) 1px, transparent 1px);
+    background-size: 50px 50px;
+  }
+
+  .cyber-grid-glow::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(hsl(var(--neon-cyan) / 0.4) 2px, transparent 2px),
+      linear-gradient(90deg, hsl(var(--neon-purple) / 0.4) 2px, transparent 2px);
+    background-size: 50px 50px;
+    filter: blur(3px);
+    opacity: 0.5;
   }
 
   .neon-border {
