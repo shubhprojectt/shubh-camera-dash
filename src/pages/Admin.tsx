@@ -124,6 +124,7 @@ const Admin = () => {
   const [passwordRecords, setPasswordRecords] = useState<PasswordRecord[]>([]);
   const [isLoadingPasswords, setIsLoadingPasswords] = useState(false);
   const [newCredits, setNewCredits] = useState("50");
+  const [customPassword, setCustomPassword] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCredits, setEditCredits] = useState("");
@@ -178,13 +179,23 @@ const Admin = () => {
       toast({ title: "Error", description: "Credits must be at least 1", variant: "destructive" });
       return;
     }
+    if (customPassword && customPassword.trim().length < 4) {
+      toast({ title: "Error", description: "Custom password must be at least 4 characters", variant: "destructive" });
+      return;
+    }
     setIsCreating(true);
     try {
       const { data, error } = await supabase.functions.invoke('admin-passwords', {
-        body: { action: 'create', adminPassword: settings.adminPassword, credits }
+        body: { 
+          action: 'create', 
+          adminPassword: settings.adminPassword, 
+          credits,
+          customPassword: customPassword.trim() || undefined
+        }
       });
       if (error) throw error;
       toast({ title: "Password Created", description: `Password: ${data.password.password_display}` });
+      setCustomPassword("");
       fetchPasswords();
     } catch (err) {
       toast({ title: "Error", description: "Failed to create password", variant: "destructive" });
@@ -1342,8 +1353,20 @@ const Admin = () => {
               <h3 className="font-bold text-neon-green flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Generate New Password
               </h3>
-              <div className="flex gap-3">
-                <div className="flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Custom Password (optional)</label>
+                  <Input
+                    type="text"
+                    value={customPassword}
+                    onChange={(e) => setCustomPassword(e.target.value.toUpperCase())}
+                    placeholder="Leave empty for random"
+                    className="h-12 text-lg font-mono uppercase"
+                    maxLength={16}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">Min 4 characters, will be UPPERCASE</p>
+                </div>
+                <div>
                   <label className="text-xs text-muted-foreground mb-1 block">Credits</label>
                   <Input
                     type="number"
@@ -1354,17 +1377,8 @@ const Admin = () => {
                     min="1"
                   />
                 </div>
-                <div className="flex items-end">
-                  <Button
-                    onClick={createPassword}
-                    disabled={isCreating}
-                    className="h-12 px-6 bg-neon-green text-background font-bold hover:bg-neon-green/80"
-                  >
-                    {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5 mr-2" /> Generate</>}
-                  </Button>
-                </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 {[10, 50, 100, 500].map((c) => (
                   <Button
                     key={c}
@@ -1377,6 +1391,13 @@ const Admin = () => {
                   </Button>
                 ))}
               </div>
+              <Button
+                onClick={createPassword}
+                disabled={isCreating}
+                className="w-full h-12 bg-neon-green text-background font-bold hover:bg-neon-green/80"
+              >
+                {isCreating ? <Loader2 className="w-5 h-5 animate-spin" /> : <><Plus className="w-5 h-5 mr-2" /> {customPassword ? 'Create Custom Password' : 'Generate Random Password'}</>}
+              </Button>
             </div>
 
             {/* Password List */}

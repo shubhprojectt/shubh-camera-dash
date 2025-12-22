@@ -77,7 +77,7 @@ serve(async (req) => {
       }
 
       case 'create': {
-        const { credits } = params;
+        const { credits, customPassword } = params;
         if (!credits || credits < 1) {
           return new Response(
             JSON.stringify({ error: 'Credits must be at least 1' }),
@@ -85,7 +85,10 @@ serve(async (req) => {
           );
         }
 
-        const password = generatePassword(8);
+        // Use custom password if provided, otherwise generate random
+        const password = customPassword && customPassword.trim().length >= 4 
+          ? customPassword.trim().toUpperCase() 
+          : generatePassword(8);
         const passwordHash = await hashPassword(password);
 
         const { data, error } = await supabase
