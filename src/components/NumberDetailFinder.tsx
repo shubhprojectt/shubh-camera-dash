@@ -204,10 +204,11 @@ const NumberDetailFinder = () => {
     // Phone search API
     if (activeButton?.searchType === "phone") {
       try {
-        const response = await fetch(`https://vishal-number-info.22web.org/information.php?number=${encodeURIComponent(searchQuery.trim())}&api_key=vishal_Hacker`);
+        const apiUrl = activeButton?.apiUrl || "https://anmolzz.teamxferry.workers.dev/?mobile=";
+        const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
         const data = await response.json();
         
-        if (data && (data.data1 || data.data2)) {
+        if (data && Object.keys(data).length > 0 && !data.error) {
           setResult({ type: "phone", data });
           toast({
             title: "Phone Found",
