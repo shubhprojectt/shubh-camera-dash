@@ -48,71 +48,54 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
       <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
 
       {/* Lock Dialog */}
-      <div className="relative w-full max-w-sm">
+      <div className="relative w-full max-w-xs">
         {/* Outer glow border */}
-        <div className="absolute -inset-[2px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-80 blur-sm animate-pulse" />
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-xl opacity-70 blur-[2px] animate-pulse" />
 
-        <div className="relative bg-background border-2 border-neon-green/50 rounded-2xl p-6 space-y-6">
+        <div className="relative bg-background border border-neon-green/50 rounded-xl p-4 space-y-3">
           {/* Lock Icon */}
           <div className="flex justify-center">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-green to-neon-pink rounded-full blur-xl opacity-50" />
-              <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-neon-green/30 via-neon-cyan/20 to-neon-pink/30 flex items-center justify-center border-2 border-neon-green/50">
-                <Lock className="w-8 h-8 text-neon-green" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-green to-neon-pink rounded-full blur-lg opacity-40" />
+              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-neon-green/30 via-neon-cyan/20 to-neon-pink/30 flex items-center justify-center border border-neon-green/50">
+                <Lock className="w-5 h-5 text-neon-green" />
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <div className="text-center space-y-2">
-            <h1 className="text-2xl font-display font-bold">
+          <div className="text-center space-y-1">
+            <h1 className="text-lg font-display font-bold">
               <span className="text-neon-green">DARK</span>{" "}
               <span className="text-neon-pink">OSINT</span>
             </h1>
-            <p className="text-neon-pink/80 text-sm">
+            <p className="text-neon-pink/80 text-[10px]">
               Password Ke Liye Telegram Msg Kare Id= @xyzd4rkhu
             </p>
           </div>
 
-          {/* Description */}
-          <div className="bg-card/50 border border-neon-cyan/30 rounded-xl p-3 space-y-2">
-            <p className="text-xs text-neon-cyan font-medium text-center">
-              Sirf number daalo aur paao complete details
-            </p>
-            <p className="text-[10px] text-muted-foreground text-center">
-              Humari API ye sab details fetch karti hai:
-            </p>
-            <div className="flex items-start gap-2 text-[10px] text-neon-green">
-              <span>1️⃣</span>
-              <span><span className="font-bold">Number Info:</span> Name, Father Name, Complete Address, ID Number & Family Link Number</span>
-            </div>
-          </div>
-
           {/* Password Input */}
-          <div className="space-y-4">
-            <div className="relative">
-              <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-cyan to-neon-cyan rounded-xl opacity-60" />
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password enter karein..."
-                className="relative bg-background border-2 border-neon-cyan/50 rounded-xl h-12 text-center text-foreground placeholder:text-muted-foreground focus-visible:ring-neon-cyan focus-visible:ring-offset-0"
-                onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
-              />
-            </div>
+          <div className="space-y-2">
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password enter karein..."
+              className="bg-background border border-neon-cyan/50 rounded-lg h-9 text-sm text-center text-foreground placeholder:text-muted-foreground focus-visible:ring-neon-cyan focus-visible:ring-offset-0"
+              onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
+            />
 
             {/* Unlock Button */}
             <Button
               onClick={handleUnlock}
-              className="w-full h-12 rounded-xl text-lg font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background hover:opacity-90 transition-all shadow-[0_0_20px_hsl(var(--neon-green)/0.5)] active:scale-95"
+              className="w-full h-9 rounded-lg text-sm font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background hover:opacity-90 transition-all shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] active:scale-95"
             >
               UNLOCK
             </Button>
           </div>
 
           {/* Footer hint */}
-          <p className="text-center text-xs text-muted-foreground">
+          <p className="text-center text-[10px] text-muted-foreground">
             🔐 Secured by SHUBH OSINT
           </p>
         </div>
