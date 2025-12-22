@@ -57,15 +57,6 @@ const Header = () => {
         <CreditDisplay />
       </div>
 
-      {/* Right side - Admin Link */}
-      <div className="absolute top-2 right-2 flex items-center gap-2">
-        <Link 
-          to="/admin" 
-          className="p-1.5 rounded-lg border border-neon-orange/50 text-neon-orange bg-neon-orange/10 hover:bg-neon-orange/20 transition-all duration-200 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.5)] backdrop-blur-sm"
-        >
-          <Settings className="w-3.5 h-3.5" />
-        </Link>
-      </div>
       
       {/* Compact Logo Container */}
       <div className="relative inline-block mb-2">
