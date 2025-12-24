@@ -1,5 +1,4 @@
-import { Wifi, Settings, Shield, Activity, Signal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Shield, Activity, Radio } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import CreditDisplay from "./CreditDisplay";
 import * as Icons from "lucide-react";
@@ -38,30 +37,36 @@ const Header = () => {
   const color2 = colorClasses[settings.headerColor2] || colorClasses.pink;
 
   return (
-    <header className="relative py-3 text-center">
-      {/* Animated top bar */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60" />
+    <header className="relative py-4 text-center">
+      {/* Premium animated top bar */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-70" />
       
       {/* Left side - Status indicators & Credit Display */}
-      <div className="absolute top-2 left-2 flex flex-col gap-1.5">
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30 backdrop-blur-sm">
-            <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
-            <span className="text-[8px] font-bold text-neon-green">LIVE</span>
+      <div className="absolute top-3 left-3 flex flex-col gap-2">
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass-card border border-neon-green/40 backdrop-blur-md">
+            <div className="relative">
+              <div className="w-2 h-2 bg-neon-green rounded-full" />
+              <div className="absolute inset-0 w-2 h-2 bg-neon-green rounded-full animate-ping opacity-60" />
+            </div>
+            <span className="text-[9px] font-bold text-neon-green tracking-wide">LIVE</span>
           </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 backdrop-blur-sm">
-            <Shield className="w-2 h-2 text-neon-cyan" />
-            <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
+          <div className="flex items-center gap-1.5 px-2 py-1 rounded-full glass-card border border-neon-cyan/40 backdrop-blur-md">
+            <Shield className="w-2.5 h-2.5 text-neon-cyan" />
+            <span className="text-[9px] font-bold text-neon-cyan tracking-wide">SECURE</span>
           </div>
         </div>
         <CreditDisplay />
       </div>
 
       
-      {/* Compact Logo Container */}
-      <div className="relative inline-block mb-2">
+      {/* Premium Logo Container */}
+      <div className="relative inline-block mb-3">
+        {/* Outer glow ring */}
+        <div className="absolute -inset-2 bg-gradient-to-br from-neon-purple/30 via-neon-cyan/20 to-neon-pink/30 rounded-full blur-xl animate-glow-breathe" />
+        
         {/* Main logo container */}
-        <div className={`relative w-14 h-14 rounded-full border-2 ${color1.border} bg-background/80 backdrop-blur-sm overflow-hidden flex items-center justify-center neon-border-animated`}>
+        <div className={`relative w-16 h-16 rounded-full border-2 ${color1.border} bg-background/90 backdrop-blur-md overflow-hidden flex items-center justify-center neon-border-animated`}>
           {settings.headerCustomLogo ? (
             <img 
               src={settings.headerCustomLogo} 
@@ -69,34 +74,36 @@ const Header = () => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <IconComponent className={`w-7 h-7 ${color1.text} animate-neon-flicker`} />
+            <IconComponent className={`w-8 h-8 ${color1.text} animate-neon-flicker`} />
           )}
         </div>
       </div>
       
-      {/* Compact Title */}
+      {/* Premium Title */}
       <div className="relative">
         <h1 
-          className={`text-2xl md:text-3xl font-black tracking-wider ${getStyleClasses()}`}
+          className={`text-2xl md:text-4xl font-black tracking-wider ${getStyleClasses()}`}
           style={{ fontFamily: settings.headerFont }}
         >
           <span className={`${color1.text} ${color1.glow}`}>{settings.headerName1}</span>
           <span className={`${color2.text} ${color2.glow} ml-2`}>{settings.headerName2}</span>
         </h1>
         
-        {/* Tagline */}
-        <p className="mt-1 text-[9px] text-muted-foreground tracking-[0.2em] uppercase font-mono">
+        {/* Premium Tagline */}
+        <p className="mt-2 text-[10px] text-muted-foreground tracking-[0.25em] uppercase font-semibold flex items-center justify-center gap-2">
+          <span className="w-4 h-[1px] bg-gradient-to-r from-transparent to-neon-green" />
           Intelligence • Search • Security
+          <span className="w-4 h-[1px] bg-gradient-to-l from-transparent to-neon-pink" />
         </p>
       </div>
       
-      {/* Compact decorative line */}
-      <div className="mt-3 flex items-center justify-center gap-2">
-        <div className="w-12 h-px bg-gradient-to-r from-transparent to-neon-green" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-16 h-px bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-cyan" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-12 h-px bg-gradient-to-l from-transparent to-neon-pink" />
+      {/* Premium decorative line */}
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-neon-green" />
+        <div className="w-2 h-2 rotate-45 border-2 border-neon-cyan bg-neon-cyan/20 animate-pulse" />
+        <div className="w-20 h-[1px] bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-cyan" />
+        <div className="w-2 h-2 rotate-45 border-2 border-neon-cyan bg-neon-cyan/20 animate-pulse" style={{ animationDelay: '0.5s' }} />
+        <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-neon-pink" />
       </div>
     </header>
   );
