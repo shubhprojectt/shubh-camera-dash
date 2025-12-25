@@ -5,13 +5,8 @@ import {
   Loader2, 
   ArrowLeft, 
   Zap, 
-  Shield, 
-  Sparkles,
-  Globe,
   Database,
-  Wifi,
-  Terminal,
-  Fingerprint
+  Sparkles
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -21,48 +16,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Link } from "react-router-dom";
 import MusicPlayer from "@/components/MusicPlayer";
 import { useAuth } from "@/contexts/AuthContext";
+import Header from "@/components/Header";
 
 const Page2 = () => {
   const { settings } = useSettings();
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<string | null>("manual");
-  const [glitchText, setGlitchText] = useState("PAGE 2");
-
-  // Glitch effect for title
-  useEffect(() => {
-    const glitchChars = "!@#$%^&*()_+-=[]{}|;:,.<>?";
-    const originalText = "PAGE 2";
-    let interval: NodeJS.Timeout;
-
-    const startGlitch = () => {
-      let iterations = 0;
-      interval = setInterval(() => {
-        setGlitchText(
-          originalText
-            .split("")
-            .map((char, index) => {
-              if (index < iterations) return char;
-              return glitchChars[Math.floor(Math.random() * glitchChars.length)];
-            })
-            .join("")
-        );
-        iterations += 1 / 3;
-        if (iterations >= originalText.length) {
-          clearInterval(interval);
-          setGlitchText(originalText);
-        }
-      }, 50);
-    };
-
-    startGlitch();
-    const repeatInterval = setInterval(startGlitch, 6000);
-    return () => {
-      clearInterval(interval);
-      clearInterval(repeatInterval);
-    };
-  }, []);
 
   const manualTab = settings.tabs.find(tab => tab.searchType === "manual");
 
@@ -100,7 +60,6 @@ const Page2 = () => {
     });
   };
 
-  // Show loading while checking auth
   if (authLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
@@ -108,8 +67,6 @@ const Page2 = () => {
       </div>
     );
   }
-
-  // Redirect handled by ProtectedRoute in App.tsx
 
   if (!manualTab?.enabled) {
     return (
@@ -121,209 +78,141 @@ const Page2 = () => {
 
   return (
     <div className="min-h-[100dvh] bg-background relative overflow-hidden">
-      {/* Animated cyber grid background */}
-      <div className="absolute inset-0 cyber-grid opacity-30" />
+      {/* Custom background image or simple gradient - same as Index */}
+      {settings.backgroundImage ? (
+        <div 
+          className="fixed-viewport bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${settings.backgroundImage})` }}
+        />
+      ) : (
+        <div className="fixed-viewport bg-background" />
+      )}
       
-      {/* Scan line effect */}
-      <div className="absolute inset-0 scanline opacity-40" />
-
-      {/* Floating orbs with purple/cyan theme */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-[5%] left-[10%] w-72 h-72 bg-neon-purple/25 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-[15%] right-[5%] w-96 h-96 bg-neon-cyan/20 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-[40%] left-[60%] w-[400px] h-[400px] bg-neon-pink/15 rounded-full blur-[150px] animate-pulse" style={{ animationDelay: '2s' }} />
-        <div className="absolute top-[60%] left-[20%] w-48 h-48 bg-neon-orange/20 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: '0.5s' }} />
-        <div className="absolute top-[20%] right-[30%] w-40 h-40 bg-neon-green/15 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: '1.5s' }} />
-      </div>
+      {/* Dark overlay for readability - same as Index */}
+      <div 
+        className="absolute inset-0 bg-background"
+        style={{ opacity: (parseInt(settings.backgroundOpacity || "30") / 100) }}
+      />
       
-      {/* Animated Corner Decorations */}
-      <div className="fixed top-0 left-0 w-32 h-32 pointer-events-none">
-        <div className="absolute top-4 left-4 w-16 h-[2px] bg-gradient-to-r from-neon-purple to-transparent" />
-        <div className="absolute top-4 left-4 w-[2px] h-16 bg-gradient-to-b from-neon-purple to-transparent" />
-      </div>
-      <div className="fixed top-0 right-0 w-32 h-32 pointer-events-none">
-        <div className="absolute top-4 right-4 w-16 h-[2px] bg-gradient-to-l from-neon-cyan to-transparent" />
-        <div className="absolute top-4 right-4 w-[2px] h-16 bg-gradient-to-b from-neon-cyan to-transparent" />
-      </div>
-      <div className="fixed bottom-0 left-0 w-32 h-32 pointer-events-none">
-        <div className="absolute bottom-4 left-4 w-16 h-[2px] bg-gradient-to-r from-neon-pink to-transparent" />
-        <div className="absolute bottom-4 left-4 w-[2px] h-16 bg-gradient-to-t from-neon-pink to-transparent" />
-      </div>
-      <div className="fixed bottom-0 right-0 w-32 h-32 pointer-events-none">
-        <div className="absolute bottom-4 right-4 w-16 h-[2px] bg-gradient-to-l from-neon-orange to-transparent" />
-        <div className="absolute bottom-4 right-4 w-[2px] h-16 bg-gradient-to-t from-neon-orange to-transparent" />
-      </div>
-
-      {/* Floating status indicators */}
-      <div className="absolute top-4 left-4 flex items-center gap-2 text-neon-purple/70 text-xs font-mono animate-pulse z-20">
-        <Wifi className="w-3 h-3" />
-        <span>CONNECTED</span>
-      </div>
-      <div className="absolute top-4 right-16 flex items-center gap-2 text-neon-cyan/70 text-xs font-mono animate-pulse z-20" style={{ animationDelay: '0.5s' }}>
-        <Database className="w-3 h-3" />
-        <span>READY</span>
-      </div>
-
-      {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-4 py-6 max-w-md min-h-screen flex flex-col">
+      {/* Simple gradient overlay - lightweight */}
+      <div className="absolute inset-0 bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5" />
+      
+      {/* Neon glowing cyber grid */}
+      <div className="absolute inset-0 cyber-grid-glow opacity-40" />
+      
+      {/* Static corner accents - no blur/animation */}
+      <div className="absolute top-0 left-0 w-40 h-40 bg-neon-green/10 rounded-full" style={{ filter: 'blur(60px)' }} />
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-neon-pink/10 rounded-full" style={{ filter: 'blur(60px)' }} />
+      
+      {/* Content */}
+      <div className="relative z-10 container mx-auto px-3 pb-6">
+        <Header />
         
-        {/* Header Section */}
-        <header className="relative py-4 text-center mb-4">
-          {/* Back Button with glow */}
-          <Link 
-            to="/" 
-            className="absolute top-2 right-0 p-2.5 rounded-xl border border-neon-cyan/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)] group"
-          >
-            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          </Link>
-          
-          {/* Logo with animated ring */}
-          <div className="relative inline-flex items-center justify-center w-20 h-20 mb-4">
-            <div className="absolute inset-0 bg-gradient-to-br from-neon-purple/30 via-neon-cyan/20 to-neon-pink/30 rounded-full blur-xl animate-pulse" />
-            <div className="absolute inset-1 rounded-full border-2 border-neon-purple/40" />
-            <div className="absolute inset-0 rounded-full border-2 border-dashed border-neon-cyan/30 animate-spin" style={{ animationDuration: '15s' }} />
-            <ClipboardPaste className="w-10 h-10 text-neon-purple relative z-10" />
-          </div>
-          
-          {/* Glitch title */}
-          <h1 className="text-2xl md:text-3xl font-black tracking-wider mb-2">
-            <span className="bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink bg-clip-text text-transparent">
-              {glitchText}
-            </span>
-          </h1>
-          
-          {/* Subtitle with terminal effect */}
-          <div className="flex items-center justify-center gap-2 text-muted-foreground text-xs">
-            <Terminal className="w-3 h-3" />
-            <span className="font-mono tracking-wider">{manualTab.label} TOOLS</span>
-          </div>
-        </header>
-
-        {/* Main Card with animated border */}
-        <div className="relative mb-4">
-          {/* Animated rainbow border */}
-          <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan via-neon-pink via-neon-orange to-neon-purple bg-[length:400%_100%] animate-gradient-shift opacity-70" />
-          <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan via-neon-pink via-neon-orange to-neon-purple bg-[length:400%_100%] animate-gradient-shift blur-xl opacity-30" />
-          
-          <div className="relative rounded-2xl p-4 bg-background/95 backdrop-blur-xl border border-transparent">
-            {/* Tab Grid */}
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              {/* Manual Tab */}
-              <button
-                onClick={() => setActiveTab("manual")}
-                className={`relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl transition-all duration-300 overflow-hidden group ${
-                  activeTab === "manual"
-                    ? 'bg-gradient-to-br from-neon-purple/20 to-neon-cyan/10'
-                    : 'bg-background/50 hover:bg-neon-purple/10'
-                }`}
-              >
-                {activeTab === "manual" && (
-                  <div className="absolute inset-0 border-2 border-neon-purple rounded-xl shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]" />
-                )}
-                <ClipboardPaste className={`w-6 h-6 ${activeTab === "manual" ? 'text-neon-purple' : 'text-neon-purple/60'} group-hover:scale-110 transition-transform`} />
-                <span className={`text-[9px] font-bold uppercase tracking-wider ${activeTab === "manual" ? 'text-neon-purple' : 'text-neon-purple/60'}`}>
-                  {manualTab.label}
-                </span>
-              </button>
-
-              {/* Coming Soon Tab 1 */}
-              <div className="relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-background/30 opacity-40 cursor-not-allowed">
-                <Database className="w-6 h-6 text-neon-cyan/50" />
-                <span className="text-[9px] font-bold text-neon-cyan/50 uppercase tracking-wider">Soon</span>
-              </div>
-
-              {/* Coming Soon Tab 2 */}
-              <div className="relative flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-background/30 opacity-40 cursor-not-allowed">
-                <Globe className="w-6 h-6 text-neon-pink/50" />
-                <span className="text-[9px] font-bold text-neon-pink/50 uppercase tracking-wider">Soon</span>
-              </div>
+        {/* Compact Stats Bar - same as Index */}
+        <div className="max-w-3xl mx-auto mb-3">
+          <div className="flex items-center justify-center gap-2 md:gap-4 flex-wrap">
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-green/30">
+              <Database className="w-3 h-3 text-neon-green" />
+              <span className="text-[10px] font-mono text-neon-green">Manual Search</span>
             </div>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-cyan/30">
+              <Zap className="w-3 h-3 text-neon-cyan" />
+              <span className="text-[10px] font-mono text-neon-cyan">External API</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-pink/30">
+              <Sparkles className="w-3 h-3 text-neon-pink" />
+              <span className="text-[10px] font-mono text-neon-pink">Page 2</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Main Content Card */}
+        <main className="max-w-3xl mx-auto">
+          <div className="relative">
+            {/* Animated border glow */}
+            <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan via-neon-pink to-neon-purple bg-[length:400%_100%] animate-gradient-shift opacity-50" />
             
-            {/* Search Input Section */}
-            {activeTab === "manual" && (
-              <div className="relative animate-slide-up">
-                <div className="relative group">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink rounded-xl opacity-0 group-focus-within:opacity-70 blur transition-opacity duration-300" />
-                  <div className="relative flex gap-2 p-2 rounded-xl bg-background/80 border border-neon-purple/30 group-focus-within:border-transparent">
-                    <div className="flex-1 flex items-center gap-2 px-2">
-                      <ClipboardPaste className="w-4 h-4 text-neon-purple/60" />
-                      <Input
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder={manualTab.placeholder || "Enter number..."}
-                        className="flex-1 bg-transparent border-0 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm font-mono"
-                        onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                      />
-                    </div>
-                    <Button 
-                      onClick={handleSearch}
-                      disabled={loading}
-                      className="relative bg-transparent border-0 overflow-hidden group/btn px-6 h-10"
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink opacity-90 group-hover/btn:opacity-100 transition-opacity" />
-                      <div className="absolute inset-[2px] bg-background/80 group-hover/btn:bg-background/60 transition-colors rounded-md" />
-                      <span className="relative z-10">
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin text-neon-cyan" /> : <Search className="w-4 h-4 text-neon-purple" />}
-                      </span>
-                    </Button>
+            <div className="relative rounded-2xl p-4 md:p-6 bg-card/90 backdrop-blur-sm border border-transparent">
+              {/* Tab Header */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-lg bg-neon-purple/20 border border-neon-purple/30">
+                    <ClipboardPaste className="w-5 h-5 text-neon-purple" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-foreground">{manualTab.label}</h2>
+                    <p className="text-[10px] text-muted-foreground font-mono">EXTERNAL API SEARCH</p>
                   </div>
                 </div>
+                
+                {/* Back Button */}
+                <Link 
+                  to="/" 
+                  className="flex items-center gap-2 px-3 py-2 rounded-xl border border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10 transition-all hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)] group"
+                >
+                  <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Main</span>
+                </Link>
               </div>
-            )}
-
-            {/* Back to Main Button */}
-            <Link
-              to="/"
-              className="mt-4 flex items-center justify-center gap-2 p-3 rounded-xl border border-neon-green/30 bg-neon-green/5 hover:bg-neon-green/10 transition-all hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.3)] group"
-            >
-              <ArrowLeft className="w-4 h-4 text-neon-green group-hover:-translate-x-1 transition-transform" />
-              <span className="text-xs font-bold text-neon-green uppercase tracking-wider">Back to Main</span>
-            </Link>
-          </div>
-        </div>
-
-        {/* Info Cards Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple to-neon-cyan rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
-            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-purple/20 text-center">
-              <Zap className="w-5 h-5 text-neon-purple mx-auto mb-2 animate-pulse" />
-              <p className="text-[10px] text-neon-purple/80 uppercase tracking-wider font-bold">Fast Results</p>
+              
+              {/* Search Input */}
+              <div className="relative group mb-4">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink rounded-xl opacity-0 group-focus-within:opacity-50 blur transition-opacity duration-300" />
+                <div className="relative flex gap-2 p-2 rounded-xl bg-background/80 border border-neon-purple/30 group-focus-within:border-neon-purple/60">
+                  <div className="flex-1 flex items-center gap-2 px-3">
+                    <ClipboardPaste className="w-4 h-4 text-neon-purple/60" />
+                    <Input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={manualTab.placeholder || "Enter number..."}
+                      className="flex-1 bg-transparent border-0 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm font-mono"
+                      onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                    />
+                  </div>
+                  <Button 
+                    onClick={handleSearch}
+                    disabled={loading}
+                    className="relative overflow-hidden px-6 h-10 bg-gradient-to-r from-neon-purple to-neon-cyan hover:from-neon-purple/80 hover:to-neon-cyan/80 border-0"
+                  >
+                    {loading ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <Search className="w-4 h-4" />
+                    )}
+                  </Button>
+                </div>
+              </div>
+              
+              {/* Info Grid */}
+              <div className="grid grid-cols-3 gap-2">
+                <div className="p-3 rounded-xl bg-neon-purple/10 border border-neon-purple/20 text-center">
+                  <Zap className="w-4 h-4 text-neon-purple mx-auto mb-1" />
+                  <p className="text-[9px] text-neon-purple/80 uppercase font-bold">Fast</p>
+                </div>
+                <div className="p-3 rounded-xl bg-neon-cyan/10 border border-neon-cyan/20 text-center">
+                  <Database className="w-4 h-4 text-neon-cyan mx-auto mb-1" />
+                  <p className="text-[9px] text-neon-cyan/80 uppercase font-bold">New Tab</p>
+                </div>
+                <div className="p-3 rounded-xl bg-neon-pink/10 border border-neon-pink/20 text-center">
+                  <Sparkles className="w-4 h-4 text-neon-pink mx-auto mb-1" />
+                  <p className="text-[9px] text-neon-pink/80 uppercase font-bold">External</p>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-cyan to-neon-pink rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
-            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-cyan/20 text-center">
-              <Shield className="w-5 h-5 text-neon-cyan mx-auto mb-2" />
-              <p className="text-[10px] text-neon-cyan/80 uppercase tracking-wider font-bold">New Tab Opens</p>
-            </div>
+          
+          {/* Music Player */}
+          <div className="mt-4">
+            <MusicPlayer musicUrl={settings.page2MusicUrl} />
           </div>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-pink to-neon-orange rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
-            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-pink/20 text-center">
-              <Sparkles className="w-5 h-5 text-neon-pink mx-auto mb-2 animate-bounce" style={{ animationDelay: '0.3s' }} />
-              <p className="text-[10px] text-neon-pink/80 uppercase tracking-wider font-bold">External API</p>
-            </div>
-          </div>
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-neon-orange to-neon-green rounded-xl opacity-30 blur group-hover:opacity-50 transition-opacity" />
-            <div className="relative p-4 rounded-xl bg-background/80 border border-neon-orange/20 text-center">
-              <Fingerprint className="w-5 h-5 text-neon-orange mx-auto mb-2" />
-              <p className="text-[10px] text-neon-orange/80 uppercase tracking-wider font-bold">Secure Search</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Music Player */}
-        <MusicPlayer musicUrl={settings.page2MusicUrl} />
-
-        {/* Footer */}
-        <div className="mt-auto pt-6 text-center">
-          <p className="text-[10px] text-muted-foreground/30 font-mono tracking-widest">
-            SHUBH OSINT v2.0 • <span className="text-neon-purple">PAGE 2</span>
-          </p>
-        </div>
+        </main>
       </div>
+      
+      {/* Simple corner decorations - same as Index */}
+      <div className="fixed top-0 left-0 w-20 h-20 border-l border-t border-neon-green/30 rounded-br-xl" />
+      <div className="fixed top-0 right-0 w-20 h-20 border-r border-t border-neon-pink/30 rounded-bl-xl" />
+      <div className="fixed bottom-0 left-0 w-20 h-20 border-l border-b border-neon-cyan/30 rounded-tr-xl" />
+      <div className="fixed bottom-0 right-0 w-20 h-20 border-r border-b border-neon-purple/30 rounded-tl-xl" />
     </div>
   );
 };
