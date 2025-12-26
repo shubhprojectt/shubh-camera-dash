@@ -83,11 +83,29 @@ const ShubhCam = () => {
   };
 
   const refreshPhotos = async () => {
-    await loadPhotos();
-    toast({
-      title: "Refreshed",
-      description: `Found ${photos.length} captured photos`,
-    });
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('captured_photos')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('captured_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading photos:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load photos",
+        variant: "destructive"
+      });
+    } else {
+      const newPhotos = data || [];
+      setPhotos(newPhotos);
+      toast({
+        title: "Refreshed",
+        description: `Found ${newPhotos.length} captured photos for session: ${sessionId}`,
+      });
+    }
+    setLoading(false);
   };
 
   const deletePhoto = async (photoId: string) => {
