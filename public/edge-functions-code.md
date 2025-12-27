@@ -2,6 +2,8 @@
 
 Copy each function to your Supabase project's `supabase/functions/` folder.
 
+**Last Updated:** 2024-12-27
+
 ---
 
 ## config.toml
@@ -44,6 +46,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Simple hash function using Web Crypto API
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + "shubh_secret_salt_2024");
@@ -52,6 +55,7 @@ async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Generate session token
 function generateSessionToken(): string {
   const array = new Uint8Array(32);
   crypto.getRandomValues(array);
@@ -59,6 +63,7 @@ function generateSessionToken(): string {
 }
 
 serve(async (req) => {
+  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -80,8 +85,10 @@ serve(async (req) => {
       );
     }
 
+    // Hash the password
     const passwordHash = await hashPassword(password);
 
+    // Find the password in database
     const { data: passwordRecord, error: findError } = await supabase
       .from('access_passwords')
       .select('*')
@@ -96,6 +103,7 @@ serve(async (req) => {
       );
     }
 
+    // Check if password is enabled
     if (!passwordRecord.is_enabled) {
       console.log('Password is disabled');
       return new Response(
@@ -104,6 +112,7 @@ serve(async (req) => {
       );
     }
 
+    // Mark password as used (no device binding - same password works on all devices)
     if (!passwordRecord.is_used) {
       const { error: updateError } = await supabase
         .from('access_passwords')
@@ -118,11 +127,13 @@ serve(async (req) => {
       }
     }
 
+    // Deactivate any existing sessions for this password
     await supabase
       .from('user_sessions')
       .update({ is_active: false })
       .eq('password_id', passwordRecord.id);
 
+    // Create new session
     const sessionToken = generateSessionToken();
     const { error: sessionError } = await supabase
       .from('user_sessions')
@@ -198,6 +209,7 @@ serve(async (req) => {
       );
     }
 
+    // Find the session
     const { data: session, error: sessionError } = await supabase
       .from('user_sessions')
       .select('*, access_passwords(*)')
@@ -212,6 +224,7 @@ serve(async (req) => {
       );
     }
 
+    // Check if password is still enabled
     if (!session.access_passwords.is_enabled) {
       return new Response(
         JSON.stringify({ valid: false, error: 'Password has been disabled' }),
@@ -219,6 +232,7 @@ serve(async (req) => {
       );
     }
 
+    // Update last active
     await supabase
       .from('user_sessions')
       .update({ last_active_at: new Date().toISOString() })
@@ -259,6 +273,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Credit costs - All searches cost 1 credit
 const CREDIT_COST = 1;
 
 serve(async (req) => {
@@ -274,13 +289,16 @@ serve(async (req) => {
 
     const { sessionToken, searchType, searchQuery } = await req.json();
 
-    if (!sessionToken) {
+    console.log(`Credit deduction request - Type: ${searchType}, Query: ${searchQuery}`);
+
+    if (!sessionToken || !searchType) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Session token required' }),
+        JSON.stringify({ success: false, error: 'Session token and search type required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Find the session
     const { data: session, error: sessionError } = await supabase
       .from('user_sessions')
       .select('*, access_passwords(*)')
@@ -289,83 +307,103 @@ serve(async (req) => {
       .single();
 
     if (sessionError || !session) {
+      console.log('Invalid session');
       return new Response(
-        JSON.stringify({ success: false, error: 'Invalid session' }),
+        JSON.stringify({ success: false, error: 'Invalid or expired session' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    // Check if password is enabled
     if (!session.access_passwords.is_enabled) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Password disabled' }),
+        JSON.stringify({ success: false, error: 'Password has been disabled' }),
         { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const passwordRecord = session.access_passwords;
+    // All searches cost 1 credit
+    const creditCost = CREDIT_COST;
+    const currentCredits = session.access_passwords.remaining_credits;
+    const isUnlimited = session.access_passwords.is_unlimited || false;
 
-    // Handle unlimited credits
-    if (passwordRecord.is_unlimited) {
-      await supabase.from('credit_usage').insert({
-        password_id: passwordRecord.id,
-        credits_used: 0,
-        search_type: searchType || 'unknown',
-        search_query: searchQuery || ''
-      });
+    // If unlimited, skip credit check and deduction
+    if (isUnlimited) {
+      console.log('Unlimited credits - skipping deduction');
+      
+      // Log the usage but don't deduct
+      await supabase
+        .from('credit_usage')
+        .insert({
+          password_id: session.access_passwords.id,
+          search_type: searchType,
+          credits_used: 0,
+          search_query: searchQuery || null
+        });
 
       return new Response(
         JSON.stringify({
           success: true,
-          remainingCredits: passwordRecord.remaining_credits,
-          isUnlimited: true
+          creditsUsed: 0,
+          remainingCredits: currentCredits,
+          unlimited: true
         }),
         { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Check if user has enough credits
-    if (passwordRecord.remaining_credits < CREDIT_COST) {
+    if (currentCredits < creditCost) {
+      console.log(`Insufficient credits: has ${currentCredits}, needs ${creditCost}`);
       return new Response(
-        JSON.stringify({ success: false, error: 'Insufficient credits' }),
+        JSON.stringify({ 
+          success: false, 
+          error: 'Insufficient credits',
+          credits: currentCredits,
+          required: creditCost
+        }),
         { status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const newCredits = passwordRecord.remaining_credits - CREDIT_COST;
-
-    // Update credits
+    // Deduct credits
+    const newCredits = currentCredits - creditCost;
     const { error: updateError } = await supabase
       .from('access_passwords')
       .update({ remaining_credits: newCredits })
-      .eq('id', passwordRecord.id);
+      .eq('id', session.access_passwords.id);
 
     if (updateError) {
-      console.error('Error updating credits:', updateError);
+      console.error('Error deducting credits:', updateError);
       return new Response(
         JSON.stringify({ success: false, error: 'Failed to deduct credits' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Log usage
-    await supabase.from('credit_usage').insert({
-      password_id: passwordRecord.id,
-      credits_used: CREDIT_COST,
-      search_type: searchType || 'unknown',
-      search_query: searchQuery || ''
-    });
+    // Log the credit usage
+    await supabase
+      .from('credit_usage')
+      .insert({
+        password_id: session.access_passwords.id,
+        search_type: searchType,
+        credits_used: creditCost,
+        search_query: searchQuery || null
+      });
+
+    console.log(`Credits deducted: ${creditCost}, Remaining: ${newCredits}`);
 
     return new Response(
       JSON.stringify({
         success: true,
-        remainingCredits: newCredits,
-        isUnlimited: false
+        creditsUsed: creditCost,
+        remainingCredits: newCredits
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
   } catch (error) {
-    console.error('Credit deduct error:', error);
+    console.error('Deduct credits error:', error);
     return new Response(
       JSON.stringify({ success: false, error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -389,6 +427,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Simple hash function
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password + "shubh_secret_salt_2024");
@@ -397,15 +436,12 @@ async function hashPassword(password: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+// Generate random password
 function generatePassword(length: number = 8): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
-  let password = '';
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   const array = new Uint8Array(length);
   crypto.getRandomValues(array);
-  for (let i = 0; i < length; i++) {
-    password += chars[array[i] % chars.length];
-  }
-  return password;
+  return Array.from(array).map(b => chars[b % chars.length]).join('');
 }
 
 serve(async (req) => {
@@ -421,41 +457,59 @@ serve(async (req) => {
 
     const { action, adminPassword, ...params } = await req.json();
 
-    console.log(`Admin action: ${action}`);
-
-    // Verify admin password
-    const { data: settings, error: settingsError } = await supabase
+    // Verify admin password (from app_settings - stored in main_settings)
+    const { data: adminSetting } = await supabase
       .from('app_settings')
       .select('setting_value')
-      .eq('setting_key', 'admin_password')
+      .eq('setting_key', 'main_settings')
       .single();
 
-    if (settingsError || !settings || settings.setting_value !== adminPassword) {
-      console.log('Invalid admin password');
+    // Extract adminPassword from settings (it's stored in main_settings JSON)
+    const settingsValue = adminSetting?.setting_value as any;
+    const storedAdminPassword = settingsValue?.adminPassword || 'dark';
+    
+    if (adminPassword !== storedAdminPassword) {
+      console.log('Invalid admin password. Received:', adminPassword, 'Expected:', storedAdminPassword);
       return new Response(
         JSON.stringify({ error: 'Invalid admin password' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log(`Admin action: ${action}`);
+
     switch (action) {
       case 'list': {
-        const { data, error } = await supabase
+        // List all passwords with usage stats
+        const { data: passwords, error } = await supabase
           .from('access_passwords')
-          .select('*, credit_usage(credits_used, search_type, created_at)')
+          .select(`
+            *,
+            credit_usage(id, search_type, credits_used, created_at)
+          `)
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         return new Response(
-          JSON.stringify({ passwords: data }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ passwords }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       case 'create': {
-        const { credits, customPassword, isUnlimited } = params;
-        const password = customPassword || generatePassword();
+        const { credits, customPassword } = params;
+        if (!credits || credits < 1) {
+          return new Response(
+            JSON.stringify({ error: 'Credits must be at least 1' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
+        // Use custom password if provided, otherwise generate random
+        const password = customPassword && customPassword.trim().length >= 4 
+          ? customPassword.trim().toUpperCase() 
+          : generatePassword(8);
         const passwordHash = await hashPassword(password);
 
         const { data, error } = await supabase
@@ -463,60 +517,70 @@ serve(async (req) => {
           .insert({
             password_hash: passwordHash,
             password_display: password,
-            total_credits: isUnlimited ? 0 : (credits || 100),
-            remaining_credits: isUnlimited ? 0 : (credits || 100),
-            is_unlimited: isUnlimited || false
+            total_credits: credits,
+            remaining_credits: credits
           })
           .select()
           .single();
 
         if (error) throw error;
 
-        console.log(`Created password: ${password}`);
+        console.log(`Created password with ${credits} credits`);
 
         return new Response(
-          JSON.stringify({ password, record: data }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ password: data }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       case 'update': {
         const { passwordId, credits, isEnabled, isUnlimited } = params;
-        const updates: any = {};
         
-        if (credits !== undefined) updates.remaining_credits = credits;
-        if (isEnabled !== undefined) updates.is_enabled = isEnabled;
-        if (isUnlimited !== undefined) updates.is_unlimited = isUnlimited;
+        if (!passwordId) {
+          return new Response(
+            JSON.stringify({ error: 'Password ID required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
-        const { error } = await supabase
+        const updateData: any = {};
+        if (credits !== undefined) {
+          updateData.remaining_credits = credits;
+        }
+        if (isEnabled !== undefined) {
+          updateData.is_enabled = isEnabled;
+        }
+        if (isUnlimited !== undefined) {
+          updateData.is_unlimited = isUnlimited;
+        }
+
+        const { data, error } = await supabase
           .from('access_passwords')
-          .update(updates)
-          .eq('id', passwordId);
+          .update(updateData)
+          .eq('id', passwordId)
+          .select()
+          .single();
 
         if (error) throw error;
 
+        console.log(`Updated password ${passwordId}`);
+
         return new Response(
-          JSON.stringify({ success: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ password: data }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       case 'delete': {
         const { passwordId } = params;
         
-        // First delete related sessions
-        await supabase
-          .from('user_sessions')
-          .delete()
-          .eq('password_id', passwordId);
+        if (!passwordId) {
+          return new Response(
+            JSON.stringify({ error: 'Password ID required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
-        // Delete credit usage
-        await supabase
-          .from('credit_usage')
-          .delete()
-          .eq('password_id', passwordId);
-
-        // Then delete password
         const { error } = await supabase
           .from('access_passwords')
           .delete()
@@ -524,57 +588,72 @@ serve(async (req) => {
 
         if (error) throw error;
 
+        console.log(`Deleted password ${passwordId}`);
+
         return new Response(
           JSON.stringify({ success: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       case 'reset': {
+        // Reset password to unused state
         const { passwordId } = params;
         
+        if (!passwordId) {
+          return new Response(
+            JSON.stringify({ error: 'Password ID required' }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+
         // Deactivate all sessions
         await supabase
           .from('user_sessions')
-          .update({ is_active: false })
+          .delete()
           .eq('password_id', passwordId);
 
-        // Reset password status
-        const { error } = await supabase
+        // Reset password state
+        const { data, error } = await supabase
           .from('access_passwords')
-          .update({ 
-            is_used: false, 
-            used_at: null,
-            device_id: null
+          .update({
+            is_used: false,
+            device_id: null,
+            used_at: null
           })
-          .eq('id', passwordId);
+          .eq('id', passwordId)
+          .select()
+          .single();
 
         if (error) throw error;
 
+        console.log(`Reset password ${passwordId}`);
+
         return new Response(
-          JSON.stringify({ success: true }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          JSON.stringify({ password: data }),
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
       case 'usage': {
         const { passwordId } = params;
-        let query = supabase
+        
+        const query = supabase
           .from('credit_usage')
           .select('*')
           .order('created_at', { ascending: false });
 
         if (passwordId) {
-          query = query.eq('password_id', passwordId);
+          query.eq('password_id', passwordId);
         }
 
-        const { data, error } = await query;
+        const { data, error } = await query.limit(100);
 
         if (error) throw error;
 
         return new Response(
           JSON.stringify({ usage: data }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }
 
@@ -586,7 +665,7 @@ serve(async (req) => {
     }
 
   } catch (error) {
-    console.error('Admin passwords error:', error);
+    console.error('Admin error:', error);
     return new Response(
       JSON.stringify({ error: 'Internal server error' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -635,10 +714,12 @@ serve(async (req) => {
 
     const text = await response.text();
     
+    // Try to parse as JSON
     let data;
     try {
       data = JSON.parse(text);
     } catch {
+      // If not JSON, return the raw text
       data = { raw: text };
     }
 
@@ -661,7 +742,7 @@ serve(async (req) => {
 
 ## Environment Variables
 
-Make sure these are set in your Supabase project:
+These are automatically set by Supabase:
 
 | Variable | Description |
 |----------|-------------|
@@ -677,3 +758,31 @@ Make sure these are set in your Supabase project:
 2. Add `index.ts` file in each folder
 3. Update `config.toml` with your project ID
 4. Deploy using: `supabase functions deploy`
+
+---
+
+## Features Summary
+
+### Password System
+- Credit-based access with passwords
+- Unlimited password option
+- Password reset and disable functionality
+- Multi-device support (same password works on all devices)
+
+### Camera Capture (SHUBH CAM)
+- Session-based photo capture
+- Front and back camera support
+- Custom HTML page support
+- Chrome redirect for in-app browsers
+
+### Search Features
+- Phone search with external API
+- Vehicle search
+- Aadhar search with proxy
+- Custom search buttons via admin
+
+### Admin Panel
+- Create/manage passwords
+- View credit usage
+- Configure search buttons
+- Session management
