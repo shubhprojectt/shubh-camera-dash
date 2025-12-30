@@ -64,6 +64,8 @@ export interface AppSettings {
   sitePasswordEnabled: boolean;
   allSearchKeyEnabled: boolean;
   telegramKeyEnabled: boolean;
+  // Credit system toggle
+  creditSystemEnabled: boolean;
   // Page2 background music URL
   page2MusicUrl: string;
   // Main page background music URL
@@ -144,6 +146,8 @@ const defaultSettings: AppSettings = {
   sitePasswordEnabled: true,
   allSearchKeyEnabled: true,
   telegramKeyEnabled: true,
+  // Credit system toggle
+  creditSystemEnabled: true,
   // Page2 background music
   page2MusicUrl: "",
   // Main page background music
