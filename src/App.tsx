@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SettingsProvider } from "@/contexts/SettingsContext";
+import { SettingsProvider, useSettings } from "@/contexts/SettingsContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -17,11 +17,13 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// Protected Route component
+// Protected Route component - bypasses auth if credit system is disabled
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { settings, isLoaded } = useSettings();
 
-  if (isLoading) {
+  // Wait for settings to load
+  if (!isLoaded || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -30,6 +32,11 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         </div>
       </div>
     );
+  }
+
+  // If credit system is disabled, allow access without authentication
+  if (!settings.creditSystemEnabled) {
+    return <>{children}</>;
   }
 
   if (!isAuthenticated) {
@@ -39,11 +46,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return <>{children}</>;
 };
 
-// Public Route - redirect to home if already authenticated
+// Public Route - redirect to home if already authenticated or if credit system disabled
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, isLoading } = useAuth();
+  const { settings, isLoaded } = useSettings();
 
-  if (isLoading) {
+  // Wait for settings to load
+  if (!isLoaded || isLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -52,6 +61,11 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
         </div>
       </div>
     );
+  }
+
+  // If credit system is disabled, redirect to home
+  if (!settings.creditSystemEnabled) {
+    return <Navigate to="/" replace />;
   }
 
   if (isAuthenticated) {

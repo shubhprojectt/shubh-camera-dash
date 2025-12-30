@@ -162,25 +162,28 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Check if user has credits (skip for unlimited)
-    if (!isUnlimited && credits <= 0) {
-      toast({
-        title: "No Credits",
-        description: "Credits finished! Contact admin for more.",
-        variant: "destructive",
-      });
-      return;
-    }
+    // Only check credits if credit system is enabled
+    if (settings.creditSystemEnabled) {
+      // Check if user has credits (skip for unlimited)
+      if (!isUnlimited && credits <= 0) {
+        toast({
+          title: "No Credits",
+          description: "Credits finished! Contact admin for more.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-    // Deduct 1 credit for search
-    const deductResult = await deductCredits(activeButton?.searchType || "search", searchQuery.trim());
-    if (!deductResult.success) {
-      toast({
-        title: "Credit Error",
-        description: deductResult.error || "Failed to deduct credits",
-        variant: "destructive",
-      });
-      return;
+      // Deduct 1 credit for search
+      const deductResult = await deductCredits(activeButton?.searchType || "search", searchQuery.trim());
+      if (!deductResult.success) {
+        toast({
+          title: "Credit Error",
+          description: deductResult.error || "Failed to deduct credits",
+          variant: "destructive",
+        });
+        return;
+      }
     }
 
     // Log search history
