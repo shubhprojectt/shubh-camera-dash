@@ -1,13 +1,16 @@
 import { useAuth } from "@/contexts/AuthContext";
+import { useSettings } from "@/contexts/SettingsContext";
 import { Coins, LogOut, RefreshCw, Infinity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 const CreditDisplay = () => {
   const { credits, totalCredits, isUnlimited, logout, refreshCredits, isAuthenticated } = useAuth();
+  const { settings } = useSettings();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  if (!isAuthenticated) return null;
+  // Hide if credit system is disabled or not authenticated
+  if (!settings.creditSystemEnabled || !isAuthenticated) return null;
 
   const handleRefresh = async () => {
     setIsRefreshing(true);

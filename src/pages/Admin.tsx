@@ -1348,6 +1348,26 @@ const Admin = () => {
               </Button>
             </div>
 
+            {/* Credit System Toggle */}
+            <div className="border border-neon-purple/50 rounded-xl p-4 bg-neon-purple/5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-bold text-neon-purple flex items-center gap-2">
+                    <Power className="w-4 h-4" /> Credit System
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    {settings.creditSystemEnabled 
+                      ? "Credit system is ON - Users need password to access" 
+                      : "Credit system is OFF - No credit password required"}
+                  </p>
+                </div>
+                <Switch
+                  checked={settings.creditSystemEnabled}
+                  onCheckedChange={(checked) => updateSettings({ creditSystemEnabled: checked })}
+                />
+              </div>
+            </div>
+
             {/* Generate New Password */}
             <div className="border border-neon-green/50 rounded-xl p-4 bg-neon-green/5 space-y-4">
               <h3 className="font-bold text-neon-green flex items-center gap-2">
