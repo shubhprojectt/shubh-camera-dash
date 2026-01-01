@@ -207,13 +207,40 @@ const NumberDetailFinder = () => {
     // Phone search API
     if (activeButton?.searchType === "phone") {
       try {
-        // Get API URL from settings (admin panel), fall back to default if empty
-        const phoneTab = settings.tabs.find(t => t.searchType === "phone");
-        const apiUrl = phoneTab?.apiUrl?.trim() || "https://anmolzz.teamxferry.workers.dev/?mobile=";
+        const defaultApiUrl = "https://anmolzz.teamxferry.workers.dev/?mobile=";
+
+        // 1) Prefer current in-memory settings
+        let apiUrl =
+          settings.tabs.find((t) => t.id === activeButton.id)?.apiUrl?.trim() ||
+          settings.tabs.find((t) => t.searchType === "phone")?.apiUrl?.trim() ||
+          "";
+
+        // 2) Always try to fetch the latest saved settings from backend (fixes stale localStorage/settings)
+        try {
+          const { data: row, error: settingsErr } = await supabase
+            .from("app_settings")
+            .select("setting_value")
+            .eq("setting_key", "main_settings")
+            .maybeSingle();
+
+          if (!settingsErr && row) {
+            const remoteTabs = (row.setting_value as any)?.tabs;
+            if (Array.isArray(remoteTabs)) {
+              const remoteApiUrl =
+                remoteTabs.find((t: any) => t?.id === activeButton.id)?.apiUrl?.trim() ||
+                remoteTabs.find((t: any) => t?.searchType === "phone")?.apiUrl?.trim();
+              if (remoteApiUrl) apiUrl = remoteApiUrl;
+            }
+          }
+        } catch (e) {
+          // ignore; fallback to in-memory settings
+        }
+
+        apiUrl = apiUrl || defaultApiUrl;
         console.log("Phone search using API:", apiUrl);
-        
+
         const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
-        
+
         // Try to get response as text first
         const text = await response.text();
         let data;
@@ -223,9 +250,9 @@ const NumberDetailFinder = () => {
           // If not JSON, use raw text
           data = { raw: text };
         }
-        
+
         if (data && (Object.keys(data).length > 0 || text.trim())) {
-          setResult({ type: "phone", data, rawText: text });
+          setResult({ type: "phone", data, rawText: text, usedApiUrl: apiUrl });
           toast({
             title: "Phone Found",
             description: `Results found for: ${searchQuery}`,
@@ -548,34 +575,26 @@ const NumberDetailFinder = () => {
   };
 
   // Render phone result as plain text/JSON
-  const renderPhoneResult = (data: any, rawText?: string) => {
-    // If we have raw text that's not JSON, show it directly
-    if (rawText && data?.raw) {
-      return (
-        <div className="space-y-3 animate-slide-up">
-          <div className="rounded-xl bg-card/80 border border-neon-green/40 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <Phone className="w-5 h-5 text-neon-green" />
-              <span className="text-sm font-bold text-neon-green uppercase tracking-wider">API Response</span>
-            </div>
-            <pre className="text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto">
-              {rawText}
-            </pre>
-          </div>
-        </div>
-      );
-    }
-    
-    // Show JSON data as plain text
+  const renderPhoneResult = (data: any, rawText?: string, usedApiUrl?: string) => {
     return (
       <div className="space-y-3 animate-slide-up">
+        {usedApiUrl && (
+          <div className="rounded-xl bg-muted/30 border border-border/50 p-3">
+            <p className="text-xs text-muted-foreground">Using API URL</p>
+            <p className="text-xs font-mono text-foreground break-all">{usedApiUrl}</p>
+          </div>
+        )}
+
         <div className="rounded-xl bg-card/80 border border-neon-green/40 p-4">
           <div className="flex items-center gap-2 mb-3">
             <Phone className="w-5 h-5 text-neon-green" />
-            <span className="text-sm font-bold text-neon-green uppercase tracking-wider">API Response (JSON)</span>
+            <span className="text-sm font-bold text-neon-green uppercase tracking-wider">
+              {rawText && data?.raw ? "API Response" : "API Response (JSON)"}
+            </span>
           </div>
+
           <pre className="text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto max-h-[60vh] overflow-y-auto">
-            {JSON.stringify(data, null, 2)}
+            {rawText && data?.raw ? rawText : JSON.stringify(data, null, 2)}
           </pre>
         </div>
       </div>
@@ -1054,7 +1073,7 @@ const NumberDetailFinder = () => {
                 ? renderAadharResult(result.data)
                 : activeButton?.searchType === "allsearch"
                 ? renderAllSearchResult(result.data)
-                : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText) : renderDefaultResult())}
+                : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText, result.usedApiUrl) : renderDefaultResult())}
             </div>
           )}
         </div>
