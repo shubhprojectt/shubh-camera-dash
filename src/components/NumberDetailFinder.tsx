@@ -207,12 +207,25 @@ const NumberDetailFinder = () => {
     // Phone search API
     if (activeButton?.searchType === "phone") {
       try {
-        const apiUrl = activeButton?.apiUrl || "https://anmolzz.teamxferry.workers.dev/?mobile=";
-        const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
-        const data = await response.json();
+        // Get API URL from settings (admin panel), fall back to default if empty
+        const phoneTab = settings.tabs.find(t => t.searchType === "phone");
+        const apiUrl = phoneTab?.apiUrl?.trim() || "https://anmolzz.teamxferry.workers.dev/?mobile=";
+        console.log("Phone search using API:", apiUrl);
         
-        if (data && Object.keys(data).length > 0 && !data.error) {
-          setResult({ type: "phone", data });
+        const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
+        
+        // Try to get response as text first
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          // If not JSON, use raw text
+          data = { raw: text };
+        }
+        
+        if (data && (Object.keys(data).length > 0 || text.trim())) {
+          setResult({ type: "phone", data, rawText: text });
           toast({
             title: "Phone Found",
             description: `Results found for: ${searchQuery}`,
@@ -226,6 +239,7 @@ const NumberDetailFinder = () => {
           });
         }
       } catch (err) {
+        console.error("Phone search error:", err);
         setError("Failed to fetch data. Please try again.");
         toast({
           title: "Error",
@@ -533,101 +547,37 @@ const NumberDetailFinder = () => {
     );
   };
 
-  const renderPhoneResult = (data: PhoneResult) => {
-    const info = data.data1 || data.data2 || {};
+  // Render phone result as plain text/JSON
+  const renderPhoneResult = (data: any, rawText?: string) => {
+    // If we have raw text that's not JSON, show it directly
+    if (rawText && data?.raw) {
+      return (
+        <div className="space-y-3 animate-slide-up">
+          <div className="rounded-xl bg-card/80 border border-neon-green/40 p-4">
+            <div className="flex items-center gap-2 mb-3">
+              <Phone className="w-5 h-5 text-neon-green" />
+              <span className="text-sm font-bold text-neon-green uppercase tracking-wider">API Response</span>
+            </div>
+            <pre className="text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto">
+              {rawText}
+            </pre>
+          </div>
+        </div>
+      );
+    }
     
+    // Show JSON data as plain text
     return (
       <div className="space-y-3 animate-slide-up">
-        {/* Header Card with Phone */}
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-green/20 via-neon-cyan/10 to-neon-green/5 border border-neon-green/50 p-4">
-          <div className="absolute top-0 right-0 w-20 h-20 bg-neon-green/10 rounded-full blur-2xl" />
-          <div className="flex items-center gap-3">
-            <div className="p-3 rounded-xl bg-neon-green/20 border border-neon-green/50">
-              <Phone className="w-6 h-6 text-neon-green" />
-            </div>
-            <div>
-              <p className="text-xs text-neon-green/70 uppercase tracking-wider">Mobile Number</p>
-              <p className="text-xl font-display font-bold text-neon-green">{info.mobile || "N/A"}</p>
-            </div>
+        <div className="rounded-xl bg-card/80 border border-neon-green/40 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <Phone className="w-5 h-5 text-neon-green" />
+            <span className="text-sm font-bold text-neon-green uppercase tracking-wider">API Response (JSON)</span>
           </div>
-          {info.circle && (
-            <div className="mt-2 inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-neon-cyan/20 border border-neon-cyan/30">
-              <Globe className="w-3 h-3 text-neon-cyan" />
-              <span className="text-xs font-medium text-neon-cyan">{info.circle}</span>
-            </div>
-          )}
+          <pre className="text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto max-h-[60vh] overflow-y-auto">
+            {JSON.stringify(data, null, 2)}
+          </pre>
         </div>
-
-        {/* Owner Info */}
-        {info.name && (
-          <div className="rounded-xl bg-gradient-to-r from-neon-pink/15 to-neon-purple/10 border border-neon-pink/40 p-3">
-            <div className="flex items-center gap-2">
-              <User className="w-4 h-4 text-neon-pink" />
-              <span className="text-xs text-neon-pink/70 uppercase">Name</span>
-            </div>
-            <p className="mt-1 font-semibold text-neon-pink text-lg">{info.name}</p>
-            {info.father_name && (
-              <p className="text-xs text-muted-foreground mt-1">Father: {info.father_name}</p>
-            )}
-          </div>
-        )}
-
-        {/* Address */}
-        {info.address && (
-          <div className="rounded-xl bg-gradient-to-r from-neon-orange/15 to-neon-yellow/10 border border-neon-orange/40 p-3">
-            <div className="flex items-center gap-2 mb-2">
-              <MapPin className="w-4 h-4 text-neon-orange" />
-              <span className="text-xs text-neon-orange/70 uppercase">Address</span>
-            </div>
-            <p className="text-sm text-neon-orange">{info.address}</p>
-          </div>
-        )}
-
-        {/* Grid Info Cards */}
-        <div className="grid grid-cols-2 gap-2">
-          {info.alt_mobile && (
-            <div className="rounded-xl bg-gradient-to-br from-neon-cyan/15 to-neon-green/10 border border-neon-cyan/40 p-3">
-              <div className="flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-neon-cyan" />
-                <span className="text-[10px] text-neon-cyan/70 uppercase">Alt Mobile</span>
-              </div>
-              <p className="mt-1 text-sm font-medium text-neon-cyan">{info.alt_mobile}</p>
-            </div>
-          )}
-          
-          {info.email && (
-            <div className="rounded-xl bg-gradient-to-br from-neon-purple/15 to-neon-pink/10 border border-neon-purple/40 p-3">
-              <div className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5 text-neon-purple" />
-                <span className="text-[10px] text-neon-purple/70 uppercase">Email</span>
-              </div>
-              <p className="mt-1 text-sm font-medium text-neon-purple truncate">{info.email}</p>
-            </div>
-          )}
-
-          {info.id_number && (
-            <div className="rounded-xl bg-gradient-to-br from-neon-yellow/15 to-neon-orange/10 border border-neon-yellow/40 p-3">
-              <div className="flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-neon-yellow" />
-                <span className="text-[10px] text-neon-yellow/70 uppercase">ID Number</span>
-              </div>
-              <p className="mt-1 text-sm font-medium text-neon-yellow">{info.id_number}</p>
-            </div>
-          )}
-
-          {info.id && (
-            <div className="rounded-xl bg-gradient-to-br from-neon-red/15 to-neon-pink/10 border border-neon-red/40 p-3">
-              <div className="flex items-center gap-1.5">
-                <Database className="w-3.5 h-3.5 text-neon-red" />
-                <span className="text-[10px] text-neon-red/70 uppercase">Record ID</span>
-              </div>
-              <p className="mt-1 text-xs font-medium text-neon-red truncate">{info.id}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Source */}
-        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT</p>
       </div>
     );
   };
@@ -1104,7 +1054,7 @@ const NumberDetailFinder = () => {
                 ? renderAadharResult(result.data)
                 : activeButton?.searchType === "allsearch"
                 ? renderAllSearchResult(result.data)
-                : (result?.type === "phone" ? renderPhoneResult(result.data) : renderDefaultResult())}
+                : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText) : renderDefaultResult())}
             </div>
           )}
         </div>
