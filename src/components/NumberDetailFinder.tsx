@@ -948,11 +948,11 @@ const NumberDetailFinder = () => {
             {/* Next Page Button */}
             <Link
               to="/page2"
-              className="animate-bounce-in flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[56px]"
+              className="animate-bounce-in flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[70px]"
               style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
             >
-              <ArrowRight className="w-4 h-4 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
-              <span className="text-[8px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
+              <ArrowRight className="w-5 h-5 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
+              <span className="text-[9px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
             </Link>
           </div>
           
