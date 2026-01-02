@@ -139,8 +139,8 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition-all duration-200",
-        "active:scale-90 min-h-[56px] backdrop-blur-sm",
+        "group relative flex flex-col items-center justify-center gap-1.5 p-3 rounded-xl border transition-all duration-200",
+        "active:scale-90 min-h-[70px] backdrop-blur-sm",
         colors.border,
         colors.text,
         colors.hoverGlow,
@@ -163,13 +163,13 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
       
       {/* Icon */}
       <Icon className={cn(
-        "w-4 h-4 transition-all duration-200",
+        "w-5 h-5 transition-all duration-200",
         active ? colors.iconGlow : "group-hover:scale-110"
       )} />
       
       {/* Label */}
       <span className={cn(
-        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
+        "text-[9px] font-bold tracking-wide uppercase text-center leading-tight",
         active && "drop-shadow-[0_0_6px_currentColor]"
       )}>
         {label}
