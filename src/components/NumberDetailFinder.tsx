@@ -956,8 +956,8 @@ const NumberDetailFinder = () => {
             </Link>
           </div>
           
-          {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram tab is selected */}
-          {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && (
+          {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram, non-phprat tab is selected */}
+          {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
             <div className="relative mt-2 animate-slide-up">
               <div className="flex gap-1.5 p-1 rounded-lg bg-background/80 border border-neon-cyan/40 shadow-[0_0_10px_hsl(var(--neon-cyan)/0.15)]">
                 <Input
@@ -1041,8 +1041,50 @@ const NumberDetailFinder = () => {
         </div>
       )}
 
+      {/* PHPRAT Panel - shows when phprat tab is active */}
+      {activeButton?.searchType === "phprat" && (
+        <div className="animate-slide-up">
+          {/* Header */}
+          <div className="flex items-center justify-center gap-2 mb-3 py-2">
+            <Code className="w-4 h-4 text-neon-green animate-pulse" />
+            <span className="text-xs font-bold tracking-[0.15em] text-neon-green uppercase">
+              PHPRAT Control Panel
+            </span>
+            <Shield className="w-4 h-4 text-neon-cyan" />
+          </div>
+          
+          {/* Info Notice */}
+          <div className="mb-3 px-3 py-2 rounded-xl bg-neon-green/5 border border-neon-green/20 flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5 text-neon-green flex-shrink-0" />
+            <p className="text-[10px] text-neon-green/80">
+              Remote Access Panel • Secure Connection • Active
+            </p>
+          </div>
+          
+          {/* Iframe Container */}
+          <div 
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'hsl(var(--neon-green))',
+              boxShadow: '0 0 20px hsl(var(--neon-green) / 0.3)'
+            }}
+          >
+            <iframe
+              src={activeButton?.apiUrl || "https://userb-92mn.onrender.com/"}
+              className="w-full bg-background"
+              style={{ height: '70vh', minHeight: '500px' }}
+              title="PHPRAT Control Panel"
+              sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Results Section */}
-      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && (
+      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
         <div>
           {/* Loading */}
           {loading && (
