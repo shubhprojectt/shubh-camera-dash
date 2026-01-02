@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface SearchButtonProps {
   icon: LucideIcon;
   label: string;
-  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue" | "white" | "teal" | "lime";
+  color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue" | "white" | "teal" | "lime" | "emerald";
   active?: boolean;
   onClick?: () => void;
 }
@@ -119,6 +119,16 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(82_85%_67%/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(82_85%_67%)]",
     bottomGlow: "bg-lime-400 shadow-[0_0_15px_hsl(82_85%_67%),0_0_30px_hsl(82_85%_67%/0.5)]",
+  },
+  emerald: {
+    border: "border-emerald-400",
+    text: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    activeBg: "bg-emerald-400/25",
+    glow: "shadow-[0_0_25px_hsl(158_64%_52%/0.7),0_0_50px_hsl(158_64%_52%/0.4),inset_0_0_20px_hsl(158_64%_52%/0.2)]",
+    hoverGlow: "hover:shadow-[0_0_20px_hsl(158_64%_52%/0.5)]",
+    iconGlow: "drop-shadow-[0_0_10px_hsl(158_64%_52%)]",
+    bottomGlow: "bg-emerald-400 shadow-[0_0_15px_hsl(158_64%_52%),0_0_30px_hsl(158_64%_52%/0.5)]",
   },
 };
 
