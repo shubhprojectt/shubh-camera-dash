@@ -13,6 +13,7 @@ import ChromeCustomCapture from "./pages/ChromeCustomCapture";
 import VideoCapture from "./pages/VideoCapture";
 import Admin from "./pages/Admin";
 import Page2 from "./pages/Page2";
+import RandiPanel from "./pages/RandiPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -96,6 +97,11 @@ const AppRoutes = () => {
       <Route path="/page2" element={
         <ProtectedRoute>
           <Page2 />
+        </ProtectedRoute>
+      } />
+      <Route path="/randi-panel" element={
+        <ProtectedRoute>
+          <RandiPanel />
         </ProtectedRoute>
       } />
       <Route path="*" element={<NotFound />} />
