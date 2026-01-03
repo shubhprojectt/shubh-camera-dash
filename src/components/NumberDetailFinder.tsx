@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   Phone, 
   CreditCard, 
@@ -24,8 +24,8 @@ import {
   Send,
   LucideIcon,
   ArrowRight,
-  
-  MessageCircle
+  MessageCircle,
+  Skull
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -38,7 +38,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull
 };
 
 interface VehicleResult {
@@ -120,6 +120,7 @@ interface AadharResult {
 const NumberDetailFinder = () => {
   const { settings } = useSettings();
   const { credits, deductCredits, isAuthenticated, isUnlimited } = useAuth();
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -131,6 +132,13 @@ const NumberDetailFinder = () => {
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
+    // Check if it's RANDI PANEL - navigate to full page
+    const tab = enabledTabs.find(t => t.label === label);
+    if (tab?.searchType === "randipanel") {
+      navigate("/randi-panel");
+      return;
+    }
+    
     if (activeTab === label) {
       setActiveTab(null);
     } else {
