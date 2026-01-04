@@ -193,7 +193,7 @@ if(aday()){
 document.body.appendChild(pd2);
 }
 
-pd3.innerHTML="<center> <h3 style='color:red'>•Notice•<h3> </center><br>This is an Open Source RAT named <b style='color:gold'>AIRAVAT </b>available for free on <a href='https://github.com/Th30neAnd0nly/AIRAVAT' style='color:#0f8;'>GitHub</a>. Reselling , Changing Brand Name , Logo  of free version are strictly prohibited.";
+pd3.innerHTML="<center> <h3 style='color:red'>•Notice•<h3> </center><br>Phone Ha@k karne wala randi hai named <b style='color:gold'>RANDI PANEL</b>available for free on <a href='https://github.com/Th30neAnd0nly/AIRAVAT' style='color:#0f8;'>GitHub</a>. Made By D4rk .";
 pd3.innerHTML+="<br><center><button onclick='this.parentElement.parentElement.parentElement.style.display="+'"none"'+"' style='margin-top:5px;color:white;background:#001;border:1px solid red;border-radius:5px;height:30px;width:150px;margin-bottom:10px;'> I Understand</button><br><u style='color:red;font-size:15px;' onclick='dnd(this);'>Hide this notice for a day</u>";
 pd2.appendChild(pd3);
 function dnd(m){
