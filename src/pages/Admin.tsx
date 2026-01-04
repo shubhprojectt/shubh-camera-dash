@@ -1633,6 +1633,19 @@ const Admin = () => {
           </div>
         </Section>
 
+        {/* Randi Panel Section */}
+        <Section title="Randi Panel" icon={Camera} color="neon-red">
+          <div className="text-center py-6">
+            <p className="text-muted-foreground mb-4">Access the camera capture panel</p>
+            <Button
+              onClick={() => navigate('/randi-panel')}
+              className="bg-neon-red hover:bg-neon-red/80 text-white"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" /> Open Randi Panel
+            </Button>
+          </div>
+        </Section>
+
       </div>
     </div>
   );
