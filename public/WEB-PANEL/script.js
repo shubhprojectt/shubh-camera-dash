@@ -224,9 +224,9 @@ pd.style.top="25px";
 pd.style.left="0";
 pd.style.zIndex="999999999999999999";
 pd.style.textAlign="center";
-pd.innerHTML="&copy; Prateek Chaubey";
+pd.innerHTML="&copy; D4rk";
 document.getElementById("tophead").appendChild(pd);
-$(".h4").text("AIRAVAT");
+$(".h4").text("RANDI PANEL");
 document.getElementById("phones").appendChild(pd1);
 
 function backk(o){
