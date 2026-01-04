@@ -19,6 +19,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-green))]",
     bottomGlow: "bg-neon-green shadow-[0_0_15px_hsl(var(--neon-green)),0_0_30px_hsl(var(--neon-green)/0.5)]",
+    activeAnimation: "animate-glow-breathe",
   },
   pink: {
     border: "border-neon-pink",
@@ -29,6 +30,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-pink))]",
     bottomGlow: "bg-neon-pink shadow-[0_0_15px_hsl(var(--neon-pink)),0_0_30px_hsl(var(--neon-pink)/0.5)]",
+    activeAnimation: "animate-heartbeat",
   },
   orange: {
     border: "border-neon-orange",
@@ -39,6 +41,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-orange))]",
     bottomGlow: "bg-neon-orange shadow-[0_0_15px_hsl(var(--neon-orange)),0_0_30px_hsl(var(--neon-orange)/0.5)]",
+    activeAnimation: "animate-wiggle",
   },
   cyan: {
     border: "border-neon-cyan",
@@ -49,6 +52,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]",
     bottomGlow: "bg-neon-cyan shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-cyan)/0.5)]",
+    activeAnimation: "animate-radar-sweep",
   },
   red: {
     border: "border-neon-red",
@@ -59,6 +63,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-red))]",
     bottomGlow: "bg-neon-red shadow-[0_0_15px_hsl(var(--neon-red)),0_0_30px_hsl(var(--neon-red)/0.5)]",
+    activeAnimation: "animate-neon-flicker-fast",
   },
   purple: {
     border: "border-neon-purple",
@@ -69,6 +74,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-purple))]",
     bottomGlow: "bg-neon-purple shadow-[0_0_15px_hsl(var(--neon-purple)),0_0_30px_hsl(var(--neon-purple)/0.5)]",
+    activeAnimation: "animate-shimmer-rotate",
   },
   yellow: {
     border: "border-neon-yellow",
@@ -79,6 +85,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-yellow))]",
     bottomGlow: "bg-neon-yellow shadow-[0_0_15px_hsl(var(--neon-yellow)),0_0_30px_hsl(var(--neon-yellow)/0.5)]",
+    activeAnimation: "animate-electric-zap",
   },
   blue: {
     border: "border-neon-blue",
@@ -89,6 +96,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-blue)/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-blue))]",
     bottomGlow: "bg-neon-blue shadow-[0_0_15px_hsl(var(--neon-blue)),0_0_30px_hsl(var(--neon-blue)/0.5)]",
+    activeAnimation: "animate-float-gentle",
   },
   white: {
     border: "border-white",
@@ -99,6 +107,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(0_0%_100%/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(0_0%_100%)]",
     bottomGlow: "bg-white shadow-[0_0_15px_hsl(0_0%_100%),0_0_30px_hsl(0_0%_100%/0.5)]",
+    activeAnimation: "animate-flash-blink",
   },
   teal: {
     border: "border-teal-400",
@@ -109,6 +118,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(171_77%_64%/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(171_77%_64%)]",
     bottomGlow: "bg-teal-400 shadow-[0_0_15px_hsl(171_77%_64%),0_0_30px_hsl(171_77%_64%/0.5)]",
+    activeAnimation: "animate-bounce-subtle",
   },
   lime: {
     border: "border-lime-400",
@@ -119,6 +129,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(82_85%_67%/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(82_85%_67%)]",
     bottomGlow: "bg-lime-400 shadow-[0_0_15px_hsl(82_85%_67%),0_0_30px_hsl(82_85%_67%/0.5)]",
+    activeAnimation: "animate-color-shift",
   },
   emerald: {
     border: "border-emerald-400",
@@ -129,6 +140,7 @@ const colorClasses = {
     hoverGlow: "hover:shadow-[0_0_20px_hsl(158_64%_52%/0.5)]",
     iconGlow: "drop-shadow-[0_0_10px_hsl(158_64%_52%)]",
     bottomGlow: "bg-emerald-400 shadow-[0_0_15px_hsl(158_64%_52%),0_0_30px_hsl(158_64%_52%/0.5)]",
+    activeAnimation: "animate-ripple-pulse",
   },
 };
 
@@ -145,7 +157,7 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
         colors.text,
         colors.hoverGlow,
         "hover:scale-[1.03]",
-        active ? [colors.activeBg, colors.glow, "scale-[1.02] border-2 animate-glow-pulse"] : [colors.bg, "border-opacity-50 hover:border-opacity-100"]
+        active ? [colors.activeBg, colors.glow, "scale-[1.02] border-2", colors.activeAnimation] : [colors.bg, "border-opacity-50 hover:border-opacity-100"]
       )}
     >
       {/* Animated pulse ring on active */}
