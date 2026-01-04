@@ -966,7 +966,7 @@ const NumberDetailFinder = () => {
           
           {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram, non-phprat tab is selected */}
           {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
-            <div className="relative mt-2 animate-slide-up">
+            <div key={`search-${activeTab}`} className="relative mt-2 animate-tab-fade-scale">
               <div className="flex gap-1.5 p-1 rounded-lg bg-background/80 border border-neon-cyan/40 shadow-[0_0_10px_hsl(var(--neon-cyan)/0.15)]">
                 <Input
                   value={searchQuery}
@@ -989,11 +989,15 @@ const NumberDetailFinder = () => {
       </div>
       
       {/* ShubhCam - shows when camhack tab is active */}
-      {activeButton?.searchType === "shubh" && <ShubhCam />}
+      {activeButton?.searchType === "shubh" && (
+        <div key={`shubh-${activeTab}`} className="animate-tab-slide-in">
+          <ShubhCam />
+        </div>
+      )}
 
       {/* DARK DB iframe - shows when darkdb tab is active */}
       {activeButton?.searchType === "darkdb" && (
-        <div className="animate-slide-up">
+        <div key={`darkdb-${activeTab}`} className="animate-tab-slide-in">
           {/* Header */}
           <div className="flex items-center justify-center gap-2 mb-3 py-2">
             <Database className="w-4 h-4 text-neon-purple animate-pulse" />
@@ -1044,14 +1048,14 @@ const NumberDetailFinder = () => {
 
       {/* Telegram OSINT Dashboard - shows when telegram tab is active */}
       {activeButton?.searchType === "telegram" && (
-        <div className="animate-slide-up mt-4">
+        <div key={`telegram-${activeTab}`} className="animate-tab-slide-in mt-4">
           <TelegramOSINT />
         </div>
       )}
 
       {/* PHPRAT Panel - shows when phprat tab is active */}
       {activeButton?.searchType === "phprat" && (
-        <div className="animate-slide-up">
+        <div key={`phprat-${activeTab}`} className="animate-tab-slide-in">
           {/* Header */}
           <div className="flex items-center justify-center gap-2 mb-3 py-2">
             <Code className="w-4 h-4 text-neon-green animate-pulse" />
@@ -1093,7 +1097,7 @@ const NumberDetailFinder = () => {
 
       {/* Results Section */}
       {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
-        <div>
+        <div key={`results-${activeTab}`} className="animate-tab-slide-in">
           {/* Loading */}
           {loading && (
             <div className="text-center py-8 border-2 border-neon-cyan/30 rounded-2xl bg-card/50 animate-pulse">
