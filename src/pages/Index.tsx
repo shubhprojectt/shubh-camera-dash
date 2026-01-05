@@ -10,31 +10,31 @@ const Index = () => {
   return (
     <PasswordProtection>
       <div className="min-h-[100dvh] bg-background relative overflow-hidden">
-        {/* Custom background image or simple gradient */}
+        {/* Custom background image - fixed and stable */}
         {settings.backgroundImage ? (
           <div 
-            className="fixed-viewport bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${settings.backgroundImage})` }}
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ 
+              backgroundImage: `url(${settings.backgroundImage})`,
+              backgroundAttachment: 'fixed',
+              willChange: 'auto'
+            }}
           />
         ) : (
-          <div className="fixed-viewport bg-background" />
+          <div className="fixed inset-0 bg-background" />
         )}
         
-        {/* Dark overlay for readability */}
+        {/* Dark overlay for readability - no blur */}
         <div 
-          className="absolute inset-0 bg-background"
+          className="fixed inset-0 bg-background pointer-events-none"
           style={{ opacity: (parseInt(settings.backgroundOpacity || "30") / 100) }}
         />
         
         {/* Simple gradient overlay - lightweight */}
-        <div className="absolute inset-0 bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5" />
+        <div className="fixed inset-0 bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5 pointer-events-none" />
         
         {/* Neon glowing cyber grid */}
-        <div className="absolute inset-0 cyber-grid-glow opacity-40" />
-        
-        {/* Static corner accents - no blur/animation */}
-        <div className="absolute top-0 left-0 w-40 h-40 bg-neon-green/10 rounded-full" style={{ filter: 'blur(60px)' }} />
-        <div className="absolute bottom-0 right-0 w-40 h-40 bg-neon-pink/10 rounded-full" style={{ filter: 'blur(60px)' }} />
+        <div className="fixed inset-0 cyber-grid-glow opacity-40 pointer-events-none" />
         
         {/* Content */}
         <div className="relative z-10 container mx-auto px-3 pb-6">
