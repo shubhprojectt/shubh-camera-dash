@@ -265,7 +265,7 @@ const ShubhCam = () => {
   };
 
   return (
-    <div className="relative border-2 border-neon-pink rounded-xl p-5 bg-gradient-to-br from-card/50 via-neon-pink/5 to-card/50 backdrop-blur-sm mt-6 overflow-hidden shadow-[0_0_30px_hsl(var(--neon-pink)/0.2)]">
+    <div className="relative border-2 border-neon-pink rounded-xl p-5 bg-gradient-to-br from-card/50 via-neon-pink/5 to-card/50 mt-6 overflow-hidden shadow-[0_0_30px_hsl(var(--neon-pink)/0.2)]">
       {/* Animated corner accents */}
       <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-neon-pink rounded-tl-xl" />
       <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-neon-cyan rounded-tr-xl" />

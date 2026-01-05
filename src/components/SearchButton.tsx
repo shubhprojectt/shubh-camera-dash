@@ -152,7 +152,7 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
       onClick={onClick}
       className={cn(
         "group relative flex flex-col items-center justify-center gap-1 p-2 rounded-xl border transition-all duration-300",
-        "active:scale-90 min-h-[56px] backdrop-blur-sm",
+        "active:scale-90 min-h-[56px]",
         colors.border,
         colors.text,
         colors.hoverGlow,

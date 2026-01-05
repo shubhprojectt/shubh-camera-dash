@@ -930,7 +930,7 @@ const NumberDetailFinder = () => {
       <div className="space-y-2">
       {/* Main Card */}
       <div className="relative">
-        <div className="relative rounded-xl p-2 overflow-hidden border border-neon-green/30 bg-card/30 backdrop-blur-sm">
+        <div className="relative rounded-xl p-2 overflow-hidden border border-neon-green/30 bg-card/30">
           
           {/* Button Grid - 4 columns for compact view */}
           <div className="relative grid grid-cols-4 gap-1.5">

@@ -45,11 +45,11 @@ const Header = () => {
       {/* Left side - Status indicators & Credit Display */}
       <div className="absolute top-2 left-2 flex flex-col gap-1.5">
         <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30 backdrop-blur-sm">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30">
             <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
             <span className="text-[8px] font-bold text-neon-green">LIVE</span>
           </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30 backdrop-blur-sm">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
             <Shield className="w-2 h-2 text-neon-cyan" />
             <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
           </div>
@@ -61,7 +61,7 @@ const Header = () => {
       {/* Compact Logo Container */}
       <div className="relative inline-block mb-2">
         {/* Main logo container */}
-        <div className={`relative w-14 h-14 rounded-full border-2 ${color1.border} bg-background/80 backdrop-blur-sm overflow-hidden flex items-center justify-center neon-border-animated`}>
+        <div className={`relative w-14 h-14 rounded-full border-2 ${color1.border} bg-background/80 overflow-hidden flex items-center justify-center neon-border-animated`}>
           {settings.headerCustomLogo ? (
             <img 
               src={settings.headerCustomLogo} 

@@ -49,14 +49,14 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
 
       {/* Lock Dialog */}
       <div className="relative w-full max-w-xs">
-        {/* Outer glow border */}
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-xl opacity-70 blur-[2px] animate-pulse" />
+        {/* Outer glow border (no blur) */}
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-xl opacity-70 animate-pulse" />
 
         <div className="relative bg-background border border-neon-green/50 rounded-xl p-4 space-y-3">
           {/* Lock Icon */}
           <div className="flex justify-center">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-green to-neon-pink rounded-full blur-lg opacity-40" />
+              <div className="absolute inset-0 bg-gradient-to-br from-neon-green to-neon-pink rounded-full opacity-35" />
               <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-neon-green/30 via-neon-cyan/20 to-neon-pink/30 flex items-center justify-center border border-neon-green/50">
                 <Lock className="w-5 h-5 text-neon-green" />
               </div>
