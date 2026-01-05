@@ -388,7 +388,7 @@ const TelegramOSINT: React.FC = () => {
       <div className="absolute -top-10 -right-20 w-32 h-32 bg-neon-pink/10 rounded-full blur-3xl pointer-events-none" />
       
       {/* User ID Input */}
-      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-cyan/5 border border-neon-cyan/30 rounded-xl p-4 mb-4 backdrop-blur-sm shadow-[0_0_20px_hsl(var(--neon-cyan)/0.1)]">
+      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-cyan/5 border border-neon-cyan/30 rounded-xl p-4 mb-4 shadow-[0_0_20px_hsl(var(--neon-cyan)/0.1)]">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-cyan rounded-tl-lg" />
         <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-neon-pink rounded-tr-lg" />
@@ -442,7 +442,7 @@ const TelegramOSINT: React.FC = () => {
 
       {/* Search History Panel */}
       {showHistory && (
-        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-purple/5 border border-neon-purple/30 rounded-xl p-4 mb-4 backdrop-blur-sm shadow-[0_0_20px_hsl(var(--neon-purple)/0.1)]">
+        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-purple/5 border border-neon-purple/30 rounded-xl p-4 mb-4 shadow-[0_0_20px_hsl(var(--neon-purple)/0.1)]">
           {/* Corner accents */}
           <div className="absolute top-0 left-0 w-3 h-3 border-t-2 border-l-2 border-neon-purple rounded-tl-lg" />
           <div className="absolute top-0 right-0 w-3 h-3 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />
@@ -511,7 +511,7 @@ const TelegramOSINT: React.FC = () => {
       </p>
 
       {/* Tools Grid */}
-      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/20 rounded-xl p-3 mb-6 backdrop-blur-sm shadow-[inset_0_0_30px_hsl(var(--neon-green)/0.03)]">
+      <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/20 rounded-xl p-3 mb-6 shadow-[inset_0_0_30px_hsl(var(--neon-green)/0.03)]">
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green rounded-tl-lg" />
         <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />
@@ -559,7 +559,7 @@ const TelegramOSINT: React.FC = () => {
 
       {/* Results */}
       {result && (
-        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/30 rounded-xl p-4 backdrop-blur-sm shadow-[0_0_25px_hsl(var(--neon-green)/0.1)]">
+        <div className="relative bg-gradient-to-br from-black/60 via-black/40 to-neon-green/5 border border-neon-green/30 rounded-xl p-4 shadow-[0_0_25px_hsl(var(--neon-green)/0.1)]">
           {/* Corner accents */}
           <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-neon-green rounded-tl-lg" />
           <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-neon-cyan rounded-tr-lg" />

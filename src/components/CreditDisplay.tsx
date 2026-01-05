@@ -24,7 +24,7 @@ const CreditDisplay = () => {
   return (
     <div className="flex items-center gap-2">
       {/* Credit Display */}
-      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border backdrop-blur-sm transition-all duration-300 ${
+      <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border transition-all duration-300 ${
         isUnlimited 
           ? 'bg-neon-purple/10 border-neon-purple/50'
           : isEmpty 

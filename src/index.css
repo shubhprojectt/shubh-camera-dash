@@ -306,8 +306,7 @@
       linear-gradient(hsl(var(--neon-cyan) / 0.4) 2px, transparent 2px),
       linear-gradient(90deg, hsl(var(--neon-purple) / 0.4) 2px, transparent 2px);
     background-size: 50px 50px;
-    filter: blur(3px);
-    opacity: 0.5;
+    opacity: 0.35;
   }
 
   .neon-border {
