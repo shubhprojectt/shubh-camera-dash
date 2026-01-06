@@ -90,7 +90,7 @@ const defaultTelegramTools: TelegramToolConfig[] = [
 ];
 
 const defaultTabs: TabConfig[] = [
-  { id: "phone", label: "Phone", icon: "Phone", color: "green", placeholder: "Enter phone number...", searchType: "phone", apiUrl: "", enabled: true },
+  { id: "phone", label: "Phone", icon: "Phone", color: "green", placeholder: "Enter phone number...", searchType: "phone", apiUrl: "https://userbotgroup.onrender.com/num?number=", enabled: true },
   { id: "aadhar", label: "Aadhar", icon: "CreditCard", color: "pink", placeholder: "Enter Aadhar number...", searchType: "aadhar", apiUrl: "", enabled: true },
   { id: "vehicle", label: "Vehicle", icon: "Car", color: "orange", placeholder: "Enter RC number...", searchType: "vehicle", apiUrl: "https://darknagi-osint-vehicle-api.vercel.app/api/vehicle?rc=", enabled: true },
   { id: "instagram", label: "Instagram", icon: "Camera", color: "cyan", placeholder: "Enter username...", searchType: "instagram", apiUrl: "", enabled: true },
