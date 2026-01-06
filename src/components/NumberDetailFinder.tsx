@@ -132,13 +132,6 @@ const NumberDetailFinder = () => {
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
-    // Check if it's RANDI PANEL - navigate to full page
-    const tab = enabledTabs.find(t => t.label === label);
-    if (tab?.searchType === "randipanel") {
-      navigate("/randi-panel");
-      return;
-    }
-    
     if (activeTab === label) {
       setActiveTab(null);
     } else {
@@ -1095,8 +1088,50 @@ const NumberDetailFinder = () => {
         </div>
       )}
 
+      {/* RANDI PANEL - shows when randipanel tab is active */}
+      {activeButton?.searchType === "randipanel" && (
+        <div key={`randipanel-${activeTab}`} className="animate-tab-slide-in">
+          {/* Header */}
+          <div className="flex items-center justify-center gap-2 mb-3 py-2">
+            <Skull className="w-4 h-4 text-neon-red animate-pulse" />
+            <span className="text-xs font-bold tracking-[0.15em] text-neon-red uppercase">
+              AIRAVAT Panel
+            </span>
+            <Shield className="w-4 h-4 text-neon-pink" />
+          </div>
+          
+          {/* Info Notice */}
+          <div className="mb-3 px-3 py-2 rounded-xl bg-neon-red/5 border border-neon-red/20 flex items-center gap-2">
+            <Zap className="w-3.5 h-3.5 text-neon-red flex-shrink-0" />
+            <p className="text-[10px] text-neon-red/80">
+              Remote Access Terminal • Connected • Active Session
+            </p>
+          </div>
+          
+          {/* Iframe Container */}
+          <div 
+            className="relative rounded-2xl overflow-hidden"
+            style={{
+              borderWidth: '2px',
+              borderStyle: 'solid',
+              borderColor: 'hsl(var(--neon-red))',
+              boxShadow: '0 0 20px hsl(var(--neon-red) / 0.3)'
+            }}
+          >
+            <iframe
+              src="/WEB-PANEL/index.html"
+              className="w-full bg-background"
+              style={{ height: '80vh', minHeight: '600px' }}
+              title="AIRAVAT Panel"
+              sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+              referrerPolicy="no-referrer"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Results Section */}
-      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
+      {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && activeButton.searchType !== "randipanel" && (
         <div key={`results-${activeTab}`} className="animate-tab-slide-in">
           {/* Loading */}
           {loading && (
