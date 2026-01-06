@@ -1,0 +1,83 @@
+// =====================================================
+// AUTH-VERIFY Edge Function
+// =====================================================
+// Purpose: Verifies user session and returns credit info
+// Endpoint: /functions/v1/auth-verify
+// Method: POST
+// =====================================================
+
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+serve(async (req) => {
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+
+    const { sessionToken } = await req.json();
+
+    if (!sessionToken) {
+      return new Response(
+        JSON.stringify({ valid: false, error: 'Session token required' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Find the session
+    const { data: session, error: sessionError } = await supabase
+      .from('user_sessions')
+      .select('*, access_passwords(*)')
+      .eq('session_token', sessionToken)
+      .eq('is_active', true)
+      .single();
+
+    if (sessionError || !session) {
+      return new Response(
+        JSON.stringify({ valid: false, error: 'Invalid or expired session' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if password is still enabled
+    if (!session.access_passwords.is_enabled) {
+      return new Response(
+        JSON.stringify({ valid: false, error: 'Password has been disabled' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Update last active
+    await supabase
+      .from('user_sessions')
+      .update({ last_active_at: new Date().toISOString() })
+      .eq('id', session.id);
+
+    return new Response(
+      JSON.stringify({
+        valid: true,
+        credits: session.access_passwords.remaining_credits,
+        totalCredits: session.access_passwords.total_credits,
+        isUnlimited: session.access_passwords.is_unlimited || false
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+
+  } catch (error) {
+    console.error('Verify error:', error);
+    return new Response(
+      JSON.stringify({ valid: false, error: 'Internal server error' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+});
