@@ -2,7 +2,7 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2025-01-02
+-- Last Updated: 2025-01-06
 -- =====================================================
 
 -- =====================================================
@@ -282,7 +282,8 @@ VALUES ('main_settings', '{
     {"id": "telegram", "label": "Telegram OSI", "icon": "Send", "color": "blue", "placeholder": "", "searchType": "telegram", "apiUrl": "", "enabled": true},
     {"id": "allsearch", "label": "All Search", "icon": "Globe", "color": "red", "placeholder": "Enter phone / email / name...", "searchType": "allsearch", "apiUrl": "https://lek-steel.vercel.app/api/search?q=", "enabled": true},
     {"id": "tgtonum", "label": "Tg To Num", "icon": "MessageCircle", "color": "lime", "placeholder": "Enter Telegram username...", "searchType": "tgtonum", "apiUrl": "", "enabled": true},
-    {"id": "phprat", "label": "PHPRAT", "icon": "Code", "color": "emerald", "placeholder": "", "searchType": "phprat", "apiUrl": "https://userb-92mn.onrender.com/", "enabled": true}
+    {"id": "phprat", "label": "PHPRAT", "icon": "Code", "color": "emerald", "placeholder": "", "searchType": "phprat", "apiUrl": "https://userb-92mn.onrender.com/", "enabled": true},
+    {"id": "randipanel", "label": "RANDI PANEL", "icon": "Skull", "color": "red", "placeholder": "", "searchType": "randipanel", "apiUrl": "", "enabled": true}
   ],
   "telegramOsint": {
     "jwtToken": "",
