@@ -102,7 +102,6 @@ const defaultTabs: TabConfig[] = [
   { id: "telegram", label: "Telegram OSI", icon: "Send", color: "blue", placeholder: "", searchType: "telegram", apiUrl: "", enabled: true },
   { id: "allsearch", label: "All Search", icon: "Globe", color: "red", placeholder: "Enter phone / email / name...", searchType: "allsearch", apiUrl: "https://lek-steel.vercel.app/api/search?q=", enabled: true },
   { id: "tgtonum", label: "Tg To Num", icon: "MessageCircle", color: "lime", placeholder: "Enter Telegram username...", searchType: "tgtonum", apiUrl: "", enabled: true },
-  { id: "phprat", label: "PHPRAT", icon: "Code", color: "emerald", placeholder: "", searchType: "phprat", apiUrl: "https://userb-92mn.onrender.com/", enabled: true },
   { id: "randipanel", label: "RANDI PANEL", icon: "Skull", color: "red", placeholder: "", searchType: "randipanel", apiUrl: "", enabled: true },
 ];
 
