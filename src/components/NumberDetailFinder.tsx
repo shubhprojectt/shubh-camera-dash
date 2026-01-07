@@ -287,6 +287,52 @@ const NumberDetailFinder = () => {
       return;
     }
 
+    // NUM INFO V2 search with cross proxy - raw JSON result
+    if (activeButton?.searchType === "numinfov2") {
+      try {
+        const apiUrl = "https://userbotgroup.onrender.com/num?number=";
+        const proxyUrl = "https://corsproxy.io/?";
+        const fullUrl = `${proxyUrl}${encodeURIComponent(apiUrl + searchQuery.trim())}`;
+        
+        console.log("NUM INFO V2 search using proxy:", fullUrl);
+        
+        const response = await fetch(fullUrl);
+        const text = await response.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch {
+          data = { raw: text };
+        }
+
+        if (data && (Object.keys(data).length > 0 || text.trim())) {
+          setResult({ type: "numinfov2", data, rawText: text });
+          toast({
+            title: "NUM INFO V2 Found",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } else {
+          setError("No information found for this number");
+          toast({
+            title: "Not Found",
+            description: "No information found",
+            variant: "destructive",
+          });
+        }
+      } catch (err) {
+        console.error("NUM INFO V2 search error:", err);
+        setError("Failed to fetch data. Please try again.");
+        toast({
+          title: "Error",
+          description: "Failed to fetch data",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
     // Aadhar search API (via edge function to avoid CORS)
     if (activeButton?.searchType === "aadhar") {
       try {
@@ -731,6 +777,63 @@ const NumberDetailFinder = () => {
     );
   };
 
+  // Render NUM INFO V2 result as raw JSON
+  const renderNumInfoV2Result = (data: any) => {
+    const copyData = () => {
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr);
+      toast({
+        title: "Copied!",
+        description: "JSON data copied to clipboard",
+      });
+    };
+
+    return (
+      <div className="space-y-3 animate-slide-up">
+        {/* Header */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-neon-cyan/20 via-neon-green/10 to-neon-cyan/5 border border-neon-cyan/50 p-4">
+          <div className="absolute top-0 right-0 w-20 h-20 bg-neon-cyan/10 rounded-full blur-2xl" />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="p-3 rounded-xl bg-neon-cyan/20 border border-neon-cyan/50">
+                <Search className="w-6 h-6 text-neon-cyan" />
+              </div>
+              <div>
+                <p className="text-xs text-neon-cyan/70 uppercase tracking-wider">NUM INFO V2</p>
+                <p className="text-lg font-display font-bold text-neon-cyan">Raw JSON Response</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyData}
+              className="border-neon-green/50 text-neon-green hover:bg-neon-green/20"
+            >
+              <ClipboardPaste className="w-4 h-4 mr-1" />
+              Copy
+            </Button>
+          </div>
+        </div>
+
+        {/* JSON Content */}
+        <div className="rounded-xl bg-card/50 border border-neon-cyan/40 overflow-hidden">
+          <div className="px-4 py-2 bg-neon-cyan/10 border-b border-neon-cyan/30 flex items-center gap-2">
+            <Code className="w-4 h-4 text-neon-cyan" />
+            <span className="text-sm text-neon-cyan font-semibold">JSON Response</span>
+          </div>
+          <div className="p-4 max-h-[500px] overflow-auto custom-scrollbar">
+            <pre className="text-xs text-neon-green font-mono whitespace-pre-wrap break-all">
+              {JSON.stringify(data, null, 2)}
+            </pre>
+          </div>
+        </div>
+
+        {/* Source */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT via Cross Proxy</p>
+      </div>
+    );
+  };
+
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text);
     toast({
@@ -1119,7 +1222,7 @@ const NumberDetailFinder = () => {
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
               <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "👄 NUMBER TO DETAIL" : "📊 RESULTS"}
+                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "👄 NUMBER TO DETAIL" : activeButton?.searchType === "numinfov2" ? "📱 NUM INFO V2" : "📊 RESULTS"}
               </h3>
               {activeButton?.searchType === "vehicle" 
                 ? renderVehicleResult(result) 
@@ -1127,6 +1230,8 @@ const NumberDetailFinder = () => {
                 ? renderAadharResult(result.data)
                 : activeButton?.searchType === "allsearch"
                 ? renderAllSearchResult(result.data)
+                : activeButton?.searchType === "numinfov2"
+                ? renderNumInfoV2Result(result.data)
                 : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText, result.usedApiUrl) : renderDefaultResult())}
             </div>
           )}
