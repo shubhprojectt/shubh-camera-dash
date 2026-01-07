@@ -287,28 +287,28 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // NUM INFO V2 search - direct API call (no proxy)
+    // NUM INFO V2 search via edge function (to avoid CORS)
     if (activeButton?.searchType === "numinfov2") {
       try {
-        const apiUrl = "https://userbotgroup.onrender.com/num?number=";
-        const fullUrl = `${apiUrl}${encodeURIComponent(searchQuery.trim())}`;
+        console.log("NUM INFO V2 search via edge function:", searchQuery.trim());
         
-        console.log("NUM INFO V2 search:", fullUrl);
+        const { data, error: fnError } = await supabase.functions.invoke('numinfo-v2', {
+          body: { number: searchQuery.trim() }
+        });
         
-        const response = await fetch(fullUrl);
-        const data = await response.json();
+        if (fnError) throw fnError;
 
-        if (data && Object.keys(data).length > 0) {
+        if (data && Object.keys(data).length > 0 && !data.error) {
           setResult({ type: "numinfov2", data });
           toast({
             title: "NUM INFO V2 Found",
             description: `Results found for: ${searchQuery}`,
           });
         } else {
-          setError("No information found for this number");
+          setError(data?.error || "No information found for this number");
           toast({
             title: "Not Found",
-            description: "No information found",
+            description: data?.error || "No information found",
             variant: "destructive",
           });
         }
