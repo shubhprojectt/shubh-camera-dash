@@ -287,26 +287,19 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // NUM INFO V2 search with cross proxy - raw JSON result
+    // NUM INFO V2 search - direct API call (no proxy)
     if (activeButton?.searchType === "numinfov2") {
       try {
         const apiUrl = "https://userbotgroup.onrender.com/num?number=";
-        const proxyUrl = "https://corsproxy.io/?";
-        const fullUrl = `${proxyUrl}${encodeURIComponent(apiUrl + searchQuery.trim())}`;
+        const fullUrl = `${apiUrl}${encodeURIComponent(searchQuery.trim())}`;
         
-        console.log("NUM INFO V2 search using proxy:", fullUrl);
+        console.log("NUM INFO V2 search:", fullUrl);
         
         const response = await fetch(fullUrl);
-        const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          data = { raw: text };
-        }
+        const data = await response.json();
 
-        if (data && (Object.keys(data).length > 0 || text.trim())) {
-          setResult({ type: "numinfov2", data, rawText: text });
+        if (data && Object.keys(data).length > 0) {
+          setResult({ type: "numinfov2", data });
           toast({
             title: "NUM INFO V2 Found",
             description: `Results found for: ${searchQuery}`,
