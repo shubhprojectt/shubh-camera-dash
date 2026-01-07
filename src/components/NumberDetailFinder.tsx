@@ -792,7 +792,7 @@ const NumberDetailFinder = () => {
                 <Search className="w-6 h-6 text-neon-cyan" />
               </div>
               <div>
-                <p className="text-xs text-neon-cyan/70 uppercase tracking-wider">NUM INFO V2</p>
+                <p className="text-xs text-neon-cyan/70 uppercase tracking-wider">Cradit D4rk</p>
                 <p className="text-lg font-display font-bold text-neon-cyan">Raw JSON Response</p>
               </div>
             </div>
