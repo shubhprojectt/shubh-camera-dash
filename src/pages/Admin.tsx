@@ -146,7 +146,7 @@ const Section = ({
 
 const Admin = () => {
   const navigate = useNavigate();
-  const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings } = useSettings();
+  const { settings, updateSettings, updateTab, updateTelegramTool, resetSettings, saveNow } = useSettings();
   const [showSitePassword, setShowSitePassword] = useState(false);
   const [showAdminPassword, setShowAdminPassword] = useState(false);
   const [showAllSearchKey, setShowAllSearchKey] = useState(false);
@@ -783,8 +783,13 @@ const Admin = () => {
               spellCheck={false}
             />
             <Button 
-              onClick={() => {
-                toast({ title: "JWT Token saved successfully!", description: "Token has been updated in the database." });
+              onClick={async () => {
+                try {
+                  await saveNow();
+                  toast({ title: "JWT Token saved successfully!", description: "Token has been updated in the database." });
+                } catch {
+                  toast({ title: "Save failed", description: "Please try again.", variant: "destructive" });
+                }
               }}
               className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green/30"
             >
