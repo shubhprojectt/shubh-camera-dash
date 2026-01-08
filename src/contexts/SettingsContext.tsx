@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface TabConfig {
@@ -209,6 +209,7 @@ interface SettingsContextType {
   updateTab: (tabId: string, updates: Partial<TabConfig>) => void;
   updateTelegramTool: (toolId: string, updates: Partial<TelegramToolConfig>) => void;
   resetSettings: () => void;
+  saveNow: () => Promise<void>;
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
@@ -223,13 +224,102 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     }
   });
 
-  // Load settings from Supabase on mount
+  const settingsRef = useRef(settings);
+  useEffect(() => {
+    settingsRef.current = settings;
+  }, [settings]);
+
+  const settingsRowIdRef = useRef<string | null>(null);
+  const hasLocalEditsRef = useRef(false);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const saveChainRef = useRef<Promise<void>>(Promise.resolve());
+
+  const saveToBackend = useCallback(async (nextSettings: AppSettings) => {
+    try {
+      const settingsJson = JSON.parse(JSON.stringify(nextSettings));
+
+      // Resolve row id once (prevents repeated SELECTs and reduces race conditions)
+      if (!settingsRowIdRef.current) {
+        const { data: existing, error: existingError } = await supabase
+          .from('app_settings')
+          .select('id')
+          .eq('setting_key', 'main_settings')
+          .maybeSingle();
+
+        if (!existingError && existing?.id) {
+          settingsRowIdRef.current = existing.id;
+        }
+      }
+
+      if (settingsRowIdRef.current) {
+        const { error } = await supabase
+          .from('app_settings')
+          .update({ setting_value: settingsJson })
+          .eq('id', settingsRowIdRef.current);
+
+        if (error) throw error;
+      } else {
+        const { data, error } = await supabase
+          .from('app_settings')
+          .insert([{ setting_key: 'main_settings', setting_value: settingsJson }])
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        if (data?.id) settingsRowIdRef.current = data.id;
+      }
+    } catch (err) {
+      console.error('Error saving settings:', err);
+    }
+  }, []);
+
+  const scheduleSave = useCallback(
+    (nextSettings: AppSettings) => {
+      // Always keep localStorage updated immediately
+      try {
+        localStorage.setItem("app_settings", JSON.stringify(nextSettings));
+      } catch {
+        // ignore
+      }
+
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      // Debounce backend writes to avoid out-of-order updates (token truncation/rollback)
+      saveTimeoutRef.current = setTimeout(() => {
+        const snapshot = nextSettings;
+        saveChainRef.current = saveChainRef.current.then(() => saveToBackend(snapshot));
+      }, 700);
+    },
+    [saveToBackend]
+  );
+
+  const saveNow = useCallback(async () => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+      saveTimeoutRef.current = null;
+    }
+
+    const snapshot = settingsRef.current;
+
+    try {
+      localStorage.setItem("app_settings", JSON.stringify(snapshot));
+    } catch {
+      // ignore
+    }
+
+    saveChainRef.current = saveChainRef.current.then(() => saveToBackend(snapshot));
+    await saveChainRef.current;
+  }, [saveToBackend]);
+
+  // Load settings from backend on mount
   useEffect(() => {
     const loadSettings = async () => {
       try {
         const { data, error } = await supabase
           .from('app_settings')
-          .select('setting_value')
+          .select('id, setting_value')
           .eq('setting_key', 'main_settings')
           .maybeSingle();
 
@@ -241,7 +331,15 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
             const parsed = JSON.parse(saved) as Partial<AppSettings>;
             setSettings(hydrateSettings(parsed));
           }
-        } else if (data) {
+          return;
+        }
+
+        if (data?.id) settingsRowIdRef.current = data.id;
+
+        // If user has already started editing locally, don't clobber their changes
+        if (hasLocalEditsRef.current) return;
+
+        if (data?.setting_value) {
           const parsed = data.setting_value as unknown as Partial<AppSettings>;
           setSettings(hydrateSettings(parsed));
         }
@@ -255,85 +353,60 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     loadSettings();
   }, []);
 
-  // Save settings to Supabase whenever they change
-  const saveToSupabase = useCallback(async (newSettings: AppSettings) => {
-    try {
-      const settingsJson = JSON.parse(JSON.stringify(newSettings));
-      
-      const { data: existing } = await supabase
-        .from('app_settings')
-        .select('id')
-        .eq('setting_key', 'main_settings')
-        .maybeSingle();
-
-      if (existing) {
-        await supabase
-          .from('app_settings')
-          .update({ setting_value: settingsJson })
-          .eq('setting_key', 'main_settings');
-      } else {
-        await supabase
-          .from('app_settings')
-          .insert([{ setting_key: 'main_settings', setting_value: settingsJson }]);
-      }
-      
-      // Also save to localStorage as backup
-      localStorage.setItem("app_settings", JSON.stringify(newSettings));
-    } catch (err) {
-      console.error('Error saving settings:', err);
-    }
-  }, []);
-
   const updateSettings = (newSettings: Partial<AppSettings>) => {
-    setSettings(prev => {
+    hasLocalEditsRef.current = true;
+    setSettings((prev) => {
       const updated = { ...prev, ...newSettings };
-      saveToSupabase(updated);
+      scheduleSave(updated);
       return updated;
     });
   };
 
   const updateTab = (tabId: string, updates: Partial<TabConfig>) => {
-    setSettings(prev => {
+    hasLocalEditsRef.current = true;
+    setSettings((prev) => {
       const updated = {
         ...prev,
-        tabs: prev.tabs.map(tab => 
-          tab.id === tabId ? { ...tab, ...updates } : tab
-        ),
+        tabs: prev.tabs.map((tab) => (tab.id === tabId ? { ...tab, ...updates } : tab)),
       };
-      saveToSupabase(updated);
+      scheduleSave(updated);
       return updated;
     });
   };
 
   const updateTelegramTool = (toolId: string, updates: Partial<TelegramToolConfig>) => {
-    setSettings(prev => {
+    hasLocalEditsRef.current = true;
+    setSettings((prev) => {
       const updated = {
         ...prev,
         telegramOsint: {
           ...prev.telegramOsint,
-          tools: prev.telegramOsint.tools.map(tool =>
+          tools: prev.telegramOsint.tools.map((tool) =>
             tool.id === toolId ? { ...tool, ...updates } : tool
           ),
         },
       };
-      saveToSupabase(updated);
+      scheduleSave(updated);
       return updated;
     });
   };
 
-  const resetSettings = async () => {
+  const resetSettings = () => {
+    hasLocalEditsRef.current = true;
     setSettings(defaultSettings);
-    localStorage.removeItem("app_settings");
-    
-    // Delete from Supabase
-    await supabase
-      .from('app_settings')
-      .delete()
-      .eq('setting_key', 'main_settings');
+    try {
+      localStorage.removeItem("app_settings");
+    } catch {
+      // ignore
+    }
+    // Persist defaults (backend)
+    scheduleSave(defaultSettings);
   };
 
   return (
-    <SettingsContext.Provider value={{ settings, isLoaded, updateSettings, updateTab, updateTelegramTool, resetSettings }}>
+    <SettingsContext.Provider
+      value={{ settings, isLoaded, updateSettings, updateTab, updateTelegramTool, resetSettings, saveNow }}
+    >
       {children}
     </SettingsContext.Provider>
   );
