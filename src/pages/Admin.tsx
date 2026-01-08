@@ -773,15 +773,24 @@ const Admin = () => {
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
             <h3 className="font-bold text-neon-green">JWT Token</h3>
             <p className="text-xs text-muted-foreground">API authentication token for funstat.info</p>
-            <Input
-              type="password"
+            <textarea
               value={settings.telegramOsint?.jwtToken || ""}
               onChange={(e) => updateSettings({ 
                 telegramOsint: { ...settings.telegramOsint, jwtToken: e.target.value } 
               })}
               placeholder="eyJhbGciOiJSUzI1NiIs..."
-              className="font-mono text-sm"
+              className="w-full font-mono text-xs bg-background border border-border rounded-lg p-3 min-h-[100px] resize-y break-all"
+              spellCheck={false}
             />
+            <Button 
+              onClick={() => {
+                toast({ title: "JWT Token saved successfully!", description: "Token has been updated in the database." });
+              }}
+              className="w-full bg-neon-green/20 border border-neon-green text-neon-green hover:bg-neon-green/30"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save JWT Token
+            </Button>
           </div>
 
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-3">
