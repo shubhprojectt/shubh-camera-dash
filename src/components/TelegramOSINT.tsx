@@ -3,6 +3,7 @@ import { User, Users, MessageSquare, BarChart3, Shield, AtSign, History, Sticker
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
+import { supabase } from '@/integrations/supabase/client';
 
 const CACHE_KEY = 'telegram_osint_cache';
 const SEARCH_HISTORY_KEY = 'telegram_osint_search_history';
@@ -65,9 +66,7 @@ const TelegramOSINT: React.FC = () => {
   const [searchHistory, setSearchHistory] = useState<SearchHistoryEntry[]>([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  // Get JWT token and base URL from settings
-  const JWT_TOKEN = settings.telegramOsint?.jwtToken || "";
-  const BASE_URL = settings.telegramOsint?.baseUrl || "https://funstat.info";
+  // No longer need JWT_TOKEN and BASE_URL here - edge function handles it
 
   // Merge settings tools with default config
   const tools: ToolButton[] = useMemo(() => {
@@ -213,18 +212,23 @@ const TelegramOSINT: React.FC = () => {
     setIsFromCache(false);
 
     try {
-      const response = await fetch(`${BASE_URL}${getEndpoint(activeTool)}`, {
-        headers: {
-          'Authorization': `Bearer ${JWT_TOKEN}`,
-          'Content-Type': 'application/json',
+      // Use edge function instead of direct API call
+      const { data, error: invokeError } = await supabase.functions.invoke('telegram-osint', {
+        body: {
+          endpoint: getEndpoint(activeTool),
+          userId: userId.trim(),
+          username: username.trim(),
         },
       });
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+      if (invokeError) {
+        throw new Error(invokeError.message || 'Failed to fetch data');
       }
 
-      const data = await response.json();
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       setResult(data);
       
       // Add to search history
