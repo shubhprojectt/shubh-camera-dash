@@ -15,9 +15,7 @@ const Index = () => {
           <div 
             className="fixed inset-0 bg-cover bg-center bg-no-repeat"
             style={{ 
-              backgroundImage: `url(${settings.backgroundImage})`,
-              backgroundAttachment: 'fixed',
-              willChange: 'auto'
+              backgroundImage: `url(${settings.backgroundImage})`
             }}
           />
         ) : (
