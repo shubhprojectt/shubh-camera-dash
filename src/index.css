@@ -84,6 +84,10 @@
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   html, body, #root {
     min-height: 100%;
     min-height: 100dvh;
