@@ -102,10 +102,10 @@ const Login = () => {
             <Button
               type="submit"
               disabled={isLoading || !password.trim()}
-              className="w-full h-9 rounded-lg text-sm font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background hover:opacity-90 transition-all shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] active:scale-95"
+              className={`w-full h-9 rounded-lg text-sm font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background transition-all active:scale-95 ${isLoading ? 'animate-pulse shadow-[0_0_25px_hsl(var(--neon-green)/0.6),0_0_50px_hsl(var(--neon-cyan)/0.4)]' : 'hover:opacity-90 shadow-[0_0_15px_hsl(var(--neon-green)/0.4)]'}`}
             >
               {isLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]" />
               ) : (
                 "UNLOCK"
               )}

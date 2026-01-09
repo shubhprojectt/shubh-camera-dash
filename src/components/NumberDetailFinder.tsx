@@ -1074,9 +1074,9 @@ const NumberDetailFinder = () => {
                 <Button 
                   onClick={handleSearch}
                   disabled={loading}
-                  className="bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-3 h-8 hover:opacity-90 text-xs shadow-[0_0_8px_hsl(var(--neon-cyan)/0.4)] transition-all active:scale-95"
+                  className={`bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-3 h-8 hover:opacity-90 text-xs transition-all active:scale-95 ${loading ? 'animate-pulse shadow-[0_0_20px_hsl(var(--neon-cyan)/0.6),0_0_40px_hsl(var(--neon-green)/0.4)]' : 'shadow-[0_0_8px_hsl(var(--neon-cyan)/0.4)]'}`}
                 >
-                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
+                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin drop-shadow-[0_0_8px_hsl(var(--neon-cyan))]" /> : <Search className="w-3.5 h-3.5" />}
                 </Button>
               </div>
             </div>
