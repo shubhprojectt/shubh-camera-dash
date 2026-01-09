@@ -413,9 +413,9 @@ const TelegramOSINT: React.FC = () => {
           <Button
             onClick={fetchData}
             disabled={loading || !activeTool}
-            className="bg-black border border-neon-cyan text-neon-cyan hover:bg-black/80 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)] px-6 transition-all duration-300"
+            className={`bg-black border border-neon-cyan text-neon-cyan px-6 transition-all duration-300 ${loading ? 'animate-pulse shadow-[0_0_20px_hsl(var(--neon-cyan)/0.6),0_0_40px_hsl(var(--neon-cyan)/0.3)]' : 'hover:bg-black/80 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)]'}`}
           >
-            {loading ? <Loader2 className="animate-spin" size={20} /> : 'Search'}
+            {loading ? <Loader2 className="animate-spin drop-shadow-[0_0_8px_hsl(var(--neon-cyan))]" size={20} /> : 'Search'}
           </Button>
           <Button
             onClick={() => setShowHistory(!showHistory)}

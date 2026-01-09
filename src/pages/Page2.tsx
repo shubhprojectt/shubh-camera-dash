@@ -186,10 +186,10 @@ const Page2 = () => {
                   <Button 
                     onClick={handleSearch}
                     disabled={loading}
-                    className="px-6 h-10 bg-gradient-to-r from-neon-purple to-neon-cyan hover:opacity-90 border-0 font-bold"
+                    className={`px-6 h-10 bg-gradient-to-r from-neon-purple to-neon-cyan border-0 font-bold transition-all ${loading ? 'animate-pulse shadow-[0_0_20px_hsl(var(--neon-purple)/0.6),0_0_40px_hsl(var(--neon-cyan)/0.4)]' : 'hover:opacity-90'}`}
                   >
                     {loading ? (
-                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <Loader2 className="w-4 h-4 animate-spin drop-shadow-[0_0_8px_hsl(var(--neon-cyan))]" />
                     ) : (
                       <>
                         <ExternalLink className="w-4 h-4 mr-2" />
