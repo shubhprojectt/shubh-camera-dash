@@ -413,7 +413,7 @@ const TelegramOSINT: React.FC = () => {
           <Button
             onClick={fetchData}
             disabled={loading || !activeTool}
-            className="bg-gradient-to-r from-neon-cyan/20 to-neon-green/20 border border-neon-cyan text-neon-cyan hover:from-neon-cyan/30 hover:to-neon-green/30 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)] px-6 transition-all duration-300"
+            className="bg-black border border-neon-cyan text-neon-cyan hover:bg-black/80 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.3)] px-6 transition-all duration-300"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Search'}
           </Button>
