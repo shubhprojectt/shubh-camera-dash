@@ -2,7 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2025-01-06
+-- Last Updated: 2025-01-09
+-- Version: 2.0
 -- =====================================================
 
 -- =====================================================
@@ -315,4 +316,5 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 1. Deploy the edge functions from supabase/functions/
 -- 2. Update config.toml with your project ID
 -- 3. Set up the PHPRAT tab URL in Admin panel if needed
+-- 4. Configure Telegram OSINT JWT token in Admin panel
 -- =====================================================
