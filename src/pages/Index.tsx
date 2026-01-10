@@ -13,9 +13,12 @@ const Index = () => {
         {/* Custom background image - fixed and stable */}
         {settings.backgroundImage ? (
           <div 
-            className="fixed inset-0 bg-cover bg-center bg-no-repeat"
+            className="fixed inset-0 bg-cover bg-center bg-no-repeat will-change-auto"
             style={{ 
-              backgroundImage: `url(${settings.backgroundImage})`
+              backgroundImage: `url(${settings.backgroundImage})`,
+              backgroundAttachment: 'fixed',
+              transform: 'translateZ(0)',
+              backfaceVisibility: 'hidden'
             }}
           />
         ) : (
