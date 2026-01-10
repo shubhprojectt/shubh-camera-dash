@@ -9,33 +9,31 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-[100dvh] bg-background relative overflow-hidden">
-        {/* Custom background image - fixed and stable */}
+      <div className="min-h-screen bg-background relative overflow-x-hidden">
+        {/* Custom background image - completely fixed */}
         {settings.backgroundImage ? (
           <div 
-            className="fixed inset-0 bg-cover bg-center bg-no-repeat will-change-auto"
+            className="bg-fixed-stable bg-cover bg-center bg-no-repeat pointer-events-none"
             style={{ 
-              backgroundImage: `url(${settings.backgroundImage})`,
-              backgroundAttachment: 'fixed',
-              transform: 'translateZ(0)',
-              backfaceVisibility: 'hidden'
+              backgroundImage: `url(${settings.backgroundImage})`
             }}
           />
         ) : (
-          <div className="fixed inset-0 bg-background" />
+          <div className="bg-fixed-stable bg-background pointer-events-none" />
         )}
         
-        {/* Dark overlay for readability - no blur */}
+        {/* Dark overlay for readability */}
         <div 
-          className="fixed inset-0 bg-background pointer-events-none"
-          style={{ opacity: (parseInt(settings.backgroundOpacity || "30") / 100) }}
+          className="bg-fixed-stable bg-background pointer-events-none"
+          style={{ 
+            opacity: (parseInt(settings.backgroundOpacity || "30") / 100)
+          }}
         />
         
-        {/* Simple gradient overlay - lightweight */}
-        <div className="fixed inset-0 bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5 pointer-events-none" />
+        <div className="bg-fixed-stable bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5 pointer-events-none" />
         
         {/* Neon glowing cyber grid */}
-        <div className="fixed inset-0 cyber-grid-glow opacity-40 pointer-events-none" />
+        <div className="bg-fixed-stable cyber-grid-glow opacity-40 pointer-events-none" />
         
         {/* Content */}
         <div className="relative z-10 container mx-auto px-3 pb-6">
