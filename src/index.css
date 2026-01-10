@@ -86,11 +86,27 @@
 
   html {
     scroll-behavior: smooth;
+    /* Prevent mobile viewport resize on scroll */
+    overflow-x: hidden;
   }
 
   html, body, #root {
     min-height: 100%;
-    min-height: 100dvh;
+    min-height: 100svh;
+    overflow-x: hidden;
+  }
+
+  /* Fixed background container - immune to viewport changes */
+  .bg-fixed-stable {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100svh !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    will-change: auto;
   }
 
   body {
