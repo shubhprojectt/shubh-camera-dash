@@ -170,10 +170,16 @@ const NumberDetailFinder = () => {
       return;
     }
 
+    // START LOADING IMMEDIATELY for instant feedback
+    setLoading(true);
+    setResult(null);
+    setError(null);
+
     // Only check credits if credit system is enabled
     if (settings.creditSystemEnabled) {
       // Check if user has credits (skip for unlimited)
       if (!isUnlimited && credits <= 0) {
+        setLoading(false);
         toast({
           title: "No Credits",
           description: "Credits finished! Contact admin for more.",
@@ -182,25 +188,22 @@ const NumberDetailFinder = () => {
         return;
       }
 
-      // Deduct 1 credit for search
-      const deductResult = await deductCredits(activeButton?.searchType || "search", searchQuery.trim());
-      if (!deductResult.success) {
-        toast({
-          title: "Credit Error",
-          description: deductResult.error || "Failed to deduct credits",
-          variant: "destructive",
-        });
-        return;
-      }
+      // Deduct credits - but don't block the UI
+      deductCredits(activeButton?.searchType || "search", searchQuery.trim()).then(deductResult => {
+        if (!deductResult.success) {
+          console.error("Credit deduction failed:", deductResult.error);
+        }
+      });
     }
 
-    // Log search history
-    await logSearchHistory(activeButton?.searchType || "unknown", searchQuery.trim());
+    // Log search history in background (non-blocking)
+    logSearchHistory(activeButton?.searchType || "unknown", searchQuery.trim());
 
     // If tab has API URL and is manual type - open in new tab
     if (activeButton?.apiUrl && activeButton.searchType === "manual") {
       const apiUrl = `${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`;
       window.open(apiUrl, '_blank');
+      setLoading(false);
       toast({
         title: "Opening API",
         description: `Opening search for: ${searchQuery}`,
@@ -208,43 +211,17 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    setLoading(true);
-    setResult(null);
-    setError(null);
-
     // Phone search API
     if (activeButton?.searchType === "phone") {
       try {
         const defaultApiUrl = "https://anmolzz.teamxferry.workers.dev/?mobile=";
 
-        // 1) Prefer current in-memory settings
-        let apiUrl =
+        // Use in-memory settings directly (already synced from context)
+        const apiUrl =
           settings.tabs.find((t) => t.id === activeButton.id)?.apiUrl?.trim() ||
           settings.tabs.find((t) => t.searchType === "phone")?.apiUrl?.trim() ||
-          "";
+          defaultApiUrl;
 
-        // 2) Always try to fetch the latest saved settings from backend (fixes stale localStorage/settings)
-        try {
-          const { data: row, error: settingsErr } = await supabase
-            .from("app_settings")
-            .select("setting_value")
-            .eq("setting_key", "main_settings")
-            .maybeSingle();
-
-          if (!settingsErr && row) {
-            const remoteTabs = (row.setting_value as any)?.tabs;
-            if (Array.isArray(remoteTabs)) {
-              const remoteApiUrl =
-                remoteTabs.find((t: any) => t?.id === activeButton.id)?.apiUrl?.trim() ||
-                remoteTabs.find((t: any) => t?.searchType === "phone")?.apiUrl?.trim();
-              if (remoteApiUrl) apiUrl = remoteApiUrl;
-            }
-          }
-        } catch (e) {
-          // ignore; fallback to in-memory settings
-        }
-
-        apiUrl = apiUrl || defaultApiUrl;
         console.log("Phone search using API:", apiUrl);
 
         const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
