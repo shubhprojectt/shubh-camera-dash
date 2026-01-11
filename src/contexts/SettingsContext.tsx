@@ -313,7 +313,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     await saveChainRef.current;
   }, [saveToBackend]);
 
-  // Load settings from backend on mount
+  // Load settings from backend on mount - ALWAYS prioritize backend over localStorage
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -325,7 +325,7 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
         if (error) {
           console.error('Error loading settings:', error);
-          // Fall back to localStorage
+          // Fall back to localStorage only on error
           const saved = localStorage.getItem("app_settings");
           if (saved) {
             const parsed = JSON.parse(saved) as Partial<AppSettings>;
@@ -336,12 +336,18 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
 
         if (data?.id) settingsRowIdRef.current = data.id;
 
-        // If user has already started editing locally, don't clobber their changes
-        if (hasLocalEditsRef.current) return;
-
+        // ALWAYS use backend settings - they are the source of truth
+        // Only skip if user has ACTIVELY edited during this session (not from localStorage)
         if (data?.setting_value) {
           const parsed = data.setting_value as unknown as Partial<AppSettings>;
-          setSettings(hydrateSettings(parsed));
+          const hydrated = hydrateSettings(parsed);
+          setSettings(hydrated);
+          // Also update localStorage to match backend
+          try {
+            localStorage.setItem("app_settings", JSON.stringify(hydrated));
+          } catch {
+            // ignore
+          }
         }
       } catch (err) {
         console.error('Error loading settings:', err);
