@@ -32,9 +32,6 @@ const Index = () => {
         
         <div className="bg-fixed-stable bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5 pointer-events-none" />
         
-        {/* Neon glowing cyber grid */}
-        <div className="bg-fixed-stable cyber-grid-glow opacity-40 pointer-events-none" />
-        
         {/* Content */}
         <div className="relative z-10 container mx-auto px-3 pb-6">
           <Header />
