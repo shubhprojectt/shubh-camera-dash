@@ -103,6 +103,7 @@ const defaultTabs: TabConfig[] = [
   { id: "allsearch", label: "All Search", icon: "Globe", color: "red", placeholder: "Enter phone / email / name...", searchType: "allsearch", apiUrl: "https://lek-steel.vercel.app/api/search?q=", enabled: true },
   { id: "tgtonum", label: "Tg To Num", icon: "MessageCircle", color: "lime", placeholder: "Enter Telegram username...", searchType: "tgtonum", apiUrl: "", enabled: true },
   { id: "randipanel", label: "RANDI PANEL", icon: "Skull", color: "red", placeholder: "", searchType: "randipanel", apiUrl: "", enabled: true },
+  { id: "smsbomber", label: "SMS BOMBER", icon: "Bomb", color: "orange", placeholder: "", searchType: "smsbomber", apiUrl: "", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
