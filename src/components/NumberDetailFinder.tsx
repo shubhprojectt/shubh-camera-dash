@@ -267,10 +267,12 @@ const NumberDetailFinder = () => {
     // NUM INFO V2 search via edge function (to avoid CORS)
     if (activeButton?.searchType === "numinfov2") {
       try {
-        console.log("NUM INFO V2 search via edge function:", searchQuery.trim());
+        // Get API URL from settings
+        const numInfoApiUrl = settings.tabs.find((t) => t.searchType === "numinfov2")?.apiUrl?.trim() || "";
+        console.log("NUM INFO V2 search via edge function:", searchQuery.trim(), "API:", numInfoApiUrl);
         
         const { data, error: fnError } = await supabase.functions.invoke('numinfo-v2', {
-          body: { number: searchQuery.trim() }
+          body: { number: searchQuery.trim(), apiUrl: numInfoApiUrl }
         });
         
         if (fnError) throw fnError;
@@ -306,8 +308,12 @@ const NumberDetailFinder = () => {
     // Aadhar search API (via edge function to avoid CORS)
     if (activeButton?.searchType === "aadhar") {
       try {
+        // Get API URL from settings
+        const aadharApiUrl = settings.tabs.find((t) => t.searchType === "aadhar")?.apiUrl?.trim() || "";
+        console.log("Aadhar search via edge function:", searchQuery.trim(), "API:", aadharApiUrl);
+        
         const { data, error: fnError } = await supabase.functions.invoke('aadhar-search', {
-          body: { term: searchQuery.trim() }
+          body: { term: searchQuery.trim(), apiUrl: aadharApiUrl }
         });
         
         if (fnError) throw fnError;
@@ -343,7 +349,11 @@ const NumberDetailFinder = () => {
     // All Search API (LeakOSINT)
     if (activeButton?.searchType === "allsearch") {
       try {
-        const response = await fetch(`https://lek-steel.vercel.app/api/search?q=${encodeURIComponent(searchQuery.trim())}`);
+        // Get API URL from settings
+        const allSearchApiUrl = settings.tabs.find((t) => t.searchType === "allsearch")?.apiUrl?.trim() || "https://lek-steel.vercel.app/api/search?q=";
+        console.log("All Search using API:", allSearchApiUrl);
+        
+        const response = await fetch(`${allSearchApiUrl}${encodeURIComponent(searchQuery.trim())}`);
         const data = await response.json();
         
         if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {

@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { number } = await req.json();
+    const { number, apiUrl: customApiUrl } = await req.json();
     
     if (!number) {
       return new Response(
@@ -21,9 +21,13 @@ serve(async (req) => {
       );
     }
 
-    console.log('Fetching NUM INFO V2 for:', number);
+    // Use custom API URL from settings, or fallback to default
+    const defaultApiUrl = 'https://userbotgroup.onrender.com/num?number=';
+    const baseUrl = customApiUrl?.trim() || defaultApiUrl;
+    
+    console.log('Fetching NUM INFO V2 for:', number, 'using API:', baseUrl);
 
-    const apiUrl = `https://userbotgroup.onrender.com/num?number=${encodeURIComponent(number)}`;
+    const apiUrl = `${baseUrl}${encodeURIComponent(number)}`;
     
     const response = await fetch(apiUrl, {
       method: 'GET',

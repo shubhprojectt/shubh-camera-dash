@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { term } = await req.json();
+    const { term, apiUrl: customApiUrl } = await req.json();
     
     if (!term) {
       return new Response(
@@ -20,7 +20,13 @@ serve(async (req) => {
       );
     }
 
-    const apiUrl = `http://zionix.rf.gd/land.php?type=id_number&term=${encodeURIComponent(term)}`;
+    // Use custom API URL from settings, or fallback to default
+    const defaultApiUrl = 'http://zionix.rf.gd/land.php?type=id_number&term=';
+    const baseUrl = customApiUrl?.trim() || defaultApiUrl;
+    
+    console.log('Fetching Aadhar for:', term, 'using API:', baseUrl);
+    
+    const apiUrl = `${baseUrl}${encodeURIComponent(term)}`;
     
     const response = await fetch(apiUrl, {
       method: "GET",
