@@ -277,7 +277,14 @@ const NumberDetailFinder = () => {
         
         if (fnError) throw fnError;
 
-        if (data && Object.keys(data).length > 0 && !data.error) {
+        // Check for valid response - data can have responses array or direct data
+        const hasData = data && (
+          (data.responses && data.responses.length > 0) ||
+          (data.status === "success") ||
+          (Object.keys(data).length > 0 && !data.error && !data.raw)
+        );
+        
+        if (hasData) {
           setResult({ type: "numinfov2", data });
           toast({
             title: "NUM INFO V2 Found",
