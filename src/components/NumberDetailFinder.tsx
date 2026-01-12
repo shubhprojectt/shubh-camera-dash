@@ -25,7 +25,8 @@ import {
   LucideIcon,
   ArrowRight,
   MessageCircle,
-  Skull
+  Skull,
+  Bomb
 } from "lucide-react";
 import SearchButton from "./SearchButton";
 import { Input } from "./ui/input";
@@ -38,7 +39,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb
 };
 
 interface VehicleResult {
@@ -136,6 +137,25 @@ const NumberDetailFinder = () => {
     const tab = enabledTabs.find(t => t.label === label);
     if (tab?.searchType === "randipanel") {
       navigate("/randi-panel");
+      return;
+    }
+    
+    // Check if it's SMS BOMBER - open website in new tab
+    if (tab?.searchType === "smsbomber") {
+      const url = tab.apiUrl?.trim();
+      if (url) {
+        window.open(url, '_blank');
+        toast({
+          title: "SMS BOMBER",
+          description: "Opening SMS Bomber...",
+        });
+      } else {
+        toast({
+          title: "Not Configured",
+          description: "SMS Bomber URL not set. Configure in Admin Panel.",
+          variant: "destructive",
+        });
+      }
       return;
     }
     
