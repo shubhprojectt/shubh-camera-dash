@@ -211,7 +211,7 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Phone search API
+    // Phone search API (via backend function to avoid CORS)
     if (activeButton?.searchType === "phone") {
       try {
         const defaultApiUrl = "https://anmolzz.teamxferry.workers.dev/?mobile=";
@@ -222,31 +222,31 @@ const NumberDetailFinder = () => {
           settings.tabs.find((t) => t.searchType === "phone")?.apiUrl?.trim() ||
           defaultApiUrl;
 
-        console.log("Phone search using API:", apiUrl);
+        console.log("Phone search via edge function:", searchQuery.trim(), "API:", apiUrl);
 
-        const response = await fetch(`${apiUrl}${encodeURIComponent(searchQuery.trim())}`);
+        const { data, error: fnError } = await supabase.functions.invoke("numinfo-v2", {
+          body: { number: searchQuery.trim(), apiUrl },
+        });
 
-        // Try to get response as text first
-        const text = await response.text();
-        let data;
-        try {
-          data = JSON.parse(text);
-        } catch {
-          // If not JSON, use raw text
-          data = { raw: text };
-        }
+        if (fnError) throw fnError;
 
-        if (data && (Object.keys(data).length > 0 || text.trim())) {
-          setResult({ type: "phone", data, rawText: text, usedApiUrl: apiUrl });
+        const hasData =
+          data &&
+          (data.responses?.length > 0 ||
+            data.status === "success" ||
+            (Object.keys(data).length > 0 && !data.error && !data.raw));
+
+        if (hasData) {
+          setResult({ type: "phone", data, usedApiUrl: apiUrl });
           toast({
             title: "Phone Found",
             description: `Results found for: ${searchQuery}`,
           });
         } else {
-          setError("No information found for this number");
+          setError(data?.error || "No information found for this number");
           toast({
             title: "Not Found",
-            description: "No information found",
+            description: data?.error || "No information found",
             variant: "destructive",
           });
         }
