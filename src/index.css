@@ -929,3 +929,65 @@
   box-shadow: 0 0 10px hsl(var(--neon-green));
   animation: glow-breathe 1.5s ease-in-out infinite;
 }
+
+/* Hacker Loader Animations */
+@keyframes scan-line {
+  0% { top: -10%; }
+  100% { top: 110%; }
+}
+
+.animate-scan-line {
+  animation: scan-line 2s linear infinite;
+}
+
+@keyframes matrix-fall {
+  0% { 
+    opacity: 1;
+    transform: translateY(-20px);
+  }
+  100% { 
+    opacity: 0;
+    transform: translateY(100px);
+  }
+}
+
+.animate-matrix-fall {
+  animation: matrix-fall 2s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 4s linear infinite;
+}
+
+@keyframes progress-slide {
+  0% { 
+    width: 0%;
+    margin-left: 0;
+  }
+  50% { 
+    width: 80%;
+    margin-left: 10%;
+  }
+  100% { 
+    width: 0%;
+    margin-left: 100%;
+  }
+}
+
+.animate-progress-slide {
+  animation: progress-slide 2s ease-in-out infinite;
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-cursor-blink {
+  animation: cursor-blink 0.8s step-end infinite;
+}

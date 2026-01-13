@@ -34,6 +34,7 @@ import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
+import HackerLoader from "./HackerLoader";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -1098,15 +1099,7 @@ const NumberDetailFinder = () => {
       {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
         <div key={`results-${activeTab}`} className="animate-tab-slide-in">
           {/* Loading */}
-          {loading && (
-            <div className="text-center py-8 border-2 border-neon-cyan/30 rounded-2xl bg-card/50 animate-pulse">
-              <div className="relative inline-block">
-                <Loader2 className="w-10 h-10 animate-spin text-neon-cyan" />
-                <div className="absolute inset-0 w-10 h-10 rounded-full bg-neon-cyan/20 animate-ping" />
-              </div>
-              <p className="text-muted-foreground mt-3 text-sm">Searching database...</p>
-            </div>
-          )}
+          {loading && <HackerLoader />}
 
           {/* Error */}
           {error && !loading && (
