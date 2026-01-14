@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2025-01-09
--- Version: 2.0
+-- Last Updated: 2026-01-14
+-- Version: 2.1
 -- =====================================================
 
 -- =====================================================
