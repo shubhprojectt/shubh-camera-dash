@@ -2,7 +2,7 @@ import Header from "@/components/Header";
 import NumberDetailFinder from "@/components/NumberDetailFinder";
 import PasswordProtection from "@/components/PasswordProtection";
 import { useSettings } from "@/contexts/SettingsContext";
-import { Sparkles, Zap, Database, Shield } from "lucide-react";
+import { Database, Zap, Sparkles, Shield, Radio } from "lucide-react";
 
 const Index = () => {
   const { settings } = useSettings();
@@ -30,42 +30,58 @@ const Index = () => {
           }}
         />
         
-        <div className="bg-fixed-stable bg-gradient-to-b from-neon-purple/5 via-transparent to-neon-cyan/5 pointer-events-none" />
-        
         {/* Content */}
         <div className="relative z-10 container mx-auto px-3 pb-6">
           <Header />
           
-          {/* Hero Section */}
-          <div className="max-w-4xl mx-auto mb-6 text-center">
-            <h1 className="text-3xl md:text-5xl font-display font-black tracking-wider mb-2">
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-neon-green to-neon-pink">
-                SHUBH OSINT
-              </span>
-            </h1>
-            <p className="text-muted-foreground text-sm md:text-base font-mono">
-              Advanced Intelligence Gathering System
-            </p>
+          {/* Status Badges */}
+          <div className="flex justify-center gap-3 mb-4">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neon-green/20 border border-neon-green/50">
+              <div className="w-2 h-2 rounded-full bg-neon-green animate-pulse" />
+              <span className="text-[10px] font-mono text-neon-green font-bold tracking-wider">LIVE</span>
+            </div>
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neon-cyan/20 border border-neon-cyan/50">
+              <Shield className="w-3 h-3 text-neon-cyan" />
+              <span className="text-[10px] font-mono text-neon-cyan font-bold tracking-wider">SECURE</span>
+            </div>
           </div>
           
-          {/* Stats Row */}
-          <div className="max-w-3xl mx-auto mb-6">
-            <div className="flex flex-wrap justify-center gap-4 text-xs font-mono">
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/50 border border-neon-green/30">
+          {/* Hero Section */}
+          <div className="max-w-4xl mx-auto mb-6 text-center">
+            {/* Main Title */}
+            <h1 className="text-4xl md:text-6xl font-display font-black tracking-wider mb-2">
+              <span className="text-neon-green drop-shadow-[0_0_10px_hsl(var(--neon-green))]">SHUBH</span>
+              {" "}
+              <span className="text-neon-pink drop-shadow-[0_0_10px_hsl(var(--neon-pink))]">OSINT</span>
+            </h1>
+            
+            {/* Subtitle */}
+            <p className="text-muted-foreground/70 text-xs md:text-sm font-mono tracking-[0.3em] mb-4">
+              INTELLIGENCE • SEARCH • SECURITY
+            </p>
+            
+            {/* Decorative Divider */}
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="w-16 h-[1px] bg-gradient-to-r from-transparent to-neon-cyan/60" />
+              <div className="w-2 h-2 rotate-45 border border-neon-cyan/60" />
+              <div className="w-8 h-[1px] bg-neon-cyan/60" />
+              <div className="w-2 h-2 rotate-45 border border-neon-cyan/60" />
+              <div className="w-16 h-[1px] bg-gradient-to-l from-transparent to-neon-cyan/60" />
+            </div>
+            
+            {/* Stats Badges */}
+            <div className="flex flex-wrap justify-center gap-3">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 border border-neon-green/40 backdrop-blur-sm">
                 <Database className="w-4 h-4 text-neon-green" />
-                <span className="text-neon-green">1B+ Records</span>
+                <span className="text-xs font-mono text-neon-green font-bold">1B+ Records</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/50 border border-neon-cyan/30">
-                <Zap className="w-4 h-4 text-neon-cyan" />
-                <span className="text-neon-cyan">&lt;1s Response</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 border border-neon-yellow/40 backdrop-blur-sm">
+                <Zap className="w-4 h-4 text-neon-yellow" />
+                <span className="text-xs font-mono text-neon-yellow font-bold">Fast</span>
               </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/50 border border-neon-pink/30">
-                <Shield className="w-4 h-4 text-neon-pink" />
-                <span className="text-neon-pink">Encrypted</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-card/50 border border-neon-purple/30">
-                <Sparkles className="w-4 h-4 text-neon-purple" />
-                <span className="text-neon-purple">AI Powered</span>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-card/60 border border-neon-cyan/40 backdrop-blur-sm">
+                <Sparkles className="w-4 h-4 text-neon-cyan" />
+                <span className="text-xs font-mono text-neon-cyan font-bold">AI</span>
               </div>
             </div>
           </div>
