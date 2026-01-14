@@ -927,13 +927,13 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-1.5">
       {/* Main Card */}
       <div className="relative">
-        <div className="relative rounded-xl p-2 overflow-hidden border border-neon-green/30 bg-card/30">
+        <div className="relative rounded-lg p-1.5 overflow-hidden border border-neon-green/30 bg-card/30">
           
           {/* Button Grid - 4 columns for compact view */}
-          <div className="relative grid grid-cols-4 gap-1.5">
+          <div className="relative grid grid-cols-4 gap-1">
             {enabledTabs.map((tab, index) => {
               const IconComponent = iconMap[tab.icon] || Sparkles;
               return (
@@ -956,11 +956,11 @@ const NumberDetailFinder = () => {
             {/* Next Page Button */}
             <Link
               to="/page2"
-              className="animate-bounce-in flex flex-col items-center justify-center gap-1 p-2 rounded-xl border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[56px]"
+              className="animate-bounce-in flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-lg border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[44px]"
               style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
             >
-              <ArrowRight className="w-4 h-4 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
-              <span className="text-[8px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
+              <ArrowRight className="w-3.5 h-3.5 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
+              <span className="text-[7px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
             </Link>
           </div>
           
