@@ -38,6 +38,7 @@ import HackerLoader from "./HackerLoader";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb
@@ -948,6 +949,7 @@ const NumberDetailFinder = () => {
                     color={tab.color as any}
                     active={tab.label === activeTab}
                     onClick={() => handleTabClick(tab.label)}
+                    size={settings.tabSize}
                   />
                 </div>
               );
@@ -956,11 +958,26 @@ const NumberDetailFinder = () => {
             {/* Next Page Button */}
             <Link
               to="/page2"
-              className="animate-bounce-in flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-lg border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group min-h-[44px]"
+              className={cn(
+                "animate-bounce-in flex flex-col items-center justify-center rounded-lg border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group",
+                settings.tabSize === "small" && "gap-0.5 p-1.5 min-h-[44px]",
+                settings.tabSize === "medium" && "gap-1 p-2 min-h-[56px]",
+                settings.tabSize === "large" && "gap-1.5 p-2.5 min-h-[68px]"
+              )}
               style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
             >
-              <ArrowRight className="w-3.5 h-3.5 text-neon-yellow group-hover:translate-x-0.5 transition-transform" />
-              <span className="text-[7px] font-bold text-neon-yellow uppercase tracking-wide">More</span>
+              <ArrowRight className={cn(
+                "text-neon-yellow group-hover:translate-x-0.5 transition-transform",
+                settings.tabSize === "small" && "w-3.5 h-3.5",
+                settings.tabSize === "medium" && "w-4 h-4",
+                settings.tabSize === "large" && "w-5 h-5"
+              )} />
+              <span className={cn(
+                "font-bold text-neon-yellow uppercase tracking-wide",
+                settings.tabSize === "small" && "text-[7px]",
+                settings.tabSize === "medium" && "text-[8px]",
+                settings.tabSize === "large" && "text-[9px]"
+              )}>More</span>
             </Link>
           </div>
           

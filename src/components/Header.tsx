@@ -2,6 +2,7 @@ import { Wifi, Settings, Shield, Activity, Signal } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
 import CreditDisplay from "./CreditDisplay";
+import AdminSettings from "./AdminSettings";
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
@@ -57,7 +58,10 @@ const Header = () => {
         <CreditDisplay />
       </div>
 
-      
+      {/* Right side - Settings button */}
+      <div className="absolute top-2 right-2">
+        <AdminSettings />
+      </div>
       {/* Compact Logo Container */}
       <div className="relative inline-block mb-2">
         {/* Main logo container */}

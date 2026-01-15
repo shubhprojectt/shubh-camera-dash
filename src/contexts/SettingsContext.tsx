@@ -70,6 +70,8 @@ export interface AppSettings {
   page2MusicUrl: string;
   // Main page background music URL
   mainPageMusicUrl: string;
+  // Tab section size (small, medium, large)
+  tabSize: "small" | "medium" | "large";
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -155,6 +157,8 @@ const defaultSettings: AppSettings = {
   page2MusicUrl: "",
   // Main page background music
   mainPageMusicUrl: "/audio/background-music.mp3",
+  // Tab size
+  tabSize: "small",
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
