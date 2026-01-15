@@ -7,6 +7,7 @@ interface SearchButtonProps {
   color: "green" | "pink" | "orange" | "cyan" | "red" | "purple" | "yellow" | "blue" | "white" | "teal" | "lime" | "emerald";
   active?: boolean;
   onClick?: () => void;
+  size?: "small" | "medium" | "large";
 }
 
 const colorClasses = {
@@ -144,15 +145,35 @@ const colorClasses = {
   },
 };
 
-const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButtonProps) => {
+const sizeClasses = {
+  small: {
+    container: "gap-0.5 p-1.5 min-h-[44px]",
+    icon: "w-3.5 h-3.5",
+    label: "text-[7px]",
+  },
+  medium: {
+    container: "gap-1 p-2 min-h-[56px]",
+    icon: "w-4 h-4",
+    label: "text-[8px]",
+  },
+  large: {
+    container: "gap-1.5 p-2.5 min-h-[68px]",
+    icon: "w-5 h-5",
+    label: "text-[9px]",
+  },
+};
+
+const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small" }: SearchButtonProps) => {
   const colors = colorClasses[color];
+  const sizeConfig = sizeClasses[size];
   
   return (
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center gap-0.5 p-1.5 rounded-lg border transition-all duration-300",
-        "active:scale-90 min-h-[44px]",
+        "group relative flex flex-col items-center justify-center rounded-lg border transition-all duration-300",
+        "active:scale-90",
+        sizeConfig.container,
         colors.border,
         colors.text,
         colors.hoverGlow,
@@ -175,13 +196,15 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick }: SearchButto
       
       {/* Icon */}
       <Icon className={cn(
-        "w-3.5 h-3.5 transition-all duration-200",
+        sizeConfig.icon,
+        "transition-all duration-200",
         active ? colors.iconGlow : "group-hover:scale-110"
       )} />
       
       {/* Label */}
       <span className={cn(
-        "text-[7px] font-bold tracking-wide uppercase text-center leading-tight",
+        sizeConfig.label,
+        "font-bold tracking-wide uppercase text-center leading-tight",
         active && "drop-shadow-[0_0_6px_currentColor]"
       )}>
         {label}
