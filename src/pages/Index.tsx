@@ -2,6 +2,7 @@ import Header from "@/components/Header";
 import NumberDetailFinder from "@/components/NumberDetailFinder";
 import PasswordProtection from "@/components/PasswordProtection";
 import { useSettings } from "@/contexts/SettingsContext";
+import { Database, Zap, Sparkles, Shield, Radio } from "lucide-react";
 
 const Index = () => {
   const { settings } = useSettings();
@@ -9,55 +10,58 @@ const Index = () => {
   return (
     <PasswordProtection>
       <div className="min-h-screen bg-background relative overflow-x-hidden">
-        {/* Animated gradient background */}
-        <div className="fixed inset-0 pointer-events-none">
-          {/* Custom background image */}
-          {settings.backgroundImage ? (
-            <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-              style={{ 
-                backgroundImage: `url(${settings.backgroundImage})`,
-                opacity: (100 - parseInt(settings.backgroundOpacity || "30")) / 100
-              }}
-            />
-          ) : (
-            <>
-              {/* Gradient orbs */}
-              <div className="absolute top-0 left-0 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[150px] -translate-x-1/2 -translate-y-1/2" />
-              <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/10 rounded-full blur-[120px] translate-x-1/3 translate-y-1/3" />
-              <div className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-secondary/8 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2" />
-            </>
-          )}
-          
-          {/* Dark overlay */}
+        {/* Custom background image - completely fixed */}
+        {settings.backgroundImage ? (
           <div 
-            className="absolute inset-0 bg-background"
+            className="bg-fixed-stable bg-cover bg-center bg-no-repeat pointer-events-none"
             style={{ 
-              opacity: parseInt(settings.backgroundOpacity || "30") / 100
+              backgroundImage: `url(${settings.backgroundImage})`
             }}
           />
-          
-          {/* Subtle grid pattern */}
-          <div 
-            className="absolute inset-0 opacity-[0.015]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-            }}
-          />
-        </div>
+        ) : (
+          <div className="bg-fixed-stable bg-background pointer-events-none" />
+        )}
+        
+        {/* Dark overlay for readability */}
+        <div 
+          className="bg-fixed-stable bg-background pointer-events-none"
+          style={{ 
+            opacity: (parseInt(settings.backgroundOpacity || "30") / 100)
+          }}
+        />
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-4 pb-6 pt-4">
+        <div className="relative z-10 container mx-auto px-3 pb-4 pt-2">
           <Header />
           
-          <main className="max-w-3xl mx-auto mt-4">
+          {/* Stats Badges - Compact */}
+          <div className="flex justify-center gap-2 mb-3">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neon-green/20 border border-neon-green/50">
+              <div className="w-1.5 h-1.5 rounded-full bg-neon-green animate-pulse" />
+              <span className="text-[8px] font-mono text-neon-green font-bold">LIVE</span>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neon-cyan/20 border border-neon-cyan/50">
+              <Shield className="w-2.5 h-2.5 text-neon-cyan" />
+              <span className="text-[8px] font-mono text-neon-cyan font-bold">SECURE</span>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-card/60 border border-neon-green/40">
+              <Database className="w-2.5 h-2.5 text-neon-green" />
+              <span className="text-[8px] font-mono text-neon-green font-bold">1B+</span>
+            </div>
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-card/60 border border-neon-yellow/40">
+              <Zap className="w-2.5 h-2.5 text-neon-yellow" />
+              <span className="text-[8px] font-mono text-neon-yellow font-bold">Fast</span>
+            </div>
+          </div>
+          
+          <main className="max-w-3xl mx-auto">
             <NumberDetailFinder />
           </main>
           
-          {/* Footer */}
-          <div className="max-w-3xl mx-auto mt-8 text-center">
-            <p className="text-xs text-muted-foreground/50">
-              ⚠ For educational purposes only • Use responsibly
+          {/* Footer text */}
+          <div className="max-w-3xl mx-auto mt-6 text-center">
+            <p className="text-[10px] text-muted-foreground/50 font-mono">
+              ⚠ FOR EDUCATIONAL PURPOSES ONLY • USE RESPONSIBLY
             </p>
           </div>
         </div>
