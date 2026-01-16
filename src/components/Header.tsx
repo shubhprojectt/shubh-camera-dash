@@ -1,4 +1,4 @@
-import { Wifi, Settings, Shield, Activity, Signal } from "lucide-react";
+import { Settings, Sparkles, Zap } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSettings } from "@/contexts/SettingsContext";
 import CreditDisplay from "./CreditDisplay";
@@ -6,101 +6,66 @@ import AdminSettings from "./AdminSettings";
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
 
-const colorClasses: Record<string, { text: string; glow: string; border: string }> = {
-  green: { text: "text-neon-green", glow: "text-glow-green", border: "border-neon-green" },
-  pink: { text: "text-neon-pink", glow: "text-glow-pink", border: "border-neon-pink" },
-  orange: { text: "text-neon-orange", glow: "", border: "border-neon-orange" },
-  cyan: { text: "text-neon-cyan", glow: "text-glow-cyan", border: "border-neon-cyan" },
-  red: { text: "text-neon-red", glow: "", border: "border-neon-red" },
-  purple: { text: "text-neon-purple", glow: "text-glow-purple", border: "border-neon-purple" },
-  yellow: { text: "text-neon-yellow", glow: "", border: "border-neon-yellow" },
-};
-
 const Header = () => {
   const { settings } = useSettings();
   
   // Get dynamic icon
   const IconComponent = (Icons[settings.headerIcon as keyof typeof Icons] as LucideIcon) || Icons.Zap;
 
-  const getStyleClasses = () => {
-    switch (settings.headerStyle) {
-      case "uppercase": return "uppercase";
-      case "lowercase": return "lowercase";
-      case "capitalize": return "capitalize";
-      case "italic": return "italic";
-      case "bold": return "font-black";
-      case "glow": return "animate-pulse-glow";
-      case "flicker": return "animate-neon-flicker";
-      default: return "";
-    }
-  };
-
-  const color1 = colorClasses[settings.headerColor1] || colorClasses.green;
-  const color2 = colorClasses[settings.headerColor2] || colorClasses.pink;
-
   return (
-    <header className="relative py-3 text-center">
-      {/* Animated top bar */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60" />
+    <header className="relative py-6 text-center">
+      {/* Gradient orb background effect */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-gradient-to-br from-primary/20 via-accent/10 to-secondary/20 rounded-full blur-[100px] pointer-events-none" />
       
-      {/* Left side - Status indicators & Credit Display */}
-      <div className="absolute top-2 left-2 flex flex-col gap-1.5">
-        <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30">
-            <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
-            <span className="text-[8px] font-bold text-neon-green">LIVE</span>
-          </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
-            <Shield className="w-2 h-2 text-neon-cyan" />
-            <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
-          </div>
-        </div>
+      {/* Left side - Credit Display */}
+      <div className="absolute top-3 left-3 flex flex-col gap-2">
         <CreditDisplay />
       </div>
 
       {/* Right side - Settings button */}
-      <div className="absolute top-2 right-2">
+      <div className="absolute top-3 right-3">
         <AdminSettings />
       </div>
-      {/* Compact Logo Container */}
-      <div className="relative inline-block mb-2">
-        {/* Main logo container */}
-        <div className={`relative w-14 h-14 rounded-full border-2 ${color1.border} bg-background/80 overflow-hidden flex items-center justify-center neon-border-animated`}>
-          {settings.headerCustomLogo ? (
-            <img 
-              src={settings.headerCustomLogo} 
-              alt="Logo" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <IconComponent className={`w-7 h-7 ${color1.text} animate-neon-flicker`} />
-          )}
+
+      {/* Logo Container */}
+      <div className="relative inline-block mb-4">
+        <div className="relative w-20 h-20 rounded-2xl bg-gradient-to-br from-primary via-accent to-secondary p-[2px] shadow-2xl shadow-primary/25">
+          <div className="w-full h-full rounded-2xl bg-card flex items-center justify-center overflow-hidden">
+            {settings.headerCustomLogo ? (
+              <img 
+                src={settings.headerCustomLogo} 
+                alt="Logo" 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <IconComponent className="w-10 h-10 text-primary" />
+            )}
+          </div>
         </div>
+        {/* Glow effect */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary via-accent to-secondary opacity-50 blur-xl -z-10" />
       </div>
       
-      {/* Compact Title */}
+      {/* Title */}
       <div className="relative">
-        <h1 
-          className={`text-2xl md:text-3xl font-black tracking-wider ${getStyleClasses()}`}
-          style={{ fontFamily: settings.headerFont }}
-        >
-          <span className={`${color1.text} ${color1.glow}`}>{settings.headerName1}</span>
-          <span className={`${color2.text} ${color2.glow} ml-2`}>{settings.headerName2}</span>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+          <span className="bg-gradient-to-r from-primary via-accent to-secondary bg-clip-text text-transparent">
+            {settings.headerName1}
+          </span>
+          <span className="text-foreground ml-2">{settings.headerName2}</span>
         </h1>
         
         {/* Tagline */}
-        <p className="mt-1 text-[9px] text-muted-foreground tracking-[0.2em] uppercase font-mono">
+        <p className="mt-2 text-sm text-muted-foreground tracking-wide">
           Intelligence • Search • Security
         </p>
       </div>
       
-      {/* Compact decorative line */}
-      <div className="mt-3 flex items-center justify-center gap-2">
-        <div className="w-12 h-px bg-gradient-to-r from-transparent to-neon-green" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-16 h-px bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-cyan" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-12 h-px bg-gradient-to-l from-transparent to-neon-pink" />
+      {/* Decorative line */}
+      <div className="mt-5 flex items-center justify-center gap-3">
+        <div className="w-16 h-[2px] bg-gradient-to-r from-transparent to-primary/50 rounded-full" />
+        <Sparkles className="w-4 h-4 text-primary/60" />
+        <div className="w-16 h-[2px] bg-gradient-to-l from-transparent to-accent/50 rounded-full" />
       </div>
     </header>
   );

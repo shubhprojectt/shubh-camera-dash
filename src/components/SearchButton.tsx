@@ -12,154 +12,118 @@ interface SearchButtonProps {
 
 const colorClasses = {
   green: {
-    border: "border-neon-green",
+    gradient: "from-neon-green/15 to-neon-green/5",
+    border: "border-neon-green/25 hover:border-neon-green/50",
     text: "text-neon-green",
-    bg: "bg-neon-green/10",
-    activeBg: "bg-neon-green/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-green)/0.7),0_0_50px_hsl(var(--neon-green)/0.4),inset_0_0_20px_hsl(var(--neon-green)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-green))]",
-    bottomGlow: "bg-neon-green shadow-[0_0_15px_hsl(var(--neon-green)),0_0_30px_hsl(var(--neon-green)/0.5)]",
-    activeAnimation: "animate-glow-breathe",
+    activeBg: "from-neon-green/25 to-neon-green/10",
+    activeBorder: "border-neon-green/60",
+    shadow: "shadow-neon-green/20",
   },
   pink: {
-    border: "border-neon-pink",
+    gradient: "from-neon-pink/15 to-neon-pink/5",
+    border: "border-neon-pink/25 hover:border-neon-pink/50",
     text: "text-neon-pink",
-    bg: "bg-neon-pink/10",
-    activeBg: "bg-neon-pink/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-pink)/0.7),0_0_50px_hsl(var(--neon-pink)/0.4),inset_0_0_20px_hsl(var(--neon-pink)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-pink))]",
-    bottomGlow: "bg-neon-pink shadow-[0_0_15px_hsl(var(--neon-pink)),0_0_30px_hsl(var(--neon-pink)/0.5)]",
-    activeAnimation: "animate-heartbeat",
+    activeBg: "from-neon-pink/25 to-neon-pink/10",
+    activeBorder: "border-neon-pink/60",
+    shadow: "shadow-neon-pink/20",
   },
   orange: {
-    border: "border-neon-orange",
+    gradient: "from-neon-orange/15 to-neon-orange/5",
+    border: "border-neon-orange/25 hover:border-neon-orange/50",
     text: "text-neon-orange",
-    bg: "bg-neon-orange/10",
-    activeBg: "bg-neon-orange/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-orange)/0.7),0_0_50px_hsl(var(--neon-orange)/0.4),inset_0_0_20px_hsl(var(--neon-orange)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-orange))]",
-    bottomGlow: "bg-neon-orange shadow-[0_0_15px_hsl(var(--neon-orange)),0_0_30px_hsl(var(--neon-orange)/0.5)]",
-    activeAnimation: "animate-wiggle",
+    activeBg: "from-neon-orange/25 to-neon-orange/10",
+    activeBorder: "border-neon-orange/60",
+    shadow: "shadow-neon-orange/20",
   },
   cyan: {
-    border: "border-neon-cyan",
+    gradient: "from-neon-cyan/15 to-neon-cyan/5",
+    border: "border-neon-cyan/25 hover:border-neon-cyan/50",
     text: "text-neon-cyan",
-    bg: "bg-neon-cyan/10",
-    activeBg: "bg-neon-cyan/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-cyan)/0.7),0_0_50px_hsl(var(--neon-cyan)/0.4),inset_0_0_20px_hsl(var(--neon-cyan)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]",
-    bottomGlow: "bg-neon-cyan shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-cyan)/0.5)]",
-    activeAnimation: "animate-radar-sweep",
+    activeBg: "from-neon-cyan/25 to-neon-cyan/10",
+    activeBorder: "border-neon-cyan/60",
+    shadow: "shadow-neon-cyan/20",
   },
   red: {
-    border: "border-neon-red",
+    gradient: "from-neon-red/15 to-neon-red/5",
+    border: "border-neon-red/25 hover:border-neon-red/50",
     text: "text-neon-red",
-    bg: "bg-neon-red/10",
-    activeBg: "bg-neon-red/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-red)/0.7),0_0_50px_hsl(var(--neon-red)/0.4),inset_0_0_20px_hsl(var(--neon-red)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-red))]",
-    bottomGlow: "bg-neon-red shadow-[0_0_15px_hsl(var(--neon-red)),0_0_30px_hsl(var(--neon-red)/0.5)]",
-    activeAnimation: "animate-neon-flicker-fast",
+    activeBg: "from-neon-red/25 to-neon-red/10",
+    activeBorder: "border-neon-red/60",
+    shadow: "shadow-neon-red/20",
   },
   purple: {
-    border: "border-neon-purple",
-    text: "text-neon-purple",
-    bg: "bg-neon-purple/10",
-    activeBg: "bg-neon-purple/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-purple)/0.7),0_0_50px_hsl(var(--neon-purple)/0.4),inset_0_0_20px_hsl(var(--neon-purple)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-purple))]",
-    bottomGlow: "bg-neon-purple shadow-[0_0_15px_hsl(var(--neon-purple)),0_0_30px_hsl(var(--neon-purple)/0.5)]",
-    activeAnimation: "animate-shimmer-rotate",
+    gradient: "from-primary/15 to-primary/5",
+    border: "border-primary/25 hover:border-primary/50",
+    text: "text-primary",
+    activeBg: "from-primary/25 to-primary/10",
+    activeBorder: "border-primary/60",
+    shadow: "shadow-primary/20",
   },
   yellow: {
-    border: "border-neon-yellow",
+    gradient: "from-neon-yellow/15 to-neon-yellow/5",
+    border: "border-neon-yellow/25 hover:border-neon-yellow/50",
     text: "text-neon-yellow",
-    bg: "bg-neon-yellow/10",
-    activeBg: "bg-neon-yellow/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-yellow)/0.7),0_0_50px_hsl(var(--neon-yellow)/0.4),inset_0_0_20px_hsl(var(--neon-yellow)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-yellow))]",
-    bottomGlow: "bg-neon-yellow shadow-[0_0_15px_hsl(var(--neon-yellow)),0_0_30px_hsl(var(--neon-yellow)/0.5)]",
-    activeAnimation: "animate-electric-zap",
+    activeBg: "from-neon-yellow/25 to-neon-yellow/10",
+    activeBorder: "border-neon-yellow/60",
+    shadow: "shadow-neon-yellow/20",
   },
   blue: {
-    border: "border-neon-blue",
-    text: "text-neon-blue",
-    bg: "bg-neon-blue/10",
-    activeBg: "bg-neon-blue/25",
-    glow: "shadow-[0_0_25px_hsl(var(--neon-blue)/0.7),0_0_50px_hsl(var(--neon-blue)/0.4),inset_0_0_20px_hsl(var(--neon-blue)/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(var(--neon-blue)/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-blue))]",
-    bottomGlow: "bg-neon-blue shadow-[0_0_15px_hsl(var(--neon-blue)),0_0_30px_hsl(var(--neon-blue)/0.5)]",
-    activeAnimation: "animate-float-gentle",
+    gradient: "from-secondary/15 to-secondary/5",
+    border: "border-secondary/25 hover:border-secondary/50",
+    text: "text-secondary",
+    activeBg: "from-secondary/25 to-secondary/10",
+    activeBorder: "border-secondary/60",
+    shadow: "shadow-secondary/20",
   },
   white: {
-    border: "border-white",
+    gradient: "from-white/10 to-white/5",
+    border: "border-white/20 hover:border-white/40",
     text: "text-white",
-    bg: "bg-white/10",
-    activeBg: "bg-white/25",
-    glow: "shadow-[0_0_25px_hsl(0_0%_100%/0.7),0_0_50px_hsl(0_0%_100%/0.4),inset_0_0_20px_hsl(0_0%_100%/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(0_0%_100%/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(0_0%_100%)]",
-    bottomGlow: "bg-white shadow-[0_0_15px_hsl(0_0%_100%),0_0_30px_hsl(0_0%_100%/0.5)]",
-    activeAnimation: "animate-flash-blink",
+    activeBg: "from-white/20 to-white/10",
+    activeBorder: "border-white/50",
+    shadow: "shadow-white/15",
   },
   teal: {
-    border: "border-teal-400",
+    gradient: "from-teal-400/15 to-teal-400/5",
+    border: "border-teal-400/25 hover:border-teal-400/50",
     text: "text-teal-400",
-    bg: "bg-teal-400/10",
-    activeBg: "bg-teal-400/25",
-    glow: "shadow-[0_0_25px_hsl(171_77%_64%/0.7),0_0_50px_hsl(171_77%_64%/0.4),inset_0_0_20px_hsl(171_77%_64%/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(171_77%_64%/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(171_77%_64%)]",
-    bottomGlow: "bg-teal-400 shadow-[0_0_15px_hsl(171_77%_64%),0_0_30px_hsl(171_77%_64%/0.5)]",
-    activeAnimation: "animate-bounce-subtle",
+    activeBg: "from-teal-400/25 to-teal-400/10",
+    activeBorder: "border-teal-400/60",
+    shadow: "shadow-teal-400/20",
   },
   lime: {
-    border: "border-lime-400",
+    gradient: "from-lime-400/15 to-lime-400/5",
+    border: "border-lime-400/25 hover:border-lime-400/50",
     text: "text-lime-400",
-    bg: "bg-lime-400/10",
-    activeBg: "bg-lime-400/25",
-    glow: "shadow-[0_0_25px_hsl(82_85%_67%/0.7),0_0_50px_hsl(82_85%_67%/0.4),inset_0_0_20px_hsl(82_85%_67%/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(82_85%_67%/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(82_85%_67%)]",
-    bottomGlow: "bg-lime-400 shadow-[0_0_15px_hsl(82_85%_67%),0_0_30px_hsl(82_85%_67%/0.5)]",
-    activeAnimation: "animate-color-shift",
+    activeBg: "from-lime-400/25 to-lime-400/10",
+    activeBorder: "border-lime-400/60",
+    shadow: "shadow-lime-400/20",
   },
   emerald: {
-    border: "border-emerald-400",
+    gradient: "from-emerald-400/15 to-emerald-400/5",
+    border: "border-emerald-400/25 hover:border-emerald-400/50",
     text: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    activeBg: "bg-emerald-400/25",
-    glow: "shadow-[0_0_25px_hsl(158_64%_52%/0.7),0_0_50px_hsl(158_64%_52%/0.4),inset_0_0_20px_hsl(158_64%_52%/0.2)]",
-    hoverGlow: "hover:shadow-[0_0_20px_hsl(158_64%_52%/0.5)]",
-    iconGlow: "drop-shadow-[0_0_10px_hsl(158_64%_52%)]",
-    bottomGlow: "bg-emerald-400 shadow-[0_0_15px_hsl(158_64%_52%),0_0_30px_hsl(158_64%_52%/0.5)]",
-    activeAnimation: "animate-ripple-pulse",
+    activeBg: "from-emerald-400/25 to-emerald-400/10",
+    activeBorder: "border-emerald-400/60",
+    shadow: "shadow-emerald-400/20",
   },
 };
 
 const sizeClasses = {
   small: {
-    container: "gap-0.5 p-1.5 min-h-[44px]",
-    icon: "w-3.5 h-3.5",
-    label: "text-[7px]",
+    container: "gap-1 p-2 min-h-[52px] rounded-xl",
+    icon: "w-4 h-4",
+    label: "text-[9px]",
   },
   medium: {
-    container: "gap-1 p-2 min-h-[56px]",
-    icon: "w-4 h-4",
-    label: "text-[8px]",
+    container: "gap-1.5 p-2.5 min-h-[64px] rounded-xl",
+    icon: "w-5 h-5",
+    label: "text-[10px]",
   },
   large: {
-    container: "gap-1.5 p-2.5 min-h-[68px]",
-    icon: "w-5 h-5",
-    label: "text-[9px]",
+    container: "gap-2 p-3 min-h-[76px] rounded-xl",
+    icon: "w-6 h-6",
+    label: "text-xs",
   },
 };
 
@@ -171,44 +135,38 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small
     <button
       onClick={onClick}
       className={cn(
-        "group relative flex flex-col items-center justify-center rounded-lg border transition-all duration-300",
-        "active:scale-90",
+        "group relative flex flex-col items-center justify-center border transition-all duration-300",
         sizeConfig.container,
-        colors.border,
-        colors.text,
-        colors.hoverGlow,
-        "hover:scale-[1.03]",
-        active ? [colors.activeBg, colors.glow, "scale-[1.02] border-2", colors.activeAnimation] : [colors.bg, "border-opacity-50 hover:border-opacity-100"]
+        "bg-gradient-to-b",
+        active ? [colors.activeBg, colors.activeBorder, "shadow-lg", colors.shadow] : [colors.gradient, colors.border],
+        "hover:shadow-md",
+        colors.shadow,
+        "active:scale-95"
       )}
     >
-      {/* Animated pulse ring on active */}
-      {active && (
-        <div className="absolute inset-0 rounded-lg border border-current animate-ping opacity-20" />
-      )}
-      
-      {/* Bottom glow indicator when active */}
-      {active && (
-        <div className={cn(
-          "absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-0.5 rounded-full",
-          colors.bottomGlow
-        )} />
-      )}
-      
       {/* Icon */}
       <Icon className={cn(
         sizeConfig.icon,
         "transition-all duration-200",
-        active ? colors.iconGlow : "group-hover:scale-110"
+        active ? colors.text : "text-muted-foreground group-hover:" + colors.text
       )} />
       
       {/* Label */}
       <span className={cn(
         sizeConfig.label,
-        "font-bold tracking-wide uppercase text-center leading-tight",
-        active && "drop-shadow-[0_0_6px_currentColor]"
+        "font-semibold tracking-wide uppercase text-center leading-tight",
+        active ? colors.text : "text-muted-foreground group-hover:" + colors.text
       )}>
         {label}
       </span>
+      
+      {/* Active indicator */}
+      {active && (
+        <div className={cn(
+          "absolute bottom-1 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full",
+          color === "purple" ? "bg-primary" : color === "blue" ? "bg-secondary" : `bg-neon-${color}`
+        )} />
+      )}
     </button>
   );
 };
