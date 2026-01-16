@@ -928,20 +928,20 @@ const NumberDetailFinder = () => {
 
   return (
     <>
-      <div className="space-y-1.5">
+      <div className="space-y-3">
       {/* Main Card */}
       <div className="relative">
-        <div className="relative rounded-lg p-1.5 overflow-hidden border border-neon-green/30 bg-card/30">
+        <div className="relative rounded-2xl p-3 overflow-hidden border border-border bg-card/50 backdrop-blur-sm">
           
-          {/* Button Grid - 4 columns for compact view */}
-          <div className="relative grid grid-cols-4 gap-1">
+          {/* Button Grid - 4 columns */}
+          <div className="relative grid grid-cols-4 gap-2">
             {enabledTabs.map((tab, index) => {
               const IconComponent = iconMap[tab.icon] || Sparkles;
               return (
                 <div
                   key={tab.id}
-                  className="animate-bounce-in"
-                  style={{ animationDelay: `${index * 30}ms` }}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <SearchButton
                     icon={IconComponent}
@@ -959,45 +959,45 @@ const NumberDetailFinder = () => {
             <Link
               to="/page2"
               className={cn(
-                "animate-bounce-in flex flex-col items-center justify-center rounded-lg border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group",
-                settings.tabSize === "small" && "gap-0.5 p-1.5 min-h-[44px]",
-                settings.tabSize === "medium" && "gap-1 p-2 min-h-[56px]",
-                settings.tabSize === "large" && "gap-1.5 p-2.5 min-h-[68px]"
+                "animate-fade-in flex flex-col items-center justify-center border border-primary/25 hover:border-primary/50 bg-gradient-to-b from-primary/15 to-primary/5 hover:shadow-md shadow-primary/20 transition-all duration-200 group",
+                settings.tabSize === "small" && "gap-1 p-2 min-h-[52px] rounded-xl",
+                settings.tabSize === "medium" && "gap-1.5 p-2.5 min-h-[64px] rounded-xl",
+                settings.tabSize === "large" && "gap-2 p-3 min-h-[76px] rounded-xl"
               )}
-              style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
+              style={{ animationDelay: `${enabledTabs.length * 50}ms` }}
             >
               <ArrowRight className={cn(
-                "text-neon-yellow group-hover:translate-x-0.5 transition-transform",
-                settings.tabSize === "small" && "w-3.5 h-3.5",
-                settings.tabSize === "medium" && "w-4 h-4",
-                settings.tabSize === "large" && "w-5 h-5"
+                "text-primary group-hover:translate-x-0.5 transition-transform",
+                settings.tabSize === "small" && "w-4 h-4",
+                settings.tabSize === "medium" && "w-5 h-5",
+                settings.tabSize === "large" && "w-6 h-6"
               )} />
               <span className={cn(
-                "font-bold text-neon-yellow uppercase tracking-wide",
-                settings.tabSize === "small" && "text-[7px]",
-                settings.tabSize === "medium" && "text-[8px]",
-                settings.tabSize === "large" && "text-[9px]"
+                "font-semibold text-primary uppercase tracking-wide",
+                settings.tabSize === "small" && "text-[9px]",
+                settings.tabSize === "medium" && "text-[10px]",
+                settings.tabSize === "large" && "text-xs"
               )}>More</span>
             </Link>
           </div>
           
-          {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram, non-phprat tab is selected */}
+          {/* Search Input */}
           {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
-            <div key={`search-${activeTab}`} className="relative mt-2 animate-tab-fade-scale">
-              <div className="flex gap-1.5 p-1 rounded-lg bg-background/80 border border-neon-cyan/40 shadow-[0_0_10px_hsl(var(--neon-cyan)/0.15)]">
+            <div key={`search-${activeTab}`} className="relative mt-3 animate-fade-in">
+              <div className="flex gap-2 p-2 rounded-xl bg-background/80 border border-border shadow-inner">
                 <Input
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={activeButton.placeholder}
-                  className="flex-1 bg-transparent border-0 text-neon-green placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-8 text-xs font-mono"
+                  className="flex-1 bg-transparent border-0 text-foreground placeholder:text-muted-foreground/50 focus-visible:ring-0 focus-visible:ring-offset-0 h-10 text-sm"
                   onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                 />
                 <Button 
                   onClick={handleSearch}
                   disabled={loading}
-                  className={`bg-gradient-to-r from-neon-cyan to-neon-green text-background font-bold px-3 h-8 hover:opacity-90 text-xs transition-all active:scale-95 ${loading ? 'animate-pulse shadow-[0_0_20px_hsl(var(--neon-cyan)/0.6),0_0_40px_hsl(var(--neon-green)/0.4)]' : 'shadow-[0_0_8px_hsl(var(--neon-cyan)/0.4)]'}`}
+                  className="bg-gradient-to-r from-primary to-accent text-primary-foreground font-semibold px-5 h-10 hover:opacity-90 text-sm transition-all active:scale-95 shadow-lg shadow-primary/25"
                 >
-                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin drop-shadow-[0_0_8px_hsl(var(--neon-cyan))]" /> : <Search className="w-3.5 h-3.5" />}
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                 </Button>
               </div>
             </div>
