@@ -11,6 +11,7 @@ import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./ui/card";
 
 interface CapturedPhoto {
   id: string;
@@ -1120,90 +1121,137 @@ const ShubhCam = () => {
 
       {/* Photo View Modal */}
       <Dialog open={!!viewingPhoto} onOpenChange={() => setViewingPhoto(null)}>
-        <DialogContent className="max-w-3xl bg-card border-neon-green/50">
-          <DialogHeader>
-            <DialogTitle className="text-neon-green flex items-center gap-2">
-              <Camera className="w-5 h-5" /> Photo Preview
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="p-0 bg-transparent border-0 shadow-none max-w-sm sm:max-w-md">
           {viewingPhoto && (
-            <div className="space-y-4">
-              <img 
-                src={viewingPhoto.image_data} 
-                alt="Captured photo" 
-                className="w-full rounded-lg border border-neon-green/30"
-              />
-              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <p><span className="text-neon-cyan">📅 Captured:</span> {new Date(viewingPhoto.captured_at).toLocaleString()}</p>
-                {viewingPhoto.user_agent && (
-                  <p className="text-xs truncate"><span className="text-neon-pink">📱 Device:</span> {viewingPhoto.user_agent}</p>
-                )}
-              </div>
-              <div className="flex gap-2">
+            <Card className="bg-card/95 backdrop-blur-sm border-2 border-neon-green/50 shadow-[0_0_30px_hsl(var(--neon-green)/0.3)] overflow-hidden">
+              <CardHeader className="p-3 pb-2 border-b border-neon-green/30">
+                <CardTitle className="text-neon-green flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <Camera className="w-4 h-4" /> Photo Preview
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setViewingPhoto(null)}
+                    className="h-6 w-6 text-muted-foreground hover:text-neon-red"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3">
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neon-green/30 bg-background/50">
+                  <img 
+                    src={viewingPhoto.image_data} 
+                    alt="Captured photo" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mt-3 space-y-1 text-xs text-muted-foreground bg-background/30 rounded-lg p-2 border border-neon-green/20">
+                  <p className="flex items-center gap-1">
+                    <span className="text-neon-cyan">📅</span> 
+                    <span className="font-medium">{new Date(viewingPhoto.captured_at).toLocaleString()}</span>
+                  </p>
+                  {viewingPhoto.user_agent && (
+                    <p className="flex items-start gap-1 truncate">
+                      <span className="text-neon-pink">📱</span> 
+                      <span className="truncate">{viewingPhoto.user_agent.slice(0, 50)}...</span>
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+              <CardFooter className="p-3 pt-0 gap-2">
                 <Button
                   onClick={() => downloadPhoto(viewingPhoto)}
-                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90"
+                  size="sm"
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 shadow-[0_0_10px_hsl(var(--neon-green)/0.3)]"
                 >
-                  <Download className="w-4 h-4 mr-2" /> Download
+                  <Download className="w-3 h-3 mr-1" /> Download
                 </Button>
                 <Button
                   onClick={() => {
                     deletePhoto(viewingPhoto.id);
                     setViewingPhoto(null);
                   }}
+                  size="sm"
                   variant="outline"
-                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10"
+                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10 shadow-[0_0_10px_hsl(var(--neon-red)/0.2)]"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                  <Trash2 className="w-3 h-3 mr-1" /> Delete
                 </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           )}
         </DialogContent>
       </Dialog>
 
       {/* Video View Modal */}
       <Dialog open={!!viewingVideo} onOpenChange={() => setViewingVideo(null)}>
-        <DialogContent className="max-w-3xl bg-card border-neon-red/50">
-          <DialogHeader>
-            <DialogTitle className="text-neon-red flex items-center gap-2">
-              <Video className="w-5 h-5" /> Video Preview
-            </DialogTitle>
-          </DialogHeader>
+        <DialogContent className="p-0 bg-transparent border-0 shadow-none max-w-sm sm:max-w-md">
           {viewingVideo && (
-            <div className="space-y-4">
-              <video 
-                src={viewingVideo.video_url} 
-                controls
-                autoPlay
-                className="w-full rounded-lg border border-neon-red/30"
-              />
-              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <p><span className="text-neon-cyan">📅 Captured:</span> {new Date(viewingVideo.captured_at).toLocaleString()}</p>
-                <p><span className="text-neon-pink">⏱ Duration:</span> {viewingVideo.duration_seconds}s</p>
-                {viewingVideo.user_agent && (
-                  <p className="text-xs truncate"><span className="text-neon-purple">📱 Device:</span> {viewingVideo.user_agent}</p>
-                )}
-              </div>
-              <div className="flex gap-2">
+            <Card className="bg-card/95 backdrop-blur-sm border-2 border-neon-red/50 shadow-[0_0_30px_hsl(var(--neon-red)/0.3)] overflow-hidden">
+              <CardHeader className="p-3 pb-2 border-b border-neon-red/30">
+                <CardTitle className="text-neon-red flex items-center justify-between text-sm">
+                  <span className="flex items-center gap-2">
+                    <Video className="w-4 h-4" /> Video Preview
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    onClick={() => setViewingVideo(null)}
+                    className="h-6 w-6 text-muted-foreground hover:text-neon-red"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="p-3">
+                <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-neon-red/30 bg-background/50">
+                  <video 
+                    src={viewingVideo.video_url} 
+                    controls
+                    autoPlay
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="mt-3 space-y-1 text-xs text-muted-foreground bg-background/30 rounded-lg p-2 border border-neon-red/20">
+                  <p className="flex items-center gap-1">
+                    <span className="text-neon-cyan">📅</span> 
+                    <span className="font-medium">{new Date(viewingVideo.captured_at).toLocaleString()}</span>
+                  </p>
+                  <p className="flex items-center gap-1">
+                    <span className="text-neon-pink">⏱</span> 
+                    <span className="font-medium">{viewingVideo.duration_seconds}s</span>
+                  </p>
+                  {viewingVideo.user_agent && (
+                    <p className="flex items-start gap-1 truncate">
+                      <span className="text-neon-purple">📱</span> 
+                      <span className="truncate">{viewingVideo.user_agent.slice(0, 50)}...</span>
+                    </p>
+                  )}
+                </div>
+              </CardContent>
+              <CardFooter className="p-3 pt-0 gap-2">
                 <Button
                   onClick={() => window.open(viewingVideo.video_url, '_blank')}
-                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90"
+                  size="sm"
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 shadow-[0_0_10px_hsl(var(--neon-green)/0.3)]"
                 >
-                  <Download className="w-4 h-4 mr-2" /> Download
+                  <Download className="w-3 h-3 mr-1" /> Download
                 </Button>
                 <Button
                   onClick={() => {
                     deleteVideo(viewingVideo.id, viewingVideo.video_url);
                     setViewingVideo(null);
                   }}
+                  size="sm"
                   variant="outline"
-                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10"
+                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10 shadow-[0_0_10px_hsl(var(--neon-red)/0.2)]"
                 >
-                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                  <Trash2 className="w-3 h-3 mr-1" /> Delete
                 </Button>
-              </div>
-            </div>
+              </CardFooter>
+            </Card>
           )}
         </DialogContent>
       </Dialog>
