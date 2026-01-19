@@ -92,15 +92,15 @@ const defaultTelegramTools: TelegramToolConfig[] = [
 ];
 
 const defaultTabs: TabConfig[] = [
-  { id: "phone", label: "Phone", icon: "Phone", color: "green", placeholder: "Enter phone number...", searchType: "phone", apiUrl: "https://userbotgroup.onrender.com/num?number=", enabled: true },
+  { id: "phone", label: "Phone Search", icon: "Phone", color: "green", placeholder: "Enter phone number...", searchType: "phone", apiUrl: "https://userbotgroup.onrender.com/num?number=", enabled: true },
   { id: "numinfov2", label: "NUM INFO V2", icon: "Search", color: "cyan", placeholder: "Enter phone number...", searchType: "numinfov2", apiUrl: "https://userbotgroup.onrender.com/num?number=", enabled: true },
-  { id: "aadhar", label: "Aadhar", icon: "CreditCard", color: "pink", placeholder: "Enter Aadhar number...", searchType: "aadhar", apiUrl: "", enabled: true },
-  { id: "vehicle", label: "Vehicle", icon: "Car", color: "orange", placeholder: "Enter RC number...", searchType: "vehicle", apiUrl: "https://darknagi-osint-vehicle-api.vercel.app/api/vehicle?rc=", enabled: true },
-  { id: "instagram", label: "Instagram", icon: "Camera", color: "cyan", placeholder: "Enter username...", searchType: "instagram", apiUrl: "", enabled: true },
-  { id: "family", label: "Family", icon: "Users", color: "purple", placeholder: "Enter name/number...", searchType: "family", apiUrl: "", enabled: true },
-  { id: "manual", label: "Manual", icon: "ClipboardPaste", color: "yellow", placeholder: "Enter number...", searchType: "manual", apiUrl: "https://hydrashop.in.net/number.php?q=", enabled: true },
-  { id: "shubh", label: "CAM HACK", icon: "Sparkles", color: "white", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
-  { id: "darkdb", label: "Hard Bomber", icon: "Database", color: "teal", placeholder: "", searchType: "darkdb", apiUrl: "https://2info.vercel.app", enabled: true },
+  { id: "aadhar", label: "Aadhar Search", icon: "CreditCard", color: "pink", placeholder: "Enter Aadhar number...", searchType: "aadhar", apiUrl: "", enabled: true },
+  { id: "vehicle", label: "Vehicle CH", icon: "Car", color: "orange", placeholder: "Enter RC number...", searchType: "vehicle", apiUrl: "https://darknagi-osint-vehicle-api.vercel.app/api/vehicle?rc=", enabled: true },
+  { id: "instagram", label: "Insta Search", icon: "Camera", color: "cyan", placeholder: "Enter username...", searchType: "instagram", apiUrl: "", enabled: true },
+  { id: "family", label: "Family Info", icon: "Users", color: "purple", placeholder: "Enter name/number...", searchType: "family", apiUrl: "", enabled: true },
+  { id: "manual", label: "Manual Paste", icon: "ClipboardPaste", color: "yellow", placeholder: "Enter number...", searchType: "manual", apiUrl: "https://hydrashop.in.net/number.php?q=", enabled: true },
+  { id: "shubh", label: "Dark Phishing", icon: "Shield", color: "white", placeholder: "", searchType: "shubh", apiUrl: "", enabled: true },
+  { id: "darkdb", label: "Webcam 360", icon: "Globe", color: "teal", placeholder: "", searchType: "darkdb", apiUrl: "https://2info.vercel.app", enabled: true },
   { id: "telegram", label: "Telegram OSI", icon: "Send", color: "blue", placeholder: "", searchType: "telegram", apiUrl: "", enabled: true },
   { id: "allsearch", label: "All Search", icon: "Globe", color: "red", placeholder: "Enter phone / email / name...", searchType: "allsearch", apiUrl: "https://lek-steel.vercel.app/api/search?q=", enabled: true },
   { id: "tgtonum", label: "Tg To Num", icon: "MessageCircle", color: "lime", placeholder: "Enter Telegram username...", searchType: "tgtonum", apiUrl: "", enabled: true },
