@@ -1075,30 +1075,14 @@ const ShubhCam = () => {
                       className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover cursor-pointer"
                       onClick={() => setViewingPhoto(photo)}
                     />
-                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                       <Button
                         size="icon"
                         variant="outline"
                         onClick={() => setViewingPhoto(photo)}
-                        className="border-neon-cyan text-neon-cyan"
+                        className="border-neon-cyan text-neon-cyan h-12 w-12"
                       >
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => downloadPhoto(photo)}
-                        className="border-neon-green text-neon-green"
-                      >
-                        <Download className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => deletePhoto(photo.id)}
-                        className="border-neon-red text-neon-red"
-                      >
-                        <Trash2 className="w-4 h-4" />
+                        <Eye className="w-6 h-6" />
                       </Button>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1 truncate">
