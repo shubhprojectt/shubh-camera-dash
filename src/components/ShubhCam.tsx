@@ -416,6 +416,32 @@ const ShubhCam = () => {
             </p>
           </div>
 
+          {/* Video Capture Link */}
+          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-xl">🎬</span>
+              <h3 className="text-neon-red font-bold tracking-wide">VIDEO CAPTURE LINK</h3>
+            </div>
+            <div className="flex gap-2">
+              <Input
+                value={videoCaptureLink}
+                readOnly
+                className="bg-background/50 border-neon-red/50 text-neon-red text-xs font-mono focus:border-neon-red focus:ring-neon-red/30"
+              />
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => copyToClipboard(videoCaptureLink)}
+                className="border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_15px_hsl(var(--neon-red)/0.4)] shrink-0 transition-all"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-neon-purple text-xs mt-3 flex items-center gap-1">
+              🎥 {settings.camVideoDuration || 5}s video capture + redirect
+            </p>
+          </div>
+
           {/* Redirect URL */}
           <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
             <div className="flex items-center gap-2 mb-3">
