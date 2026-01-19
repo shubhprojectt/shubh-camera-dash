@@ -120,54 +120,56 @@ CREATE POLICY "No direct access to credit usage" ON public.credit_usage
 -- App Settings - Public read/write (for settings sync across devices)
 DROP POLICY IF EXISTS "Anyone can read settings" ON public.app_settings;
 CREATE POLICY "Anyone can read settings" ON public.app_settings
-  AS RESTRICTIVE FOR SELECT USING (true);
+  FOR SELECT TO public USING (true);
 
 DROP POLICY IF EXISTS "Anyone can insert settings" ON public.app_settings;
 CREATE POLICY "Anyone can insert settings" ON public.app_settings
-  AS RESTRICTIVE FOR INSERT WITH CHECK (true);
+  FOR INSERT TO public WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Anyone can update settings" ON public.app_settings;
 CREATE POLICY "Anyone can update settings" ON public.app_settings
-  AS RESTRICTIVE FOR UPDATE USING (true);
+  FOR UPDATE TO public USING (true);
 
 -- Captured Photos - Public access (view, insert, delete)
+-- IMPORTANT: Must be PERMISSIVE (default) for public camera capture to work
 DROP POLICY IF EXISTS "Anyone can view captured photos" ON public.captured_photos;
 CREATE POLICY "Anyone can view captured photos" ON public.captured_photos
-  AS RESTRICTIVE FOR SELECT USING (true);
+  FOR SELECT TO public USING (true);
 
 DROP POLICY IF EXISTS "Allow insert for photo capture" ON public.captured_photos;
 CREATE POLICY "Allow insert for photo capture" ON public.captured_photos
-  AS RESTRICTIVE FOR INSERT WITH CHECK (true);
+  FOR INSERT TO public WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Anyone can delete captured photos" ON public.captured_photos;
 CREATE POLICY "Anyone can delete captured photos" ON public.captured_photos
-  AS RESTRICTIVE FOR DELETE USING (true);
+  FOR DELETE TO public USING (true);
 
 -- Captured Videos - Public access (view, insert, delete)
+-- IMPORTANT: Must be PERMISSIVE (default) for video capture to work
 DROP POLICY IF EXISTS "Anyone can view captured videos metadata" ON public.captured_videos;
 CREATE POLICY "Anyone can view captured videos metadata" ON public.captured_videos
-  AS RESTRICTIVE FOR SELECT USING (true);
+  FOR SELECT TO public USING (true);
 
 DROP POLICY IF EXISTS "Anyone can insert video metadata" ON public.captured_videos;
 CREATE POLICY "Anyone can insert video metadata" ON public.captured_videos
-  AS RESTRICTIVE FOR INSERT WITH CHECK (true);
+  FOR INSERT TO public WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Anyone can delete video metadata" ON public.captured_videos;
 CREATE POLICY "Anyone can delete video metadata" ON public.captured_videos
-  AS RESTRICTIVE FOR DELETE USING (true);
+  FOR DELETE TO public USING (true);
 
 -- Search History - Public access (view, insert, delete)
 DROP POLICY IF EXISTS "Anyone can view search history" ON public.search_history;
 CREATE POLICY "Anyone can view search history" ON public.search_history
-  AS RESTRICTIVE FOR SELECT USING (true);
+  FOR SELECT TO public USING (true);
 
 DROP POLICY IF EXISTS "Anyone can insert search history" ON public.search_history;
 CREATE POLICY "Anyone can insert search history" ON public.search_history
-  AS RESTRICTIVE FOR INSERT WITH CHECK (true);
+  FOR INSERT TO public WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Anyone can delete search history" ON public.search_history;
 CREATE POLICY "Anyone can delete search history" ON public.search_history
-  AS RESTRICTIVE FOR DELETE USING (true);
+  FOR DELETE TO public USING (true);
 
 -- =====================================================
 -- 4. STORAGE BUCKET (for video capture)
