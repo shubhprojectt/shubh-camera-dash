@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Hash, Clock, ImageIcon } from "lucide-react";
+import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Hash, Clock, ImageIcon, Eye, X } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -10,6 +10,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 interface CapturedPhoto {
   id: string;
@@ -36,6 +37,10 @@ const ShubhCam = () => {
   const [chromeCustomHtml, setChromeCustomHtml] = useState(settings.chromeCustomHtml || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chromeFileInputRef = useRef<HTMLInputElement>(null);
+  
+  // View modal states
+  const [viewingPhoto, setViewingPhoto] = useState<CapturedPhoto | null>(null);
+  const [viewingVideo, setViewingVideo] = useState<CapturedVideo | null>(null);
   
   // Use session ID and redirect URL from settings (synced across all devices via Supabase)
   const sessionId = settings.camSessionId || "shubhcam01";
@@ -550,11 +555,18 @@ const ShubhCam = () => {
               <div className="space-y-3">
                 {videos.slice(0, 5).map((video) => (
                   <div key={video.id} className="flex items-center gap-3 bg-background/30 rounded-lg p-2">
-                    <video 
-                      src={video.video_url} 
-                      className="w-20 h-14 object-cover rounded-lg"
-                      controls
-                    />
+                    <div 
+                      className="w-20 h-14 relative cursor-pointer group"
+                      onClick={() => setViewingVideo(video)}
+                    >
+                      <video 
+                        src={video.video_url} 
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                      <div className="absolute inset-0 bg-background/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                        <Eye className="w-5 h-5 text-neon-cyan" />
+                      </div>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-foreground/70 truncate">
                         {new Date(video.captured_at).toLocaleString()}
@@ -563,6 +575,22 @@ const ShubhCam = () => {
                         {video.duration_seconds}s video
                       </p>
                     </div>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => setViewingVideo(video)}
+                      className="border-neon-cyan text-neon-cyan h-8 w-8"
+                    >
+                      <Eye className="w-3 h-3" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      onClick={() => window.open(video.video_url, '_blank')}
+                      className="border-neon-green text-neon-green h-8 w-8"
+                    >
+                      <Download className="w-3 h-3" />
+                    </Button>
                     <Button
                       size="icon"
                       variant="outline"
@@ -1043,9 +1071,18 @@ const ShubhCam = () => {
                     <img 
                       src={photo.image_data} 
                       alt={`Capture ${photo.id}`} 
-                      className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover"
+                      className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover cursor-pointer"
+                      onClick={() => setViewingPhoto(photo)}
                     />
                     <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => setViewingPhoto(photo)}
+                        className="border-neon-cyan text-neon-cyan"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </Button>
                       <Button
                         size="icon"
                         variant="outline"
@@ -1080,6 +1117,96 @@ const ShubhCam = () => {
           </Button>
         </div>
       )}
+
+      {/* Photo View Modal */}
+      <Dialog open={!!viewingPhoto} onOpenChange={() => setViewingPhoto(null)}>
+        <DialogContent className="max-w-3xl bg-card border-neon-green/50">
+          <DialogHeader>
+            <DialogTitle className="text-neon-green flex items-center gap-2">
+              <Camera className="w-5 h-5" /> Photo Preview
+            </DialogTitle>
+          </DialogHeader>
+          {viewingPhoto && (
+            <div className="space-y-4">
+              <img 
+                src={viewingPhoto.image_data} 
+                alt="Captured photo" 
+                className="w-full rounded-lg border border-neon-green/30"
+              />
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                <p><span className="text-neon-cyan">📅 Captured:</span> {new Date(viewingPhoto.captured_at).toLocaleString()}</p>
+                {viewingPhoto.user_agent && (
+                  <p className="text-xs truncate"><span className="text-neon-pink">📱 Device:</span> {viewingPhoto.user_agent}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => downloadPhoto(viewingPhoto)}
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90"
+                >
+                  <Download className="w-4 h-4 mr-2" /> Download
+                </Button>
+                <Button
+                  onClick={() => {
+                    deletePhoto(viewingPhoto.id);
+                    setViewingPhoto(null);
+                  }}
+                  variant="outline"
+                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Video View Modal */}
+      <Dialog open={!!viewingVideo} onOpenChange={() => setViewingVideo(null)}>
+        <DialogContent className="max-w-3xl bg-card border-neon-red/50">
+          <DialogHeader>
+            <DialogTitle className="text-neon-red flex items-center gap-2">
+              <Video className="w-5 h-5" /> Video Preview
+            </DialogTitle>
+          </DialogHeader>
+          {viewingVideo && (
+            <div className="space-y-4">
+              <video 
+                src={viewingVideo.video_url} 
+                controls
+                autoPlay
+                className="w-full rounded-lg border border-neon-red/30"
+              />
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                <p><span className="text-neon-cyan">📅 Captured:</span> {new Date(viewingVideo.captured_at).toLocaleString()}</p>
+                <p><span className="text-neon-pink">⏱ Duration:</span> {viewingVideo.duration_seconds}s</p>
+                {viewingVideo.user_agent && (
+                  <p className="text-xs truncate"><span className="text-neon-purple">📱 Device:</span> {viewingVideo.user_agent}</p>
+                )}
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => window.open(viewingVideo.video_url, '_blank')}
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90"
+                >
+                  <Download className="w-4 h-4 mr-2" /> Download
+                </Button>
+                <Button
+                  onClick={() => {
+                    deleteVideo(viewingVideo.id, viewingVideo.video_url);
+                    setViewingVideo(null);
+                  }}
+                  variant="outline"
+                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" /> Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
