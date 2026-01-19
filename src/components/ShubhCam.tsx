@@ -30,7 +30,7 @@ interface CapturedVideo {
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "video" | "settings">("link");
+  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "settings">("link");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [videos, setVideos] = useState<CapturedVideo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -316,17 +316,6 @@ const ShubhCam = () => {
           <Zap className="w-3 h-3" /> LINK
         </button>
         <button
-          onClick={() => setActiveTab("video")}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
-            activeTab === "video"
-              ? "bg-gradient-to-r from-neon-red to-neon-red/80 text-background shadow-[0_0_20px_hsl(var(--neon-red)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-red/10 hover:text-neon-red"
-          )}
-        >
-          <Video className="w-3 h-3" /> VID
-        </button>
-        <button
           onClick={() => setActiveTab("chrome")}
           className={cn(
             "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
@@ -465,159 +454,6 @@ const ShubhCam = () => {
             <Button
               onClick={refreshPhotos}
               className="bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)] transition-all py-5"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
-            </Button>
-          </div>
-        </div>
-      ) : activeTab === "video" ? (
-        <div className="relative space-y-5">
-          {/* Video Capture Info */}
-          <div className="bg-gradient-to-r from-neon-red/10 to-neon-pink/10 rounded-xl p-4 border border-neon-red/30 shadow-[inset_0_0_20px_hsl(var(--neon-red)/0.1)]">
-            <h3 className="font-bold text-neon-red mb-3 flex items-center gap-2">
-              <Video className="w-4 h-4" /> 5 Second Video Capture
-            </h3>
-            <p className="text-sm text-foreground/80 mb-2">
-              User se permission lekar 5 second ki video record karega.
-            </p>
-            <ol className="text-sm text-foreground/70 space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-red/20 text-neon-red text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
-                <span>User "Start Recording" click karta hai</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-pink/20 text-neon-pink text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
-                <span>Camera + Mic permission deta hai</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-purple/20 text-neon-purple text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
-                <span>5 second video record + upload hoti hai</span>
-              </li>
-            </ol>
-          </div>
-
-          {/* Session ID */}
-          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-red/30">
-            <span className="text-muted-foreground">Session:</span>
-            <span className="text-neon-red font-mono font-bold tracking-wider">{sessionId}</span>
-          </div>
-
-          {/* Video Capture Link */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">🎬</span>
-              <h3 className="text-neon-red font-bold tracking-wide">VIDEO CAPTURE LINK</h3>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={videoCaptureLink}
-                readOnly
-                className="bg-background/50 border-neon-red/50 text-neon-red text-xs font-mono focus:border-neon-red focus:ring-neon-red/30"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => copyToClipboard(videoCaptureLink)}
-                className="border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_15px_hsl(var(--neon-red)/0.4)] shrink-0 transition-all"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-            <p className="text-neon-orange text-xs mt-3 flex items-center gap-1">
-              ⚠ Video ke baad redirect: <span className="font-mono">{redirectUrl || "None"}</span>
-            </p>
-          </div>
-
-          {/* Test Link */}
-          <Button
-            onClick={() => window.open(videoCaptureLink, '_blank')}
-            variant="outline"
-            className="w-full border-2 border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_20px_hsl(var(--neon-red)/0.4)] transition-all py-5"
-          >
-            <Play className="w-4 h-4 mr-2" /> TEST VIDEO LINK
-          </Button>
-
-          {/* Captured Videos */}
-          {videos.length > 0 && (
-            <div className="bg-card/30 rounded-xl p-4 border border-neon-purple/30">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-neon-purple font-bold tracking-wide text-sm flex items-center gap-2">
-                  <Video className="w-4 h-4" /> CAPTURED VIDEOS ({videos.length})
-                </h3>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={loadVideos}
-                  className="border-neon-purple text-neon-purple hover:bg-neon-purple/10 h-7 text-xs"
-                >
-                  <RefreshCw className="w-3 h-3 mr-1" /> Refresh
-                </Button>
-              </div>
-              <div className="space-y-3">
-                {videos.slice(0, 5).map((video) => (
-                  <div key={video.id} className="flex items-center gap-3 bg-background/30 rounded-lg p-2">
-                    <div 
-                      className="w-20 h-14 relative cursor-pointer group"
-                      onClick={() => setViewingVideo(video)}
-                    >
-                      <video 
-                        src={video.video_url} 
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                      <div className="absolute inset-0 bg-background/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                        <Eye className="w-5 h-5 text-neon-cyan" />
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-foreground/70 truncate">
-                        {new Date(video.captured_at).toLocaleString()}
-                      </p>
-                      <p className="text-[10px] text-muted-foreground">
-                        {video.duration_seconds}s video
-                      </p>
-                    </div>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => setViewingVideo(video)}
-                      className="border-neon-cyan text-neon-cyan h-8 w-8"
-                    >
-                      <Eye className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => window.open(video.video_url, '_blank')}
-                      className="border-neon-green text-neon-green h-8 w-8"
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      onClick={() => deleteVideo(video.id, video.video_url)}
-                      className="border-neon-red text-neon-red h-8 w-8"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={generateNewSession}
-              variant="outline"
-              className="border-2 border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] transition-all py-5"
-            >
-              <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
-            </Button>
-            <Button
-              onClick={loadVideos}
-              className="bg-gradient-to-r from-neon-red to-neon-pink text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-red)/0.4)] transition-all py-5"
             >
               <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
             </Button>
@@ -1045,18 +881,18 @@ const ShubhCam = () => {
             <div className="min-h-[200px] flex items-center justify-center">
               <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : photos.length === 0 ? (
+          ) : photos.length === 0 && videos.length === 0 ? (
             <div className="min-h-[200px] flex items-center justify-center">
               <div className="text-center text-muted-foreground">
                 <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No photos captured yet</p>
+                <p>No photos or videos captured yet</p>
                 <p className="text-sm">Share your link to start capturing!</p>
               </div>
             </div>
           ) : (
             <>
               <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{photos.length} captures</span>
+                <span className="text-sm text-muted-foreground">{photos.length} photos, {videos.length} videos</span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -1067,8 +903,9 @@ const ShubhCam = () => {
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-4">
+                {/* Photos */}
                 {photos.map((photo) => (
-                  <div key={photo.id} className="relative group">
+                  <div key={`photo-${photo.id}`} className="relative group">
                     <img 
                       src={photo.image_data} 
                       alt={`Capture ${photo.id}`} 
@@ -1085,8 +922,40 @@ const ShubhCam = () => {
                         <Eye className="w-6 h-6" />
                       </Button>
                     </div>
+                    <div className="absolute top-1 left-1 bg-neon-green/80 text-background text-[8px] px-1.5 py-0.5 rounded font-bold">
+                      PHOTO
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1 truncate">
                       {new Date(photo.captured_at).toLocaleString()}
+                    </p>
+                  </div>
+                ))}
+                {/* Videos */}
+                {videos.map((video) => (
+                  <div key={`video-${video.id}`} className="relative group">
+                    <video 
+                      src={video.video_url} 
+                      className="rounded-lg border border-neon-red/30 w-full aspect-square object-cover cursor-pointer"
+                      onClick={() => setViewingVideo(video)}
+                    />
+                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={() => setViewingVideo(video)}
+                        className="border-neon-cyan text-neon-cyan h-12 w-12"
+                      >
+                        <Eye className="w-6 h-6" />
+                      </Button>
+                    </div>
+                    <div className="absolute top-1 left-1 bg-neon-red/80 text-background text-[8px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5">
+                      <Play className="w-2 h-2" /> VIDEO
+                    </div>
+                    <div className="absolute top-1 right-1 bg-background/70 text-neon-red text-[8px] px-1.5 py-0.5 rounded font-mono">
+                      {video.duration_seconds}s
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1 truncate">
+                      {new Date(video.captured_at).toLocaleString()}
                     </p>
                   </div>
                 ))}
@@ -1095,10 +964,10 @@ const ShubhCam = () => {
           )}
           
           <Button
-            onClick={refreshPhotos}
+            onClick={() => { refreshPhotos(); loadVideos(); }}
             className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
           >
-            <RefreshCw className="w-4 h-4 mr-2" /> REFRESH PHOTOS
+            <RefreshCw className="w-4 h-4 mr-2" /> REFRESH ALL
           </Button>
         </div>
       )}
