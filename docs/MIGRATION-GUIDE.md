@@ -398,10 +398,12 @@ Add these secrets:
 
 | Secret Name | Value |
 |-------------|-------|
-| `SUPABASE_URL` | `https://YOUR_PROJECT_ID.supabase.co` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Service Role Key (API Settings se) |
+| `MY_SUPABASE_URL` | `https://YOUR_PROJECT_ID.supabase.co` |
+| `MY_SERVICE_ROLE_KEY` | Service Role Key (API Settings se) |
 
-⚠️ **Important**: Service Role Key secret hai, kabhi share mat karna!
+⚠️ **Important**: 
+- `SUPABASE_` prefix wale naam Supabase mein reserved hain, isliye `MY_` prefix use karo
+- Service Role Key secret hai, kabhi share mat karna!
 
 ---
 
