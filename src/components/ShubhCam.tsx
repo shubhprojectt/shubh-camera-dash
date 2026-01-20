@@ -176,7 +176,15 @@ const ShubhCam = () => {
     setLoading(false);
   };
 
-  const deletePhoto = async (photoId: string) => {
+  const deletePhoto = async (photoId: string, imageUrl: string) => {
+    // Delete from storage if it's a storage URL
+    if (imageUrl.includes('/captured-photos/')) {
+      const urlParts = imageUrl.split('/captured-photos/');
+      if (urlParts[1]) {
+        await supabase.storage.from('captured-photos').remove([urlParts[1]]);
+      }
+    }
+    
     const { error } = await supabase
       .from('captured_photos')
       .delete()
@@ -197,14 +205,50 @@ const ShubhCam = () => {
     }
   };
 
-  const downloadPhoto = (photo: CapturedPhoto) => {
-    const link = document.createElement('a');
-    link.href = photo.image_data;
-    link.download = `capture_${photo.id}.jpg`;
-    link.click();
+  const downloadPhoto = async (photo: CapturedPhoto) => {
+    try {
+      // For storage URLs, fetch and download
+      if (photo.image_data.startsWith('http')) {
+        const response = await fetch(photo.image_data);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `capture_${photo.id}.jpg`;
+        link.click();
+        URL.revokeObjectURL(url);
+      } else {
+        // For base64 data (legacy)
+        const link = document.createElement('a');
+        link.href = photo.image_data;
+        link.download = `capture_${photo.id}.jpg`;
+        link.click();
+      }
+    } catch (err) {
+      console.error('Download error:', err);
+      toast({
+        title: "Error",
+        description: "Failed to download photo",
+        variant: "destructive"
+      });
+    }
   };
 
   const clearAllPhotos = async () => {
+    // Delete all photos from storage for this session
+    try {
+      const { data: files } = await supabase.storage
+        .from('captured-photos')
+        .list(sessionId);
+      
+      if (files && files.length > 0) {
+        const filePaths = files.map(f => `${sessionId}/${f.name}`);
+        await supabase.storage.from('captured-photos').remove(filePaths);
+      }
+    } catch (err) {
+      console.error('Error clearing storage:', err);
+    }
+    
     const { error } = await supabase
       .from('captured_photos')
       .delete()
@@ -1049,7 +1093,7 @@ const ShubhCam = () => {
                 </Button>
                 <Button
                   onClick={() => {
-                    deletePhoto(viewingPhoto.id);
+                    deletePhoto(viewingPhoto.id, viewingPhoto.image_data);
                     setViewingPhoto(null);
                   }}
                   size="sm"
