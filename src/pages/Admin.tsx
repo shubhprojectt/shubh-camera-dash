@@ -557,7 +557,16 @@ const Admin = () => {
                 </div>
                 <Button
                   variant="outline"
-                  onClick={() => updateSettings({ backgroundImage: "" })}
+                  onClick={async () => {
+                    // If it's a storage URL, try to delete the file
+                    if (settings.backgroundImage.includes('/storage/v1/object/public/backgrounds/')) {
+                      const fileName = settings.backgroundImage.split('/backgrounds/').pop();
+                      if (fileName) {
+                        await supabase.storage.from('backgrounds').remove([fileName]);
+                      }
+                    }
+                    updateSettings({ backgroundImage: "" });
+                  }}
                   className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
                 >
                   <X className="w-4 h-4 mr-1" /> Remove Background
@@ -572,14 +581,33 @@ const Admin = () => {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        updateSettings({ backgroundImage: reader.result as string });
-                      };
-                      reader.readAsDataURL(file);
+                      try {
+                        toast({ title: "Uploading...", description: "Uploading background image..." });
+                        
+                        // Generate unique filename
+                        const fileName = `background-${Date.now()}.${file.name.split('.').pop()}`;
+                        
+                        // Upload to Supabase Storage
+                        const { data, error } = await supabase.storage
+                          .from('backgrounds')
+                          .upload(fileName, file, { upsert: true });
+                        
+                        if (error) throw error;
+                        
+                        // Get public URL
+                        const { data: urlData } = supabase.storage
+                          .from('backgrounds')
+                          .getPublicUrl(fileName);
+                        
+                        updateSettings({ backgroundImage: urlData.publicUrl });
+                        toast({ title: "Success!", description: "Background image uploaded successfully!" });
+                      } catch (err) {
+                        console.error('Upload error:', err);
+                        toast({ title: "Upload Failed", description: "Could not upload image. Please try again.", variant: "destructive" });
+                      }
                     }
                   }}
                 />
