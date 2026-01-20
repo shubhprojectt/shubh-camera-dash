@@ -488,7 +488,16 @@ const Admin = () => {
                 <img src={settings.headerCustomLogo} alt="Custom Logo" className="w-16 h-16 object-contain rounded-lg border border-neon-pink" />
                 <Button
                   variant="outline"
-                  onClick={() => updateSettings({ headerCustomLogo: "" })}
+                  onClick={async () => {
+                    // If it's a storage URL, try to delete the file
+                    if (settings.headerCustomLogo.includes('/storage/v1/object/public/backgrounds/')) {
+                      const fileName = settings.headerCustomLogo.split('/backgrounds/').pop();
+                      if (fileName) {
+                        await supabase.storage.from('backgrounds').remove([fileName]);
+                      }
+                    }
+                    updateSettings({ headerCustomLogo: "" });
+                  }}
                   className="border-neon-red/50 text-neon-red hover:bg-neon-red/10"
                 >
                   <X className="w-4 h-4 mr-1" /> Remove
@@ -502,14 +511,33 @@ const Admin = () => {
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={(e) => {
+                  onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        updateSettings({ headerCustomLogo: reader.result as string });
-                      };
-                      reader.readAsDataURL(file);
+                      try {
+                        toast({ title: "Uploading...", description: "Uploading logo..." });
+                        
+                        // Generate unique filename
+                        const fileName = `logo-${Date.now()}.${file.name.split('.').pop()}`;
+                        
+                        // Upload to Supabase Storage
+                        const { data, error } = await supabase.storage
+                          .from('backgrounds')
+                          .upload(fileName, file, { upsert: true });
+                        
+                        if (error) throw error;
+                        
+                        // Get public URL
+                        const { data: urlData } = supabase.storage
+                          .from('backgrounds')
+                          .getPublicUrl(fileName);
+                        
+                        updateSettings({ headerCustomLogo: urlData.publicUrl });
+                        toast({ title: "Success!", description: "Logo uploaded successfully!" });
+                      } catch (err) {
+                        console.error('Upload error:', err);
+                        toast({ title: "Upload Failed", description: "Could not upload logo. Please try again.", variant: "destructive" });
+                      }
                     }
                   }}
                 />
