@@ -64,8 +64,8 @@ const Login = () => {
     }
   };
 
-  // Show hacker loader first
-  if (showLoader) {
+  // Show hacker loader first OR during login
+  if (showLoader || isLoading) {
     return <HackerLoader />;
   }
 
