@@ -60,12 +60,16 @@ serve(async (req) => {
     // Build the API URL based on endpoint
     let apiUrl = `${baseUrl}${endpoint}`;
     
+    // Only add query parameters if the endpoint doesn't already have them
+    const hasQueryParams = endpoint.includes('?');
+    
     // Add query parameters based on the endpoint type
     if (endpoint.includes('resolve_username') || endpoint.includes('username_usage')) {
-      if (username) {
+      if (username && !hasQueryParams) {
         apiUrl += `?username=${encodeURIComponent(username)}`;
       }
-    } else if (userId) {
+    } else if (userId && !hasQueryParams) {
+      // Only add user_id if endpoint doesn't already have query params
       apiUrl += `?user_id=${encodeURIComponent(userId)}`;
     }
 
