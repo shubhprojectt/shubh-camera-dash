@@ -1,16 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "@/hooks/use-toast";
+import HackerLoader from "@/components/HackerLoader";
 
 const Login = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showLoader, setShowLoader] = useState(true);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  // Show loader animation for 2.5 seconds before showing login form
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowLoader(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +64,13 @@ const Login = () => {
     }
   };
 
+  // Show hacker loader first
+  if (showLoader) {
+    return <HackerLoader />;
+  }
+
   return (
-    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4 animate-fade-in">
       {/* Background effects */}
       <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
 
