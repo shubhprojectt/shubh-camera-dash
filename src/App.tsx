@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SettingsProvider, useSettings } from "@/contexts/SettingsContext";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import HackerLoader from "@/components/HackerLoader";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Capture from "./pages/Capture";
@@ -26,10 +27,9 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // Wait for settings to load
   if (!isLoaded || isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin" />
-          <p className="text-neon-cyan font-mono">Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-sm">
+          <HackerLoader />
         </div>
       </div>
     );
@@ -55,10 +55,9 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   // Wait for settings to load
   if (!isLoaded || isLoading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-neon-cyan border-t-transparent rounded-full animate-spin" />
-          <p className="text-neon-cyan font-mono">Loading...</p>
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <div className="w-full max-w-sm">
+          <HackerLoader />
         </div>
       </div>
     );
