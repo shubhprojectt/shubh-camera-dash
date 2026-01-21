@@ -931,10 +931,37 @@ const NumberDetailFinder = () => {
       <div className="space-y-1.5">
       {/* Main Card */}
       <div className="relative">
-        {/* Multicolor running glow border */}
-        <div className="absolute -inset-[2px] rounded-lg bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink via-neon-purple to-neon-green bg-[length:400%_100%] animate-rainbow-border opacity-70" />
-        <div className="absolute -inset-[1px] rounded-lg bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink via-neon-purple to-neon-green bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-50" />
-        <div className="relative rounded-lg p-1.5 overflow-hidden bg-card/95 backdrop-blur-sm">
+        {/* Dynamic Multicolor running glow border */}
+        {(() => {
+          const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
+          const gradientColors = colors.map(c => `hsl(var(--neon-${c}))`).join(', ');
+          const speed = settings.sectionBorderSpeed || 4;
+          const gradient = `linear-gradient(90deg, ${gradientColors}, ${gradientColors.split(', ')[0]})`;
+          
+          return (
+            <>
+              <div 
+                className="absolute -inset-[2px] rounded-lg bg-[length:400%_100%] animate-rainbow-border opacity-70"
+                style={{ 
+                  background: gradient,
+                  backgroundSize: '400% 100%',
+                  animationDuration: `${speed}s`
+                }}
+              />
+              <div 
+                className="absolute -inset-[1px] rounded-lg bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-50"
+                style={{ 
+                  background: gradient,
+                  backgroundSize: '400% 100%',
+                  animationDuration: `${speed}s`
+                }}
+              />
+            </>
+          );
+        })()}
+        <div className={`relative rounded-lg p-1.5 overflow-hidden backdrop-blur-sm ${
+          settings.sectionTransparent ? 'bg-card/30' : 'bg-card/95'
+        }`}>
           
           {/* Button Grid - 4 columns for compact view */}
           <div className="relative grid grid-cols-4 gap-1">
@@ -953,6 +980,9 @@ const NumberDetailFinder = () => {
                     active={tab.label === activeTab}
                     onClick={() => handleTabClick(tab.label)}
                     size={settings.tabSize}
+                    particleEnabled={settings.tabParticleEnabled !== false}
+                    particleCount={settings.tabParticleCount || 3}
+                    particleSpeed={settings.tabParticleSpeed || 1}
                   />
                 </div>
               );

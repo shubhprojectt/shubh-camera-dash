@@ -8,6 +8,9 @@ interface SearchButtonProps {
   active?: boolean;
   onClick?: () => void;
   size?: "small" | "medium" | "large";
+  particleEnabled?: boolean;
+  particleCount?: number;
+  particleSpeed?: number;
 }
 
 const colorClasses = {
@@ -175,9 +178,28 @@ const sizeClasses = {
   },
 };
 
-const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small" }: SearchButtonProps) => {
+const SearchButton = ({ 
+  icon: Icon, 
+  label, 
+  color, 
+  active, 
+  onClick, 
+  size = "small",
+  particleEnabled = true,
+  particleCount = 3,
+  particleSpeed = 1
+}: SearchButtonProps) => {
   const colors = colorClasses[color];
   const sizeConfig = sizeClasses[size];
+  
+  // Calculate animation durations based on speed multiplier
+  const orbitDurations = [
+    `${3 / particleSpeed}s`,
+    `${4 / particleSpeed}s`,
+    `${5 / particleSpeed}s`,
+    `${3.5 / particleSpeed}s`,
+    `${4.5 / particleSpeed}s`,
+  ];
   
   return (
     <button
@@ -200,23 +222,73 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small
         )}
       >
         {/* Floating Particles around active tab */}
-        {active && (
+        {active && particleEnabled && (
           <>
-            <span className={cn(
-              "absolute w-1.5 h-1.5 rounded-full animate-orbit-1",
-              colors.text,
-              "opacity-80 blur-[0.5px]"
-            )} style={{ boxShadow: '0 0 6px currentColor' }} />
-            <span className={cn(
-              "absolute w-1 h-1 rounded-full animate-orbit-2",
-              colors.text,
-              "opacity-70 blur-[0.5px]"
-            )} style={{ boxShadow: '0 0 4px currentColor' }} />
-            <span className={cn(
-              "absolute w-1.5 h-1.5 rounded-full animate-orbit-3",
-              colors.text,
-              "opacity-75 blur-[0.5px]"
-            )} style={{ boxShadow: '0 0 5px currentColor' }} />
+            {particleCount >= 1 && (
+              <span 
+                className={cn(
+                  "absolute w-1.5 h-1.5 rounded-full animate-orbit-1",
+                  colors.text,
+                  "opacity-80 blur-[0.5px]"
+                )} 
+                style={{ 
+                  boxShadow: '0 0 6px currentColor',
+                  animationDuration: orbitDurations[0]
+                }} 
+              />
+            )}
+            {particleCount >= 2 && (
+              <span 
+                className={cn(
+                  "absolute w-1 h-1 rounded-full animate-orbit-2",
+                  colors.text,
+                  "opacity-70 blur-[0.5px]"
+                )} 
+                style={{ 
+                  boxShadow: '0 0 4px currentColor',
+                  animationDuration: orbitDurations[1]
+                }} 
+              />
+            )}
+            {particleCount >= 3 && (
+              <span 
+                className={cn(
+                  "absolute w-1.5 h-1.5 rounded-full animate-orbit-3",
+                  colors.text,
+                  "opacity-75 blur-[0.5px]"
+                )} 
+                style={{ 
+                  boxShadow: '0 0 5px currentColor',
+                  animationDuration: orbitDurations[2]
+                }} 
+              />
+            )}
+            {particleCount >= 4 && (
+              <span 
+                className={cn(
+                  "absolute w-1 h-1 rounded-full animate-orbit-1",
+                  colors.text,
+                  "opacity-60 blur-[0.5px]"
+                )} 
+                style={{ 
+                  boxShadow: '0 0 4px currentColor',
+                  animationDuration: orbitDurations[3]
+                }} 
+              />
+            )}
+            {particleCount >= 5 && (
+              <span 
+                className={cn(
+                  "absolute w-1 h-1 rounded-full animate-orbit-2",
+                  colors.text,
+                  "opacity-65 blur-[0.5px]"
+                )} 
+                style={{ 
+                  boxShadow: '0 0 3px currentColor',
+                  animationDuration: orbitDurations[4]
+                }} 
+              />
+            )}
           </>
         )}
         

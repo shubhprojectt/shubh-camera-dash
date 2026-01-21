@@ -672,6 +672,131 @@ const Admin = () => {
           </div>
         </Section>
 
+        {/* Section Border & Tab Settings */}
+        <Section title="Section Border & Tab Settings" icon={Palette} color="neon-pink">
+          {/* Border Colors */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+            <h3 className="font-bold text-neon-cyan">Rainbow Border Colors</h3>
+            <p className="text-xs text-muted-foreground">Select colors for the animated rainbow border (in order)</p>
+            <div className="space-y-3">
+              {(settings.sectionBorderColors || ["green", "cyan", "pink", "purple"]).map((color, idx) => (
+                <div key={idx} className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-8">#{idx + 1}</span>
+                  <div className="grid grid-cols-8 gap-2 flex-1">
+                    {colorOptions.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => {
+                          const newColors = [...(settings.sectionBorderColors || ["green", "cyan", "pink", "purple"])];
+                          newColors[idx] = c.value;
+                          updateSettings({ sectionBorderColors: newColors });
+                        }}
+                        className={`h-8 rounded-lg ${c.color} transition-all ${
+                          color === c.value 
+                            ? "ring-2 ring-white scale-110" 
+                            : "opacity-50 hover:opacity-100"
+                        }`}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Border Animation Speed */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+            <h3 className="font-bold text-neon-green">Border Animation Speed</h3>
+            <p className="text-xs text-muted-foreground">Lower = Faster animation</p>
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-neon-cyan">Speed: {settings.sectionBorderSpeed || 4}s</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="10"
+                value={settings.sectionBorderSpeed || 4}
+                onChange={(e) => updateSettings({ sectionBorderSpeed: parseInt(e.target.value) })}
+                className="w-full h-2 bg-card rounded-lg appearance-none cursor-pointer accent-neon-green"
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Fast (1s)</span>
+                <span>Slow (10s)</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Section Transparency */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+            <h3 className="font-bold text-neon-orange">Section Background</h3>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm text-foreground">Transparent Section</span>
+                <p className="text-xs text-muted-foreground">Enable for glass-like transparent look</p>
+              </div>
+              <Switch
+                checked={settings.sectionTransparent || false}
+                onCheckedChange={(checked) => updateSettings({ sectionTransparent: checked })}
+              />
+            </div>
+          </div>
+
+          {/* Tab Particle Settings */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
+            <h3 className="font-bold text-neon-purple">Tab Particle Effects</h3>
+            
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm text-foreground">Enable Particles</span>
+                <p className="text-xs text-muted-foreground">Floating orbs around active tab</p>
+              </div>
+              <Switch
+                checked={settings.tabParticleEnabled !== false}
+                onCheckedChange={(checked) => updateSettings({ tabParticleEnabled: checked })}
+              />
+            </div>
+
+            {(settings.tabParticleEnabled !== false) && (
+              <>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-neon-cyan">Particle Count: {settings.tabParticleCount || 3}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="1"
+                    max="5"
+                    value={settings.tabParticleCount || 3}
+                    onChange={(e) => updateSettings({ tabParticleCount: parseInt(e.target.value) })}
+                    className="w-full h-2 bg-card rounded-lg appearance-none cursor-pointer accent-neon-cyan"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-neon-pink">Speed Multiplier: {settings.tabParticleSpeed || 1}x</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.5"
+                    max="2"
+                    step="0.1"
+                    value={settings.tabParticleSpeed || 1}
+                    onChange={(e) => updateSettings({ tabParticleSpeed: parseFloat(e.target.value) })}
+                    className="w-full h-2 bg-card rounded-lg appearance-none cursor-pointer accent-neon-pink"
+                  />
+                  <div className="flex justify-between text-xs text-muted-foreground">
+                    <span>Slow (0.5x)</span>
+                    <span>Fast (2x)</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </Section>
+
         {/* Tabs Section */}
         <Section title="Tab Configuration" icon={LayoutGrid} color="neon-green">
           {settings.tabs.map((tab) => (

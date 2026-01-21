@@ -79,6 +79,14 @@ export interface AppSettings {
   mainPageMusicUrl: string;
   // Tab section size (small, medium, large)
   tabSize: "small" | "medium" | "large";
+  // Section border settings
+  sectionBorderColors: string[]; // Array of colors for rainbow border
+  sectionBorderSpeed: number; // Animation speed in seconds (1-10)
+  sectionTransparent: boolean; // true = transparent, false = solid
+  // Tab particle settings
+  tabParticleEnabled: boolean;
+  tabParticleCount: number; // 1-5 particles
+  tabParticleSpeed: number; // Animation speed multiplier
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -173,6 +181,14 @@ const defaultSettings: AppSettings = {
   mainPageMusicUrl: "/audio/background-music.mp3",
   // Tab size
   tabSize: "small",
+  // Section border settings
+  sectionBorderColors: ["green", "cyan", "pink", "purple"],
+  sectionBorderSpeed: 4,
+  sectionTransparent: false,
+  // Tab particle settings
+  tabParticleEnabled: true,
+  tabParticleCount: 3,
+  tabParticleSpeed: 1,
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
