@@ -931,8 +931,8 @@ const NumberDetailFinder = () => {
       <div className="space-y-1.5">
       {/* Main Card */}
       <div className="relative">
-        {/* Dynamic Multicolor running glow border (always visible) */}
-        {(() => {
+        {/* Dynamic Multicolor running glow border (only when NOT transparent) */}
+        {!settings.sectionTransparent && (() => {
           const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
           const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
           const speed = settings.sectionBorderSpeed || 4;
@@ -960,7 +960,7 @@ const NumberDetailFinder = () => {
           );
         })()}
         <div className={`relative rounded-lg p-1.5 overflow-hidden ${
-          settings.sectionTransparent ? 'bg-transparent' : 'bg-card/95 backdrop-blur-sm'
+          settings.sectionTransparent ? 'bg-transparent border-l border-r border-white/20' : 'bg-card/95 backdrop-blur-sm'
         }`}>
           
           {/* Button Grid - 4 columns for compact view */}
