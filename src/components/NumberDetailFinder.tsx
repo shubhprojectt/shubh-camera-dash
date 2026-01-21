@@ -959,8 +959,8 @@ const NumberDetailFinder = () => {
             </>
           );
         })()}
-        <div className={`relative rounded-lg p-1.5 overflow-hidden backdrop-blur-sm ${
-          settings.sectionTransparent ? 'bg-card/30' : 'bg-card/95'
+        <div className={`relative rounded-lg p-1.5 overflow-hidden ${
+          settings.sectionTransparent ? 'bg-transparent' : 'bg-card/95 backdrop-blur-sm'
         }`}>
           
           {/* Button Grid - 4 columns for compact view */}
