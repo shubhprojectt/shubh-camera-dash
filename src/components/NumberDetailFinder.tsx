@@ -931,7 +931,10 @@ const NumberDetailFinder = () => {
       <div className="space-y-1.5">
       {/* Main Card */}
       <div className="relative">
-        <div className="relative rounded-lg p-1.5 overflow-hidden border border-neon-green/30 bg-card/30">
+        {/* Multicolor running glow border */}
+        <div className="absolute -inset-[2px] rounded-lg bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink via-neon-purple to-neon-green bg-[length:400%_100%] animate-rainbow-border opacity-70" />
+        <div className="absolute -inset-[1px] rounded-lg bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink via-neon-purple to-neon-green bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-50" />
+        <div className="relative rounded-lg p-1.5 overflow-hidden bg-card/95 backdrop-blur-sm">
           
           {/* Button Grid - 4 columns for compact view */}
           <div className="relative grid grid-cols-4 gap-1">
