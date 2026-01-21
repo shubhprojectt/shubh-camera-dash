@@ -221,58 +221,24 @@ const SearchPanel = () => {
 
   const renderResult = () => {
     if (!result) return null;
-    
-    const flattenObject = (obj: any, prefix = ''): Record<string, string> => {
-      const flat: Record<string, string> = {};
-      for (const key in obj) {
-        if (obj[key] === null || obj[key] === undefined || obj[key] === '') continue;
-        const newKey = prefix ? `${prefix}.${key}` : key;
-        if (typeof obj[key] === 'object' && !Array.isArray(obj[key])) {
-          Object.assign(flat, flattenObject(obj[key], newKey));
-        } else {
-          flat[newKey] = String(obj[key]);
-        }
-      }
-      return flat;
-    };
 
-    const data = result.type === "phone" || result.type === "aadhar" || result.type === "numinfov2" || result.type === "allsearch"
-      ? flattenObject(result.data)
-      : result.type === "vehicle"
-      ? flattenObject(result.data)
-      : {};
-
-    const entries = Object.entries(data).filter(([_, v]) => v && v !== "null" && v !== "undefined");
-
-    if (entries.length === 0) {
-      return <p className="text-center text-muted-foreground py-4">No data available</p>;
-    }
-
+    // Show raw JSON for all results
     return (
-      <div className="grid gap-2">
-        {entries.map(([key, value]) => (
-          <div
-            key={key}
-            className="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-background/50 border border-neon-green/20 group hover:border-neon-green/40 transition-colors"
-          >
-            <div className="flex-1 min-w-0">
-              <p className="text-[10px] text-muted-foreground uppercase tracking-wider truncate">
-                {key.split('.').pop()?.replace(/_/g, ' ')}
-              </p>
-              <p className="text-sm text-foreground font-medium truncate">{value}</p>
-            </div>
-            <button
-              onClick={() => copyToClipboard(value, key)}
-              className="opacity-0 group-hover:opacity-100 transition-opacity p-1.5 rounded-md hover:bg-neon-green/10"
-            >
-              {copiedField === key ? (
-                <Check className="w-3.5 h-3.5 text-neon-green" />
-              ) : (
-                <Copy className="w-3.5 h-3.5 text-muted-foreground" />
-              )}
-            </button>
-          </div>
-        ))}
+      <div className="space-y-3">
+        <pre className="text-xs font-mono bg-background/80 p-3 rounded-lg border border-neon-green/20 overflow-x-auto whitespace-pre-wrap break-words text-foreground max-h-[400px] overflow-y-auto">
+          {JSON.stringify(result.data, null, 2)}
+        </pre>
+        <button
+          onClick={() => copyToClipboard(JSON.stringify(result.data, null, 2), "JSON Data")}
+          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neon-green/10 border border-neon-green/30 hover:bg-neon-green/20 transition-colors text-sm text-neon-green"
+        >
+          {copiedField === "JSON Data" ? (
+            <Check className="w-4 h-4" />
+          ) : (
+            <Copy className="w-4 h-4" />
+          )}
+          Copy JSON
+        </button>
       </div>
     );
   };
@@ -307,14 +273,14 @@ const SearchPanel = () => {
         <div className="animate-slide-up" style={{ animationDelay: `${enabledTabs.length * 50}ms` }}>
           <Link to="/page2">
             <div className={cn(
-              "flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-300",
+              "flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-300",
               "backdrop-blur-sm bg-gradient-to-br from-neon-yellow/20 to-neon-yellow/5",
               "border-neon-yellow/40 hover:border-neon-yellow hover:scale-[1.02]"
             )}>
-              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-background/80 to-background/40 border border-neon-yellow/30 flex items-center justify-center text-neon-yellow">
-                <ArrowRight className="w-5 h-5" />
+              <div className="w-7 h-7 rounded-md bg-gradient-to-br from-background/80 to-background/40 border border-neon-yellow/30 flex items-center justify-center text-neon-yellow">
+                <ArrowRight className="w-3.5 h-3.5" />
               </div>
-              <span className="text-[10px] font-bold tracking-wide uppercase text-neon-yellow">More</span>
+              <span className="text-[8px] font-bold tracking-wide uppercase text-neon-yellow">More</span>
             </div>
           </Link>
         </div>
