@@ -126,6 +126,11 @@ export default {
           "50%": { opacity: "1" },
           "100%": { transform: "rotate(600deg) translateX(30px) rotate(-600deg)", opacity: "0.75" },
         },
+        "rainbow-border": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+          "100%": { backgroundPosition: "0% 50%" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -137,6 +142,7 @@ export default {
         "bounce-in": "bounce-in 0.4s ease-out",
         "shimmer": "shimmer 2s linear infinite",
         "orbit-1": "orbit-1 3s linear infinite",
+        "rainbow-border": "rainbow-border 4s linear infinite",
         "orbit-2": "orbit-2 4s linear infinite",
         "orbit-3": "orbit-3 5s linear infinite",
       },
