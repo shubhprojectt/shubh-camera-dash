@@ -545,29 +545,6 @@ const Admin = () => {
             )}
           </div>
 
-          {/* Header Icon */}
-          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-            <h3 className="font-bold text-neon-cyan">Header Icon (used if no custom logo)</h3>
-            <div className="grid grid-cols-5 gap-2">
-              {iconOptions.map((iconName) => {
-                const IconComp = Icons[iconName as keyof typeof Icons] as React.FC<{ className?: string }>;
-                return IconComp ? (
-                  <button
-                    key={iconName}
-                    onClick={() => updateSettings({ headerIcon: iconName })}
-                    className={`p-3 rounded-lg border-2 transition-all flex flex-col items-center gap-1 ${
-                      settings.headerIcon === iconName && !settings.headerCustomLogo
-                        ? "border-neon-green bg-neon-green/10 shadow-[0_0_10px_hsl(var(--neon-green)/0.5)]"
-                        : "border-border/50 hover:border-neon-green/50"
-                    }`}
-                  >
-                    <IconComp className="w-5 h-5 text-neon-green" />
-                    <span className="text-[10px] text-muted-foreground">{iconName}</span>
-                  </button>
-                ) : null;
-              })}
-            </div>
-          </div>
         </Section>
 
         {/* Background Section */}
