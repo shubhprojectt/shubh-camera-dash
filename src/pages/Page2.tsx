@@ -107,53 +107,53 @@ const Page2 = () => {
       <div className="absolute top-0 left-0 w-40 h-40 bg-neon-green/10 rounded-full" style={{ filter: 'blur(60px)' }} />
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-neon-pink/10 rounded-full" style={{ filter: 'blur(60px)' }} />
       
-      {/* Content */}
-      <div className="relative z-10 w-full mx-auto px-0 sm:px-3 py-4">
-        {/* Header */}
-        <header className="w-full mx-auto mb-4">
-          <div className="flex items-center justify-between">
-            {/* Back Button */}
-            <Link 
-              to="/" 
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-neon-cyan/40 bg-card/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all group"
-            >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              <span className="text-xs font-bold uppercase tracking-wider">Back</span>
-            </Link>
-            
-            {/* Title */}
-            <div className="text-center">
-              <h1 className="text-xl md:text-2xl font-black tracking-wider bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink bg-clip-text text-transparent">
-                PAGE 2
-              </h1>
-              <p className="text-[9px] text-muted-foreground font-mono">EXTERNAL API TOOLS</p>
+        {/* Content */}
+        <div className="relative z-10 container max-w-3xl mx-auto px-3 py-4">
+          {/* Header */}
+          <header className="container max-w-3xl mx-auto mb-4">
+            <div className="flex items-center justify-between">
+              {/* Back Button */}
+              <Link 
+                to="/" 
+                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-neon-cyan/40 bg-card/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all group"
+              >
+                <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+                <span className="text-xs font-bold uppercase tracking-wider">Back</span>
+              </Link>
+              
+              {/* Title */}
+              <div className="text-center">
+                <h1 className="text-xl md:text-2xl font-black tracking-wider bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink bg-clip-text text-transparent">
+                  PAGE 2
+                </h1>
+                <p className="text-[9px] text-muted-foreground font-mono">EXTERNAL API TOOLS</p>
+              </div>
+              
+              {/* Credits */}
+              <CreditDisplay />
             </div>
-            
-            {/* Credits */}
-            <CreditDisplay />
+          </header>
+          
+          {/* Stats Bar */}
+          <div className="container max-w-3xl mx-auto mb-4">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-purple/30">
+                <Terminal className="w-3 h-3 text-neon-purple" />
+                <span className="text-[10px] font-mono text-neon-purple">Manual Mode</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-cyan/30">
+                <Globe className="w-3 h-3 text-neon-cyan" />
+                <span className="text-[10px] font-mono text-neon-cyan">External API</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-green/30">
+                <ExternalLink className="w-3 h-3 text-neon-green" />
+                <span className="text-[10px] font-mono text-neon-green">New Tab</span>
+              </div>
+            </div>
           </div>
-        </header>
-        
-        {/* Stats Bar */}
-        <div className="w-full mx-auto mb-4">
-          <div className="flex items-center justify-center gap-2 flex-wrap">
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-purple/30">
-              <Terminal className="w-3 h-3 text-neon-purple" />
-              <span className="text-[10px] font-mono text-neon-purple">Manual Mode</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-cyan/30">
-              <Globe className="w-3 h-3 text-neon-cyan" />
-              <span className="text-[10px] font-mono text-neon-cyan">External API</span>
-            </div>
-            <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-green/30">
-              <ExternalLink className="w-3 h-3 text-neon-green" />
-              <span className="text-[10px] font-mono text-neon-green">New Tab</span>
-            </div>
-          </div>
-        </div>
-        
-        {/* Main Dashboard */}
-        <main className="w-full mx-auto space-y-4">
+          
+          {/* Main Dashboard */}
+          <main className="container max-w-3xl mx-auto space-y-4">
           {/* Search Card */}
           <div className="relative">
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink opacity-40" />
