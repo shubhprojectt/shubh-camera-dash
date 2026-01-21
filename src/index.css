@@ -254,6 +254,13 @@
     100% { background-position: 0% 50%; }
   }
 
+  /* Vertical version of rainbow-border (for left/right edges) */
+  @keyframes rainbow-border-y {
+    0% { background-position: 50% 0%; }
+    50% { background-position: 50% 100%; }
+    100% { background-position: 50% 0%; }
+  }
+
   @keyframes float {
     0%, 100% { transform: translateY(0) rotate(12deg); }
     50% { transform: translateY(-10px) rotate(12deg); }
@@ -275,6 +282,11 @@
   .animate-gradient-shift {
     background-size: 200% 200%;
     animation: gradient-shift 3s ease infinite;
+  }
+
+  .animate-rainbow-border-y {
+    background-size: 100% 400%;
+    animation: rainbow-border-y 4s linear infinite;
   }
 
   .animate-float {

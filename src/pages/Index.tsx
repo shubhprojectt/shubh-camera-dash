@@ -32,15 +32,15 @@ const Index = () => {
         )}
         
         {/* Content */}
-        <div className="relative z-10 container mx-auto px-3 pb-4 pt-2">
+        <div className="relative z-10 w-full mx-auto px-0 sm:px-3 pb-4 pt-2">
           <Header />
           
-          <main className="max-w-3xl mx-auto">
+          <main className="w-full mx-auto">
             <NumberDetailFinder />
           </main>
           
           {/* Footer text */}
-          <div className="max-w-3xl mx-auto mt-6 text-center">
+          <div className="w-full mx-auto mt-6 text-center">
             <p className="text-[10px] text-muted-foreground/50 font-mono">
               ⚠ FOR EDUCATIONAL PURPOSES ONLY • USE RESPONSIBLY
             </p>
