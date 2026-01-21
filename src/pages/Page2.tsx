@@ -69,9 +69,12 @@ const Page2 = () => {
       <div className="fixed inset-0 pointer-events-none">
         {settings.backgroundImage ? (
           <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 bg-fixed-stable"
             style={{ 
               backgroundImage: `url(${settings.backgroundImage})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
               opacity: (parseInt(settings.backgroundOpacity || "30") / 100)
             }}
           />

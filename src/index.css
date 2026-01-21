@@ -96,14 +96,22 @@
   }
 
   .bg-fixed-stable {
+    /*
+      Avoid "zoom in/out" on mobile scrolling:
+      - Don't use explicit dvh height here (mobile toolbars change dvh while scrolling)
+      - Don't rely on background-attachment: fixed (buggy on mobile)
+      - Use a fixed layer that simply covers the viewport via inset
+    */
     position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100vw !important;
-    height: 100dvh !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    will-change: auto;
+    inset: 0 !important;
+    /* Force non-fixed attachment (mobile bug: fixed attachment can "zoom") */
+    background-attachment: scroll !important;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    contain: paint;
+    will-change: transform;
   }
 
   body {
