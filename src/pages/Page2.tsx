@@ -108,9 +108,9 @@ const Page2 = () => {
       <div className="absolute bottom-0 right-0 w-40 h-40 bg-neon-pink/10 rounded-full" style={{ filter: 'blur(60px)' }} />
       
       {/* Content */}
-      <div className="relative z-10 container mx-auto px-3 py-4">
+      <div className="relative z-10 w-full mx-auto px-0 sm:px-3 py-4">
         {/* Header */}
-        <header className="max-w-3xl mx-auto mb-4">
+        <header className="w-full mx-auto mb-4">
           <div className="flex items-center justify-between">
             {/* Back Button */}
             <Link 
@@ -135,7 +135,7 @@ const Page2 = () => {
         </header>
         
         {/* Stats Bar */}
-        <div className="max-w-3xl mx-auto mb-4">
+        <div className="w-full mx-auto mb-4">
           <div className="flex items-center justify-center gap-2 flex-wrap">
             <div className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-card/50 border border-neon-purple/30">
               <Terminal className="w-3 h-3 text-neon-purple" />
@@ -153,7 +153,7 @@ const Page2 = () => {
         </div>
         
         {/* Main Dashboard */}
-        <main className="max-w-3xl mx-auto space-y-4">
+        <main className="w-full mx-auto space-y-4">
           {/* Search Card */}
           <div className="relative">
             <div className="absolute -inset-[1px] rounded-2xl bg-gradient-to-r from-neon-purple via-neon-cyan to-neon-pink opacity-40" />

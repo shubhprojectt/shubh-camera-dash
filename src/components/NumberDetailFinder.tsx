@@ -960,19 +960,93 @@ const NumberDetailFinder = () => {
               </>
             );
           })()}
-        {/* Side neon glow borders for transparent mode */}
-        {settings.sectionTransparent && (
-          <>
-            {/* Left glow */}
-            <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-neon-cyan via-neon-green to-neon-cyan shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-green)/0.5)]" />
-            {/* Right glow */}
-            <div className="absolute right-0 top-0 bottom-0 w-[2px] bg-gradient-to-b from-neon-pink via-neon-purple to-neon-pink shadow-[0_0_15px_hsl(var(--neon-pink)),0_0_30px_hsl(var(--neon-purple)/0.5)]" />
-            {/* Top glow */}
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-pink shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-pink)/0.5)]" />
-            {/* Bottom glow */}
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-neon-green via-neon-purple to-neon-purple shadow-[0_0_15px_hsl(var(--neon-green)),0_0_30px_hsl(var(--neon-purple)/0.5)]" />
-          </>
-        )}
+        {/* Running neon border lines for transparent mode (no fill) */}
+        {settings.sectionTransparent &&
+          (() => {
+            const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
+            const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
+            const speed = settings.sectionBorderSpeed || 4;
+            const first = gradientColors.split(", ")[0];
+
+            const gradientX = `linear-gradient(90deg, ${gradientColors}, ${first})`;
+            const gradientY = `linear-gradient(180deg, ${gradientColors}, ${first})`;
+
+            return (
+              <>
+                {/* Top */}
+                <div
+                  className="pointer-events-none absolute left-0 right-0 top-0 h-[2px] bg-[length:400%_100%] animate-rainbow-border opacity-80"
+                  style={{
+                    background: gradientX,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute left-0 right-0 top-0 h-[2px] bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-55"
+                  style={{
+                    background: gradientX,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+
+                {/* Bottom */}
+                <div
+                  className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-[length:400%_100%] animate-rainbow-border opacity-80"
+                  style={{
+                    background: gradientX,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute left-0 right-0 bottom-0 h-[2px] bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-55"
+                  style={{
+                    background: gradientX,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+
+                {/* Left */}
+                <div
+                  className="pointer-events-none absolute top-0 bottom-0 left-0 w-[2px] animate-rainbow-border-y opacity-80"
+                  style={{
+                    background: gradientY,
+                    backgroundSize: "100% 400%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute top-0 bottom-0 left-0 w-[2px] animate-rainbow-border-y blur-sm opacity-55"
+                  style={{
+                    background: gradientY,
+                    backgroundSize: "100% 400%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+
+                {/* Right */}
+                <div
+                  className="pointer-events-none absolute top-0 bottom-0 right-0 w-[2px] animate-rainbow-border-y opacity-80"
+                  style={{
+                    background: gradientY,
+                    backgroundSize: "100% 400%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+                <div
+                  className="pointer-events-none absolute top-0 bottom-0 right-0 w-[2px] animate-rainbow-border-y blur-sm opacity-55"
+                  style={{
+                    background: gradientY,
+                    backgroundSize: "100% 400%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+              </>
+            );
+          })()}
         <div className={`relative rounded-lg p-1.5 overflow-hidden ${
           settings.sectionTransparent ? 'bg-transparent' : 'bg-card/95 backdrop-blur-sm'
         }`}>
