@@ -20,10 +20,11 @@ const Index = () => {
                 backgroundSize: 'cover',
                 backgroundPosition: 'center',
                 backgroundRepeat: 'no-repeat',
-                backgroundAttachment: 'fixed',
                 opacity: (parseInt(settings.backgroundOpacity || "30") / 100),
-                willChange: 'auto',
-                transform: 'translateZ(0)'
+                /* Mobile browsers can "zoom" fixed-attachment backgrounds while scrolling.
+                   The layer itself is fixed via .bg-fixed-stable, so keep attachment default. */
+                willChange: 'transform',
+                transform: 'translate3d(0,0,0)'
               }}
             />
           ) : (
