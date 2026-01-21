@@ -1161,8 +1161,8 @@ const NumberDetailFinder = () => {
       {/* Results Section */}
       {activeTab && activeButton && activeButton.searchType !== "shubh" && activeButton.searchType !== "darkdb" && activeButton.searchType !== "telegram" && activeButton.searchType !== "phprat" && (
         <div key={`results-${activeTab}`} className="animate-tab-slide-in">
-          {/* Loading */}
-          {loading && <HackerLoader />}
+          {/* Loading - inline version to not cover the screen */}
+          {loading && <HackerLoader inline />}
 
           {/* Error */}
           {error && !loading && (

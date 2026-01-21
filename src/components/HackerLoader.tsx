@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 
-const HackerLoader = () => {
+interface HackerLoaderProps {
+  inline?: boolean; // If true, shows inline (not full screen overlay)
+}
+
+const HackerLoader = ({ inline = false }: HackerLoaderProps) => {
   const [progress, setProgress] = useState(0);
   const [glitchText, setGlitchText] = useState("SHUBH OSINT");
   const [dots, setDots] = useState("");
@@ -41,6 +45,51 @@ const HackerLoader = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Inline compact version for search loading
+  if (inline) {
+    return (
+      <div className="relative overflow-hidden rounded-xl bg-card/80 border border-neon-cyan/30 p-4 animate-fade-in">
+        {/* Animated gradient border effect */}
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-neon-pink/10 via-neon-cyan/10 to-neon-pink/10 bg-[length:200%_100%] animate-gradient-x" />
+        
+        {/* Main content */}
+        <div className="relative z-10 flex flex-col items-center gap-3">
+          {/* Compact loading icon */}
+          <div className="relative">
+            <div className="absolute -inset-2 rounded-full border border-dashed border-neon-pink/40 animate-spin" style={{ animationDuration: '4s' }} />
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-pink/20 to-neon-cyan/20 border border-neon-pink/50 flex items-center justify-center shadow-[0_0_15px_hsl(var(--neon-pink)/0.3)]">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                <path 
+                  d="M12 2L21 7V17L12 22L3 17V7L12 2Z" 
+                  className="stroke-neon-cyan fill-neon-cyan/10" 
+                  strokeWidth="1.5"
+                />
+                <circle cx="12" cy="12" r="2" className="fill-neon-pink animate-pulse" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Status text */}
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-neon-cyan animate-pulse shadow-[0_0_6px_hsl(var(--neon-cyan))]" />
+            <span className="text-neon-cyan text-[10px]">SEARCHING{dots}</span>
+          </div>
+
+          {/* Progress bar */}
+          <div className="w-full max-w-[150px]">
+            <div className="h-0.5 bg-muted/30 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-gradient-to-r from-neon-pink via-neon-cyan to-neon-pink rounded-full transition-all duration-100"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Full screen overlay version (original)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
       <div className="relative overflow-hidden rounded-2xl bg-background/95 p-6">
