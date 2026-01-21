@@ -75,25 +75,63 @@ const iconOptions = [
 ];
 
 const fontOptions = [
-  { value: "Orbitron", label: "Orbitron", style: "font-display" },
-  { value: "Share Tech Mono", label: "Share Tech Mono", style: "font-mono" },
-  { value: "Courier New", label: "Courier New", style: "font-mono" },
-  { value: "Impact", label: "Impact", style: "font-sans" },
-  { value: "Georgia", label: "Georgia", style: "font-serif" },
-  { value: "Arial Black", label: "Arial Black", style: "font-sans" },
-  { value: "Verdana", label: "Verdana", style: "font-sans" },
-  { value: "Times New Roman", label: "Times New Roman", style: "font-serif" },
+  // Techy/Futuristic Fonts
+  { value: "Orbitron", label: "Orbitron", category: "Tech" },
+  { value: "Share Tech Mono", label: "Share Tech Mono", category: "Tech" },
+  { value: "Courier New", label: "Courier New", category: "Mono" },
+  { value: "Consolas", label: "Consolas", category: "Mono" },
+  { value: "Monaco", label: "Monaco", category: "Mono" },
+  { value: "Lucida Console", label: "Lucida Console", category: "Mono" },
+  // Bold/Impact Fonts
+  { value: "Impact", label: "Impact", category: "Bold" },
+  { value: "Arial Black", label: "Arial Black", category: "Bold" },
+  { value: "Trebuchet MS", label: "Trebuchet MS", category: "Bold" },
+  { value: "Franklin Gothic Medium", label: "Franklin Gothic", category: "Bold" },
+  // Classic Fonts
+  { value: "Georgia", label: "Georgia", category: "Classic" },
+  { value: "Times New Roman", label: "Times New Roman", category: "Classic" },
+  { value: "Palatino Linotype", label: "Palatino", category: "Classic" },
+  { value: "Book Antiqua", label: "Book Antiqua", category: "Classic" },
+  // Modern/Clean Fonts
+  { value: "Verdana", label: "Verdana", category: "Modern" },
+  { value: "Tahoma", label: "Tahoma", category: "Modern" },
+  { value: "Segoe UI", label: "Segoe UI", category: "Modern" },
+  { value: "Calibri", label: "Calibri", category: "Modern" },
+  { value: "Arial", label: "Arial", category: "Modern" },
+  { value: "Helvetica", label: "Helvetica", category: "Modern" },
+  // Stylish/Decorative
+  { value: "Copperplate", label: "Copperplate", category: "Stylish" },
+  { value: "Papyrus", label: "Papyrus", category: "Stylish" },
+  { value: "Brush Script MT", label: "Brush Script", category: "Stylish" },
+  { value: "Lucida Handwriting", label: "Lucida Hand", category: "Stylish" },
 ];
 
 const headerStyleOptions = [
-  { value: "normal", label: "Normal" },
-  { value: "uppercase", label: "UPPERCASE" },
-  { value: "lowercase", label: "lowercase" },
-  { value: "capitalize", label: "Capitalize" },
-  { value: "italic", label: "Italic" },
-  { value: "bold", label: "Bold" },
-  { value: "glow", label: "Glow Effect" },
-  { value: "flicker", label: "Neon Flicker" },
+  // Basic Transforms
+  { value: "normal", label: "Normal", category: "Basic" },
+  { value: "uppercase", label: "UPPERCASE", category: "Basic" },
+  { value: "lowercase", label: "lowercase", category: "Basic" },
+  { value: "capitalize", label: "Capitalize", category: "Basic" },
+  // Text Weight
+  { value: "italic", label: "Italic", category: "Weight" },
+  { value: "bold", label: "Bold", category: "Weight" },
+  { value: "light", label: "Light", category: "Weight" },
+  { value: "thin", label: "Thin", category: "Weight" },
+  // Spacing
+  { value: "wide", label: "W I D E", category: "Spacing" },
+  { value: "tight", label: "Tight", category: "Spacing" },
+  // Animations
+  { value: "glow", label: "Glow Pulse", category: "Animate" },
+  { value: "flicker", label: "Neon Flicker", category: "Animate" },
+  { value: "bounce", label: "Bounce", category: "Animate" },
+  { value: "shake", label: "Shake", category: "Animate" },
+  { value: "pulse", label: "Pulse", category: "Animate" },
+  // Effects
+  { value: "shadow", label: "Shadow", category: "Effect" },
+  { value: "outline", label: "Outline", category: "Effect" },
+  { value: "gradient", label: "Gradient", category: "Effect" },
+  { value: "glitch", label: "Glitch", category: "Effect" },
+  { value: "blur", label: "Blur Hover", category: "Effect" },
 ];
 
 interface SearchHistoryItem {
@@ -439,41 +477,59 @@ const Admin = () => {
 
           {/* Font Selection */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-            <h3 className="font-bold text-neon-orange">Header Font</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {fontOptions.map((font) => (
-                <button
-                  key={font.value}
-                  onClick={() => updateSettings({ headerFont: font.value })}
-                  style={{ fontFamily: font.value }}
-                  className={`p-3 rounded-lg border-2 transition-all text-sm ${
-                    settings.headerFont === font.value
-                      ? "border-neon-orange bg-neon-orange/10"
-                      : "border-border/50 hover:border-neon-orange/50"
-                  }`}
-                >
-                  {font.label}
-                </button>
+            <h3 className="font-bold text-neon-orange flex items-center gap-2">
+              <Type className="w-4 h-4" /> Header Font
+            </h3>
+            <div className="space-y-3">
+              {["Tech", "Mono", "Bold", "Classic", "Modern", "Stylish"].map((category) => (
+                <div key={category}>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">{category}</p>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {fontOptions.filter(f => f.category === category).map((font) => (
+                      <button
+                        key={font.value}
+                        onClick={() => updateSettings({ headerFont: font.value })}
+                        style={{ fontFamily: font.value }}
+                        className={`p-2 rounded-lg border transition-all text-xs truncate ${
+                          settings.headerFont === font.value
+                            ? "border-neon-orange bg-neon-orange/15 text-neon-orange shadow-[0_0_8px_hsl(var(--neon-orange)/0.3)]"
+                            : "border-border/40 hover:border-neon-orange/50 text-foreground/80"
+                        }`}
+                      >
+                        {font.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
 
           {/* Header Style */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-            <h3 className="font-bold text-neon-pink">Header Style</h3>
-            <div className="grid grid-cols-4 gap-2">
-              {headerStyleOptions.map((style) => (
-                <button
-                  key={style.value}
-                  onClick={() => updateSettings({ headerStyle: style.value })}
-                  className={`p-2 rounded-lg border-2 transition-all text-xs ${
-                    settings.headerStyle === style.value
-                      ? "border-neon-pink bg-neon-pink/10"
-                      : "border-border/50 hover:border-neon-pink/50"
-                  }`}
-                >
-                  {style.label}
-                </button>
+            <h3 className="font-bold text-neon-pink flex items-center gap-2">
+              <Palette className="w-4 h-4" /> Header Style
+            </h3>
+            <div className="space-y-3">
+              {["Basic", "Weight", "Spacing", "Animate", "Effect"].map((category) => (
+                <div key={category}>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">{category}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {headerStyleOptions.filter(s => s.category === category).map((style) => (
+                      <button
+                        key={style.value}
+                        onClick={() => updateSettings({ headerStyle: style.value })}
+                        className={`px-2.5 py-1.5 rounded-lg border transition-all text-[10px] ${
+                          settings.headerStyle === style.value
+                            ? "border-neon-pink bg-neon-pink/15 text-neon-pink shadow-[0_0_8px_hsl(var(--neon-pink)/0.3)]"
+                            : "border-border/40 hover:border-neon-pink/50 text-foreground/80"
+                        }`}
+                      >
+                        {style.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               ))}
             </div>
           </div>

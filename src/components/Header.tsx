@@ -22,13 +22,30 @@ const Header = () => {
 
   const getStyleClasses = () => {
     switch (settings.headerStyle) {
+      // Basic transforms
       case "uppercase": return "uppercase";
       case "lowercase": return "lowercase";
       case "capitalize": return "capitalize";
+      // Weight
       case "italic": return "italic";
       case "bold": return "font-black";
+      case "light": return "font-light";
+      case "thin": return "font-thin";
+      // Spacing
+      case "wide": return "tracking-[0.5em]";
+      case "tight": return "tracking-tighter";
+      // Animations
       case "glow": return "animate-pulse-glow";
       case "flicker": return "animate-neon-flicker";
+      case "bounce": return "animate-bounce";
+      case "shake": return "animate-shake";
+      case "pulse": return "animate-pulse";
+      // Effects
+      case "shadow": return "drop-shadow-[0_0_10px_currentColor]";
+      case "outline": return "[text-shadow:_-1px_-1px_0_currentColor,_1px_-1px_0_currentColor,_-1px_1px_0_currentColor,_1px_1px_0_currentColor]";
+      case "gradient": return "bg-gradient-to-r from-current via-white to-current bg-clip-text";
+      case "glitch": return "animate-glitch";
+      case "blur": return "hover:blur-[1px] transition-all";
       default: return "";
     }
   };
