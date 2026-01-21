@@ -931,36 +931,37 @@ const NumberDetailFinder = () => {
       <div className="space-y-1.5">
       {/* Main Card */}
       <div className="relative">
-        {/* Dynamic Multicolor running glow border (always visible on all sides) */}
-        {(() => {
-          const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
-          const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
-          const speed = settings.sectionBorderSpeed || 4;
-          const gradient = `linear-gradient(90deg, ${gradientColors}, ${gradientColors.split(", ")[0]})`;
+        {/* Dynamic Multicolor running glow border (disabled in transparent mode) */}
+        {!settings.sectionTransparent &&
+          (() => {
+            const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
+            const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
+            const speed = settings.sectionBorderSpeed || 4;
+            const gradient = `linear-gradient(90deg, ${gradientColors}, ${gradientColors.split(", ")[0]})`;
 
-          return (
-            <>
-              <div
-                className="absolute -inset-[2px] rounded-lg bg-[length:400%_100%] animate-rainbow-border opacity-70"
-                style={{
-                  background: gradient,
-                  backgroundSize: "400% 100%",
-                  animationDuration: `${speed}s`,
-                }}
-              />
-              <div
-                className="absolute -inset-[1px] rounded-lg bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-50"
-                style={{
-                  background: gradient,
-                  backgroundSize: "400% 100%",
-                  animationDuration: `${speed}s`,
-                }}
-              />
-            </>
-          );
-        })()}
+            return (
+              <>
+                <div
+                  className="absolute -inset-[2px] rounded-lg bg-[length:400%_100%] animate-rainbow-border opacity-70"
+                  style={{
+                    background: gradient,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+                <div
+                  className="absolute -inset-[1px] rounded-lg bg-[length:400%_100%] animate-rainbow-border blur-sm opacity-50"
+                  style={{
+                    background: gradient,
+                    backgroundSize: "400% 100%",
+                    animationDuration: `${speed}s`,
+                  }}
+                />
+              </>
+            );
+          })()}
         <div className={`relative rounded-lg p-1.5 overflow-hidden ${
-          settings.sectionTransparent ? 'bg-transparent' : 'bg-card/95 backdrop-blur-sm'
+          settings.sectionTransparent ? 'bg-transparent border-l border-r border-border/40' : 'bg-card/95 backdrop-blur-sm'
         }`}>
           
           {/* Button Grid - 4 columns for compact view */}
