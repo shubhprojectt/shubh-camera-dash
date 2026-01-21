@@ -103,7 +103,7 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardP
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-300",
+        "relative flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-300",
         "backdrop-blur-sm bg-gradient-to-br",
         colors.gradient,
         colors.border,
@@ -113,28 +113,28 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardP
     >
       {/* Active indicator dot */}
       {active && (
-        <div className={cn("absolute top-1.5 right-1.5 w-2 h-2 rounded-full animate-pulse", colors.bg)} />
+        <div className={cn("absolute top-1 right-1 w-1.5 h-1.5 rounded-full animate-pulse", colors.bg)} />
       )}
       
       {/* Icon container with glow */}
       <div className={cn(
-        "relative w-10 h-10 rounded-lg flex items-center justify-center",
+        "relative w-7 h-7 rounded-md flex items-center justify-center",
         "bg-gradient-to-br from-background/80 to-background/40",
         "border border-current/30",
         colors.text
       )}>
         {active && (
-          <div className="absolute inset-0 rounded-lg bg-current/10 animate-pulse" />
+          <div className="absolute inset-0 rounded-md bg-current/10 animate-pulse" />
         )}
         <Icon className={cn(
-          "w-5 h-5 transition-transform duration-200",
+          "w-3.5 h-3.5 transition-transform duration-200",
           active && "drop-shadow-[0_0_8px_currentColor]"
         )} />
       </div>
       
       {/* Label */}
       <span className={cn(
-        "text-[10px] font-bold tracking-wide uppercase text-center leading-tight",
+        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
         colors.text,
         active && "drop-shadow-[0_0_6px_currentColor]"
       )}>
