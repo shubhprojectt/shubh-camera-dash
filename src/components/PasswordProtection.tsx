@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { Lock } from "lucide-react";
+import { Lock, Shield } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { toast } from "@/hooks/use-toast";
@@ -17,11 +17,10 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   const handleUnlock = () => {
     if (password === settings.sitePassword) {
       setIsUnlocked(true);
-      // Set session flag so Page2 knows user came through main page
       sessionStorage.setItem("site_unlocked", "true");
       toast({
         title: "Access Granted",
-        description: "Welcome to SHUBH OSINT",
+        description: "Welcome to the platform",
       });
     } else {
       toast({
@@ -33,7 +32,6 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
     }
   };
 
-  // If password protection is disabled, show children directly
   if (!settings.sitePasswordEnabled) {
     return <>{children}</>;
   }
@@ -43,61 +41,78 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4">
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-6">
       {/* Background effects */}
-      <div className="absolute inset-0 cyber-grid opacity-[0.03]" />
+      <div className="fixed inset-0 pointer-events-none">
+        {/* Gradient orbs */}
+        <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-neon-green/10 rounded-full blur-[80px]" />
+        <div className="absolute bottom-[20%] right-[10%] w-[200px] h-[200px] bg-neon-cyan/10 rounded-full blur-[80px]" />
+        
+        {/* Subtle grid */}
+        <div 
+          className="absolute inset-0 opacity-[0.02]"
+          style={{
+            backgroundImage: `
+              linear-gradient(hsl(var(--neon-green)) 1px, transparent 1px),
+              linear-gradient(90deg, hsl(var(--neon-green)) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px'
+          }}
+        />
+      </div>
 
-      {/* Lock Dialog */}
-      <div className="relative w-full max-w-xs">
-        {/* Outer glow border (no blur) */}
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-xl opacity-70 animate-pulse" />
-
-        <div className="relative bg-background border border-neon-green/50 rounded-xl p-4 space-y-3">
-          {/* Lock Icon */}
-          <div className="flex justify-center">
+      {/* Lock Card */}
+      <div className="relative w-full max-w-sm">
+        {/* Animated border glow */}
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 animate-gradient-shift bg-[length:200%_auto]" />
+        
+        <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
+          {/* Lock icon with glow */}
+          <div className="flex justify-center mb-5">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-br from-neon-green to-neon-pink rounded-full opacity-35" />
-              <div className="relative w-12 h-12 rounded-full bg-gradient-to-br from-neon-green/30 via-neon-cyan/20 to-neon-pink/30 flex items-center justify-center border border-neon-green/50">
-                <Lock className="w-5 h-5 text-neon-green" />
+              <div className="absolute -inset-4 bg-neon-green/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
+                <Lock className="w-8 h-8 text-neon-green" />
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <div className="text-center space-y-1">
-            <h1 className="text-lg font-display font-bold">
-              <span className="text-neon-green">DARK</span>{" "}
-              <span className="text-neon-pink">OSINT</span>
+          <div className="text-center mb-5">
+            <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent mb-1">
+              {settings.headerName1 || "SHUBH"} {settings.headerName2 || "OSINT"}
             </h1>
-            <p className="text-neon-pink/80 text-[10px]">
-              Password Ke Liye Telegram Msg Kare Id= @xyzd4rkhu
+            <p className="text-sm text-muted-foreground">
+              Enter password to continue
             </p>
           </div>
 
           {/* Password Input */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password enter karein..."
-              className="bg-background border border-neon-cyan/50 rounded-lg h-9 text-sm text-center text-foreground placeholder:text-muted-foreground focus-visible:ring-neon-cyan focus-visible:ring-offset-0"
+              placeholder="Enter password..."
+              className="h-12 bg-background/80 border-neon-green/30 text-foreground text-center text-base placeholder:text-muted-foreground/50 focus:border-neon-green rounded-xl"
               onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
             />
 
-            {/* Unlock Button */}
             <Button
               onClick={handleUnlock}
-              className="w-full h-9 rounded-lg text-sm font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink text-background hover:opacity-90 transition-all shadow-[0_0_15px_hsl(var(--neon-green)/0.4)] active:scale-95"
+              className="w-full h-12 rounded-xl text-base font-bold bg-gradient-to-r from-neon-green to-neon-cyan text-background hover:shadow-[0_0_25px_hsl(var(--neon-green)/0.5)] transition-all active:scale-[0.98]"
             >
-              UNLOCK
+              UNLOCK ACCESS
             </Button>
           </div>
 
-          {/* Footer hint */}
-          <p className="text-center text-[10px] text-muted-foreground">
-            🔐 Secured by SHUBH OSINT
-          </p>
+          {/* Footer */}
+          <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-white/5">
+            <Shield className="w-3.5 h-3.5 text-neon-green/60" />
+            <p className="text-[11px] text-muted-foreground/60">
+              Protected Access
+            </p>
+          </div>
         </div>
       </div>
     </div>
