@@ -21,6 +21,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-green))]",
     bottomGlow: "bg-neon-green shadow-[0_0_15px_hsl(var(--neon-green)),0_0_30px_hsl(var(--neon-green)/0.5)]",
     activeAnimation: "animate-glow-breathe",
+    ringColor: "ring-neon-green/50",
   },
   pink: {
     border: "border-neon-pink",
@@ -32,6 +33,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-pink))]",
     bottomGlow: "bg-neon-pink shadow-[0_0_15px_hsl(var(--neon-pink)),0_0_30px_hsl(var(--neon-pink)/0.5)]",
     activeAnimation: "animate-heartbeat",
+    ringColor: "ring-neon-pink/50",
   },
   orange: {
     border: "border-neon-orange",
@@ -43,6 +45,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-orange))]",
     bottomGlow: "bg-neon-orange shadow-[0_0_15px_hsl(var(--neon-orange)),0_0_30px_hsl(var(--neon-orange)/0.5)]",
     activeAnimation: "animate-wiggle",
+    ringColor: "ring-neon-orange/50",
   },
   cyan: {
     border: "border-neon-cyan",
@@ -54,6 +57,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-cyan))]",
     bottomGlow: "bg-neon-cyan shadow-[0_0_15px_hsl(var(--neon-cyan)),0_0_30px_hsl(var(--neon-cyan)/0.5)]",
     activeAnimation: "animate-radar-sweep",
+    ringColor: "ring-neon-cyan/50",
   },
   red: {
     border: "border-neon-red",
@@ -65,6 +69,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-red))]",
     bottomGlow: "bg-neon-red shadow-[0_0_15px_hsl(var(--neon-red)),0_0_30px_hsl(var(--neon-red)/0.5)]",
     activeAnimation: "animate-neon-flicker-fast",
+    ringColor: "ring-neon-red/50",
   },
   purple: {
     border: "border-neon-purple",
@@ -76,6 +81,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-purple))]",
     bottomGlow: "bg-neon-purple shadow-[0_0_15px_hsl(var(--neon-purple)),0_0_30px_hsl(var(--neon-purple)/0.5)]",
     activeAnimation: "animate-shimmer-rotate",
+    ringColor: "ring-neon-purple/50",
   },
   yellow: {
     border: "border-neon-yellow",
@@ -87,6 +93,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-yellow))]",
     bottomGlow: "bg-neon-yellow shadow-[0_0_15px_hsl(var(--neon-yellow)),0_0_30px_hsl(var(--neon-yellow)/0.5)]",
     activeAnimation: "animate-electric-zap",
+    ringColor: "ring-neon-yellow/50",
   },
   blue: {
     border: "border-neon-blue",
@@ -98,6 +105,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(var(--neon-blue))]",
     bottomGlow: "bg-neon-blue shadow-[0_0_15px_hsl(var(--neon-blue)),0_0_30px_hsl(var(--neon-blue)/0.5)]",
     activeAnimation: "animate-float-gentle",
+    ringColor: "ring-neon-blue/50",
   },
   white: {
     border: "border-white",
@@ -109,6 +117,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(0_0%_100%)]",
     bottomGlow: "bg-white shadow-[0_0_15px_hsl(0_0%_100%),0_0_30px_hsl(0_0%_100%/0.5)]",
     activeAnimation: "animate-flash-blink",
+    ringColor: "ring-white/50",
   },
   teal: {
     border: "border-teal-400",
@@ -120,6 +129,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(171_77%_64%)]",
     bottomGlow: "bg-teal-400 shadow-[0_0_15px_hsl(171_77%_64%),0_0_30px_hsl(171_77%_64%/0.5)]",
     activeAnimation: "animate-bounce-subtle",
+    ringColor: "ring-teal-400/50",
   },
   lime: {
     border: "border-lime-400",
@@ -131,6 +141,7 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(82_85%_67%)]",
     bottomGlow: "bg-lime-400 shadow-[0_0_15px_hsl(82_85%_67%),0_0_30px_hsl(82_85%_67%/0.5)]",
     activeAnimation: "animate-color-shift",
+    ringColor: "ring-lime-400/50",
   },
   emerald: {
     border: "border-emerald-400",
@@ -142,24 +153,25 @@ const colorClasses = {
     iconGlow: "drop-shadow-[0_0_10px_hsl(158_64%_52%)]",
     bottomGlow: "bg-emerald-400 shadow-[0_0_15px_hsl(158_64%_52%),0_0_30px_hsl(158_64%_52%/0.5)]",
     activeAnimation: "animate-ripple-pulse",
+    ringColor: "ring-emerald-400/50",
   },
 };
 
 const sizeClasses = {
   small: {
-    container: "gap-0.5 p-1.5 min-h-[44px]",
-    icon: "w-3.5 h-3.5",
-    label: "text-[7px]",
-  },
-  medium: {
-    container: "gap-1 p-2 min-h-[56px]",
-    icon: "w-4 h-4",
+    circle: "w-12 h-12",
+    icon: "w-5 h-5",
     label: "text-[8px]",
   },
-  large: {
-    container: "gap-1.5 p-2.5 min-h-[68px]",
-    icon: "w-5 h-5",
+  medium: {
+    circle: "w-14 h-14",
+    icon: "w-6 h-6",
     label: "text-[9px]",
+  },
+  large: {
+    circle: "w-16 h-16",
+    icon: "w-7 h-7",
+    label: "text-[10px]",
   },
 };
 
@@ -170,42 +182,50 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "group relative flex flex-col items-center justify-center rounded-lg border transition-all duration-300",
-        "active:scale-90",
-        sizeConfig.container,
-        colors.border,
-        colors.text,
-        colors.hoverGlow,
-        "hover:scale-[1.03]",
-        active ? [colors.activeBg, colors.glow, "scale-[1.02] border-2", colors.activeAnimation] : [colors.bg, "border-opacity-50 hover:border-opacity-100"]
-      )}
+      className="group flex flex-col items-center gap-1.5 transition-all duration-300"
     >
-      {/* Animated pulse ring on active */}
-      {active && (
-        <div className="absolute inset-0 rounded-lg border border-current animate-ping opacity-20" />
-      )}
-      
-      {/* Bottom glow indicator when active */}
-      {active && (
-        <div className={cn(
-          "absolute bottom-0 left-1/2 -translate-x-1/2 w-2/3 h-0.5 rounded-full",
-          colors.bottomGlow
+      {/* Round Icon Container */}
+      <div
+        className={cn(
+          "relative flex items-center justify-center rounded-full border-2 transition-all duration-300",
+          "active:scale-90",
+          sizeConfig.circle,
+          colors.border,
+          colors.text,
+          colors.hoverGlow,
+          "hover:scale-110",
+          active 
+            ? [colors.activeBg, colors.glow, "scale-105 border-[3px]", colors.activeAnimation, "ring-4", colors.ringColor] 
+            : [colors.bg, "border-opacity-60 hover:border-opacity-100"]
+        )}
+      >
+        {/* Animated pulse ring on active */}
+        {active && (
+          <div className="absolute inset-0 rounded-full border-2 border-current animate-ping opacity-30" />
+        )}
+        
+        {/* Inner glow circle when active */}
+        {active && (
+          <div className={cn(
+            "absolute inset-1 rounded-full opacity-20",
+            colors.activeBg
+          )} />
+        )}
+        
+        {/* Icon */}
+        <Icon className={cn(
+          sizeConfig.icon,
+          "transition-all duration-200 relative z-10",
+          active ? colors.iconGlow : "group-hover:scale-110"
         )} />
-      )}
+      </div>
       
-      {/* Icon */}
-      <Icon className={cn(
-        sizeConfig.icon,
-        "transition-all duration-200",
-        active ? colors.iconGlow : "group-hover:scale-110"
-      )} />
-      
-      {/* Label */}
+      {/* Label Below */}
       <span className={cn(
         sizeConfig.label,
-        "font-bold tracking-wide uppercase text-center leading-tight",
-        active && "drop-shadow-[0_0_6px_currentColor]"
+        "font-bold tracking-wider uppercase text-center leading-tight max-w-[60px] transition-all duration-200",
+        colors.text,
+        active && "drop-shadow-[0_0_8px_currentColor] scale-105"
       )}>
         {label}
       </span>
