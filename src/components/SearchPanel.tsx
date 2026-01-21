@@ -250,14 +250,10 @@ const SearchPanel = () => {
     <div className="px-4 space-y-4">
       {/* Feature Cards Grid */}
       <div className="grid grid-cols-4 gap-2">
-        {enabledTabs.map((tab, index) => {
+        {enabledTabs.map((tab) => {
           const IconComponent = iconMap[tab.icon] || Sparkles;
           return (
-            <div
-              key={tab.id}
-              className="animate-slide-up"
-              style={{ animationDelay: `${index * 50}ms` }}
-            >
+            <div key={tab.id}>
               <FeatureCard
                 icon={IconComponent}
                 label={tab.label}
@@ -270,12 +266,12 @@ const SearchPanel = () => {
         })}
         
         {/* More Button */}
-        <div className="animate-slide-up" style={{ animationDelay: `${enabledTabs.length * 50}ms` }}>
+        <div>
           <Link to="/page2">
             <div className={cn(
-              "flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-300",
-              "backdrop-blur-sm bg-gradient-to-br from-neon-yellow/20 to-neon-yellow/5",
-              "border-neon-yellow/40 hover:border-neon-yellow hover:scale-[1.02]"
+              "flex flex-col items-center gap-1 p-2 rounded-lg border transition-colors",
+              "bg-gradient-to-br from-neon-yellow/20 to-neon-yellow/5",
+              "border-neon-yellow/40 hover:border-neon-yellow"
             )}>
               <div className="w-7 h-7 rounded-md bg-gradient-to-br from-background/80 to-background/40 border border-neon-yellow/30 flex items-center justify-center text-neon-yellow">
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -288,11 +284,8 @@ const SearchPanel = () => {
 
       {/* Search Input Section */}
       {showSearchInput && (
-        <div className="animate-slide-up">
-          <div className="relative rounded-xl bg-gradient-to-br from-card/90 to-card/70 backdrop-blur-sm border border-neon-cyan/30 p-3 overflow-hidden">
-            {/* Subtle glow effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-neon-cyan/5 via-transparent to-neon-green/5" />
-            
+        <div>
+          <div className="relative rounded-xl bg-gradient-to-br from-card/90 to-card/70 border border-neon-cyan/30 p-3 overflow-hidden">
             <div className="relative flex gap-2">
               <Input
                 value={searchQuery}
@@ -305,10 +298,8 @@ const SearchPanel = () => {
                 onClick={handleSearch}
                 disabled={loading}
                 className={cn(
-                  "h-11 px-4 rounded-lg font-bold transition-all",
-                  "bg-gradient-to-r from-neon-green to-neon-cyan text-background",
-                  "hover:shadow-[0_0_20px_hsl(var(--neon-green)/0.5)]",
-                  loading && "animate-pulse"
+                  "h-11 px-4 rounded-lg font-bold",
+                  "bg-gradient-to-r from-neon-green to-neon-cyan text-background"
                 )}
               >
                 {loading ? (
@@ -324,21 +315,21 @@ const SearchPanel = () => {
 
       {/* ShubhCam Panel */}
       {activeButton?.searchType === "shubh" && (
-        <div className="animate-slide-up">
+        <div>
           <ShubhCam />
         </div>
       )}
 
       {/* Telegram OSINT Panel */}
       {activeButton?.searchType === "telegram" && (
-        <div className="animate-slide-up">
+        <div>
           <TelegramOSINT />
         </div>
       )}
 
       {/* DARK DB iframe */}
       {activeButton?.searchType === "darkdb" && (
-        <div className="animate-slide-up">
+        <div>
           <div className="rounded-xl border-2 border-neon-purple/40 overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2 bg-neon-purple/10 border-b border-neon-purple/20">
               <Database className="w-4 h-4 text-neon-purple" />
@@ -357,7 +348,7 @@ const SearchPanel = () => {
 
       {/* PHPRAT Panel */}
       {activeButton?.searchType === "phprat" && (
-        <div className="animate-slide-up">
+        <div>
           <div className="rounded-xl border-2 border-neon-green/40 overflow-hidden">
             <div className="flex items-center gap-2 px-3 py-2 bg-neon-green/10 border-b border-neon-green/20">
               <Code className="w-4 h-4 text-neon-green" />
@@ -386,7 +377,7 @@ const SearchPanel = () => {
           )}
           
           {result && !loading && !error && (
-            <div className="rounded-xl border border-neon-green/40 bg-gradient-to-br from-card/90 to-card/70 p-4 animate-slide-up">
+            <div className="rounded-xl border border-neon-green/40 bg-gradient-to-br from-card/90 to-card/70 p-4">
               <div className="flex items-center gap-2 mb-3 pb-2 border-b border-neon-green/20">
                 <Zap className="w-4 h-4 text-neon-green" />
                 <h3 className="text-sm font-bold text-neon-green uppercase tracking-wider">
