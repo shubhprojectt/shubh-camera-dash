@@ -1,5 +1,4 @@
-import { Wifi, Settings, Shield, Activity, Signal } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Shield, Cpu, Zap, Radio } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import CreditDisplay from "./CreditDisplay";
 import AdminSettings from "./AdminSettings";
@@ -19,7 +18,6 @@ const colorClasses: Record<string, { text: string; glow: string; border: string 
 const Header = () => {
   const { settings } = useSettings();
   
-  // Get dynamic icon
   const IconComponent = (Icons[settings.headerIcon as keyof typeof Icons] as LucideIcon) || Icons.Zap;
 
   const getStyleClasses = () => {
@@ -39,68 +37,84 @@ const Header = () => {
   const color2 = colorClasses[settings.headerColor2] || colorClasses.pink;
 
   return (
-    <header className="relative py-3 text-center">
-      {/* Animated top bar */}
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-60" />
-      
-      {/* Left side - Status indicators & Credit Display */}
-      <div className="absolute top-2 left-2 flex flex-col gap-1.5">
+    <header className="relative py-2">
+      {/* Top Status Bar */}
+      <div className="flex items-center justify-between mb-3">
+        {/* Left - Status Pills */}
         <div className="flex items-center gap-1">
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/30">
-            <div className="w-1.5 h-1.5 bg-neon-green rounded-full animate-pulse" />
-            <span className="text-[8px] font-bold text-neon-green">LIVE</span>
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-neon-green/10 border border-neon-green/40">
+            <div className="w-1 h-1 bg-neon-green rounded-full animate-pulse" />
+            <span className="text-[7px] font-mono font-bold text-neon-green tracking-wider">ONLINE</span>
           </div>
-          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
+          <div className="flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-neon-cyan/10 border border-neon-cyan/40">
             <Shield className="w-2 h-2 text-neon-cyan" />
-            <span className="text-[8px] font-bold text-neon-cyan">SECURE</span>
+            <span className="text-[7px] font-mono font-bold text-neon-cyan tracking-wider">SECURE</span>
           </div>
         </div>
-        <CreditDisplay />
+
+        {/* Right - Credits & Settings */}
+        <div className="flex items-center gap-1.5">
+          <CreditDisplay />
+          <AdminSettings />
+        </div>
       </div>
 
-      {/* Right side - Settings button */}
-      <div className="absolute top-2 right-2">
-        <AdminSettings />
-      </div>
-      {/* Compact Logo Container */}
-      <div className="relative inline-block mb-2">
-        {/* Main logo container */}
-        <div className={`relative w-14 h-14 rounded-full border-2 ${color1.border} bg-background/80 overflow-hidden flex items-center justify-center neon-border-animated`}>
-          {settings.headerCustomLogo ? (
-            <img 
-              src={settings.headerCustomLogo} 
-              alt="Logo" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <IconComponent className={`w-7 h-7 ${color1.text} animate-neon-flicker`} />
-          )}
+      {/* Main Logo Section */}
+      <div className="flex flex-col items-center">
+        {/* Logo with animated ring */}
+        <div className="relative mb-2">
+          {/* Outer glow ring */}
+          <div className={`absolute -inset-1 rounded-full ${color1.border} opacity-30 animate-pulse`} 
+               style={{ boxShadow: `0 0 20px hsl(var(--neon-${settings.headerColor1 || 'green'}))` }} />
+          
+          {/* Logo container */}
+          <div className={`relative w-12 h-12 rounded-full border-2 ${color1.border} bg-background/90 backdrop-blur-sm flex items-center justify-center overflow-hidden`}
+               style={{ boxShadow: `inset 0 0 15px hsl(var(--neon-${settings.headerColor1 || 'green'}) / 0.2)` }}>
+            {settings.headerCustomLogo ? (
+              <img 
+                src={settings.headerCustomLogo} 
+                alt="Logo" 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <IconComponent className={`w-6 h-6 ${color1.text} animate-neon-flicker`} />
+            )}
+          </div>
+
+          {/* Corner accents */}
+          <div className="absolute -top-0.5 -left-0.5 w-2 h-2 border-t border-l border-neon-cyan/60" />
+          <div className="absolute -top-0.5 -right-0.5 w-2 h-2 border-t border-r border-neon-cyan/60" />
+          <div className="absolute -bottom-0.5 -left-0.5 w-2 h-2 border-b border-l border-neon-cyan/60" />
+          <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 border-b border-r border-neon-cyan/60" />
         </div>
-      </div>
-      
-      {/* Compact Title */}
-      <div className="relative">
+        
+        {/* Title */}
         <h1 
-          className={`text-2xl md:text-3xl font-black tracking-wider ${getStyleClasses()}`}
+          className={`text-xl md:text-2xl font-black tracking-widest ${getStyleClasses()}`}
           style={{ fontFamily: settings.headerFont }}
         >
           <span className={`${color1.text} ${color1.glow}`}>{settings.headerName1}</span>
-          <span className={`${color2.text} ${color2.glow} ml-2`}>{settings.headerName2}</span>
+          <span className="mx-1.5 text-muted-foreground/40">•</span>
+          <span className={`${color2.text} ${color2.glow}`}>{settings.headerName2}</span>
         </h1>
         
-        {/* Tagline */}
-        <p className="mt-1 text-[9px] text-muted-foreground tracking-[0.2em] uppercase font-mono">
-          Intelligence • Search • Security
-        </p>
+        {/* Tagline with tech icons */}
+        <div className="flex items-center gap-2 mt-1">
+          <Cpu className="w-2.5 h-2.5 text-neon-cyan/60" />
+          <p className="text-[8px] text-muted-foreground/70 tracking-[0.25em] uppercase font-mono">
+            Intelligence • Search • Security
+          </p>
+          <Radio className="w-2.5 h-2.5 text-neon-pink/60" />
+        </div>
       </div>
       
-      {/* Compact decorative line */}
-      <div className="mt-3 flex items-center justify-center gap-2">
-        <div className="w-12 h-px bg-gradient-to-r from-transparent to-neon-green" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-16 h-px bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-cyan" />
-        <div className="w-1.5 h-1.5 rotate-45 border border-neon-cyan bg-neon-cyan/20" />
-        <div className="w-12 h-px bg-gradient-to-l from-transparent to-neon-pink" />
+      {/* Bottom decorative line */}
+      <div className="mt-2 flex items-center justify-center gap-1.5">
+        <div className="w-8 h-px bg-gradient-to-r from-transparent via-neon-green/50 to-neon-green" />
+        <Zap className="w-2.5 h-2.5 text-neon-cyan animate-pulse" />
+        <div className="w-12 h-px bg-gradient-to-r from-neon-cyan via-neon-pink to-neon-cyan" />
+        <Zap className="w-2.5 h-2.5 text-neon-cyan animate-pulse" />
+        <div className="w-8 h-px bg-gradient-to-l from-transparent via-neon-pink/50 to-neon-pink" />
       </div>
     </header>
   );
