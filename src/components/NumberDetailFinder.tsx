@@ -988,30 +988,43 @@ const NumberDetailFinder = () => {
               );
             })}
             
-            {/* Next Page Button */}
-            <Link
-              to="/page2"
-              className={cn(
-                "animate-bounce-in flex flex-col items-center justify-center rounded-lg border border-neon-yellow/50 bg-neon-yellow/10 hover:bg-neon-yellow/20 transition-all duration-200 hover:shadow-[0_0_10px_hsl(var(--neon-yellow)/0.4)] group",
-                settings.tabSize === "small" && "gap-0.5 p-1.5 min-h-[44px]",
-                settings.tabSize === "medium" && "gap-1 p-2 min-h-[56px]",
-                settings.tabSize === "large" && "gap-1.5 p-2.5 min-h-[68px]"
-              )}
+            {/* Next Page Button - Round style matching other tabs */}
+            <div
+              className="animate-bounce-in"
               style={{ animationDelay: `${enabledTabs.length * 30}ms` }}
             >
-              <ArrowRight className={cn(
-                "text-neon-yellow group-hover:translate-x-0.5 transition-transform",
-                settings.tabSize === "small" && "w-3.5 h-3.5",
-                settings.tabSize === "medium" && "w-4 h-4",
-                settings.tabSize === "large" && "w-5 h-5"
-              )} />
-              <span className={cn(
-                "font-bold text-neon-yellow uppercase tracking-wide",
-                settings.tabSize === "small" && "text-[7px]",
-                settings.tabSize === "medium" && "text-[8px]",
-                settings.tabSize === "large" && "text-[9px]"
-              )}>More</span>
-            </Link>
+              <Link
+                to="/page2"
+                className="group flex flex-col items-center gap-1.5 transition-all duration-300"
+              >
+                {/* Round Icon Container */}
+                <div
+                  className={cn(
+                    "relative flex items-center justify-center rounded-full border-2 transition-all duration-300",
+                    "active:scale-90 border-neon-yellow text-neon-yellow bg-neon-yellow/10",
+                    "hover:shadow-[0_0_20px_hsl(var(--neon-yellow)/0.5)] hover:scale-110",
+                    settings.tabSize === "small" && "w-12 h-12",
+                    settings.tabSize === "medium" && "w-14 h-14",
+                    settings.tabSize === "large" && "w-16 h-16"
+                  )}
+                >
+                  <ArrowRight className={cn(
+                    "text-neon-yellow group-hover:translate-x-0.5 transition-transform",
+                    settings.tabSize === "small" && "w-5 h-5",
+                    settings.tabSize === "medium" && "w-6 h-6",
+                    settings.tabSize === "large" && "w-7 h-7"
+                  )} />
+                </div>
+                
+                {/* Label Below */}
+                <span className={cn(
+                  "font-bold tracking-wider uppercase text-center leading-tight text-neon-yellow",
+                  settings.tabSize === "small" && "text-[8px]",
+                  settings.tabSize === "medium" && "text-[9px]",
+                  settings.tabSize === "large" && "text-[10px]"
+                )}>More</span>
+              </Link>
+            </div>
           </div>
           
           {/* Search Input - Shows when a non-camhack, non-darkdb, non-telegram, non-phprat tab is selected */}
