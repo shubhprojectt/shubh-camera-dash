@@ -1,0 +1,147 @@
+import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+
+interface FeatureCardProps {
+  icon: LucideIcon;
+  label: string;
+  color: string;
+  active?: boolean;
+  onClick?: () => void;
+}
+
+const colorMap: Record<string, { gradient: string; border: string; text: string; glow: string; bg: string }> = {
+  green: {
+    gradient: "from-neon-green/20 to-neon-green/5",
+    border: "border-neon-green/40 hover:border-neon-green",
+    text: "text-neon-green",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-green)/0.4)]",
+    bg: "bg-neon-green",
+  },
+  pink: {
+    gradient: "from-neon-pink/20 to-neon-pink/5",
+    border: "border-neon-pink/40 hover:border-neon-pink",
+    text: "text-neon-pink",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-pink)/0.4)]",
+    bg: "bg-neon-pink",
+  },
+  orange: {
+    gradient: "from-neon-orange/20 to-neon-orange/5",
+    border: "border-neon-orange/40 hover:border-neon-orange",
+    text: "text-neon-orange",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-orange)/0.4)]",
+    bg: "bg-neon-orange",
+  },
+  cyan: {
+    gradient: "from-neon-cyan/20 to-neon-cyan/5",
+    border: "border-neon-cyan/40 hover:border-neon-cyan",
+    text: "text-neon-cyan",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-cyan)/0.4)]",
+    bg: "bg-neon-cyan",
+  },
+  red: {
+    gradient: "from-neon-red/20 to-neon-red/5",
+    border: "border-neon-red/40 hover:border-neon-red",
+    text: "text-neon-red",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-red)/0.4)]",
+    bg: "bg-neon-red",
+  },
+  purple: {
+    gradient: "from-neon-purple/20 to-neon-purple/5",
+    border: "border-neon-purple/40 hover:border-neon-purple",
+    text: "text-neon-purple",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-purple)/0.4)]",
+    bg: "bg-neon-purple",
+  },
+  yellow: {
+    gradient: "from-neon-yellow/20 to-neon-yellow/5",
+    border: "border-neon-yellow/40 hover:border-neon-yellow",
+    text: "text-neon-yellow",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-yellow)/0.4)]",
+    bg: "bg-neon-yellow",
+  },
+  blue: {
+    gradient: "from-neon-blue/20 to-neon-blue/5",
+    border: "border-neon-blue/40 hover:border-neon-blue",
+    text: "text-neon-blue",
+    glow: "shadow-[0_0_30px_hsl(var(--neon-blue)/0.4)]",
+    bg: "bg-neon-blue",
+  },
+  white: {
+    gradient: "from-white/20 to-white/5",
+    border: "border-white/40 hover:border-white",
+    text: "text-white",
+    glow: "shadow-[0_0_30px_hsl(0_0%_100%/0.4)]",
+    bg: "bg-white",
+  },
+  teal: {
+    gradient: "from-teal-400/20 to-teal-400/5",
+    border: "border-teal-400/40 hover:border-teal-400",
+    text: "text-teal-400",
+    glow: "shadow-[0_0_30px_rgba(45,212,191,0.4)]",
+    bg: "bg-teal-400",
+  },
+  lime: {
+    gradient: "from-lime-400/20 to-lime-400/5",
+    border: "border-lime-400/40 hover:border-lime-400",
+    text: "text-lime-400",
+    glow: "shadow-[0_0_30px_rgba(163,230,53,0.4)]",
+    bg: "bg-lime-400",
+  },
+  emerald: {
+    gradient: "from-emerald-400/20 to-emerald-400/5",
+    border: "border-emerald-400/40 hover:border-emerald-400",
+    text: "text-emerald-400",
+    glow: "shadow-[0_0_30px_rgba(52,211,153,0.4)]",
+    bg: "bg-emerald-400",
+  },
+};
+
+const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardProps) => {
+  const colors = colorMap[color] || colorMap.green;
+
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "relative flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-300",
+        "backdrop-blur-sm bg-gradient-to-br",
+        colors.gradient,
+        colors.border,
+        "hover:scale-[1.02] active:scale-95",
+        active && [colors.glow, "border-2 scale-[1.02]"]
+      )}
+    >
+      {/* Active indicator dot */}
+      {active && (
+        <div className={cn("absolute top-1.5 right-1.5 w-2 h-2 rounded-full animate-pulse", colors.bg)} />
+      )}
+      
+      {/* Icon container with glow */}
+      <div className={cn(
+        "relative w-10 h-10 rounded-lg flex items-center justify-center",
+        "bg-gradient-to-br from-background/80 to-background/40",
+        "border border-current/30",
+        colors.text
+      )}>
+        {active && (
+          <div className="absolute inset-0 rounded-lg bg-current/10 animate-pulse" />
+        )}
+        <Icon className={cn(
+          "w-5 h-5 transition-transform duration-200",
+          active && "drop-shadow-[0_0_8px_currentColor]"
+        )} />
+      </div>
+      
+      {/* Label */}
+      <span className={cn(
+        "text-[10px] font-bold tracking-wide uppercase text-center leading-tight",
+        colors.text,
+        active && "drop-shadow-[0_0_6px_currentColor]"
+      )}>
+        {label}
+      </span>
+    </button>
+  );
+};
+
+export default FeatureCard;
