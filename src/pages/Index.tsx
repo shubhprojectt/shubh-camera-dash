@@ -9,46 +9,40 @@ const Index = () => {
   return (
     <PasswordProtection>
       <div className="min-h-[100dvh] bg-background relative overflow-x-hidden">
-        {/* Background with gradient mesh */}
-        <div className="fixed inset-0 pointer-events-none">
-          {/* Custom background image */}
+        {/* Background - Fixed and optimized */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          {/* Custom background image - Fixed positioning */}
           {settings.backgroundImage ? (
             <div 
-              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              className="absolute inset-0 bg-fixed-stable"
               style={{ 
                 backgroundImage: `url(${settings.backgroundImage})`,
-                opacity: (parseInt(settings.backgroundOpacity || "30") / 100)
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                backgroundAttachment: 'fixed',
+                opacity: (parseInt(settings.backgroundOpacity || "30") / 100),
+                willChange: 'auto',
+                transform: 'translateZ(0)'
               }}
             />
           ) : (
             <>
-              {/* Gradient mesh background */}
+              {/* Static gradient background - no animations */}
               <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-background" />
               
-              {/* Floating gradient orbs */}
-              <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] bg-neon-green/10 rounded-full blur-[100px] animate-float" />
-              <div className="absolute top-[50%] right-[5%] w-[250px] h-[250px] bg-neon-cyan/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '1s' }} />
-              <div className="absolute bottom-[10%] left-[20%] w-[200px] h-[200px] bg-neon-pink/10 rounded-full blur-[100px] animate-float" style={{ animationDelay: '2s' }} />
-              
-              {/* Subtle grid pattern */}
-              <div 
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `
-                    linear-gradient(hsl(var(--neon-green)) 1px, transparent 1px),
-                    linear-gradient(90deg, hsl(var(--neon-green)) 1px, transparent 1px)
-                  `,
-                  backgroundSize: '50px 50px'
-                }}
-              />
+              {/* Static gradient orbs - no animations for performance */}
+              <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] bg-neon-green/8 rounded-full blur-[100px]" />
+              <div className="absolute top-[50%] right-[5%] w-[250px] h-[250px] bg-neon-cyan/8 rounded-full blur-[100px]" />
+              <div className="absolute bottom-[10%] left-[20%] w-[200px] h-[200px] bg-neon-pink/8 rounded-full blur-[100px]" />
             </>
           )}
           
           {/* Top gradient fade */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-background to-transparent" />
+          <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-background to-transparent" />
           
           {/* Bottom gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
         </div>
         
         {/* Content */}

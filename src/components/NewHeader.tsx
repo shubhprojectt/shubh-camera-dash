@@ -8,10 +8,10 @@ const NewHeader = () => {
 
   return (
     <header className="relative px-4 pt-4 pb-2">
-      {/* Glass morphism header card */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-background/90 via-card/80 to-background/90 backdrop-blur-xl border border-neon-green/20 p-4 overflow-hidden">
-        {/* Animated gradient border effect */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-neon-green/0 via-neon-green/20 to-neon-green/0 animate-shimmer" />
+      {/* Glass morphism header card - optimized */}
+      <div className="relative rounded-2xl bg-gradient-to-br from-background/90 via-card/80 to-background/90 backdrop-blur-sm border border-neon-green/20 p-4 overflow-hidden">
+        {/* Static border glow - no animation */}
+        <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-neon-green/0 via-neon-green/10 to-neon-green/0" />
         
         {/* Corner accents */}
         <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-neon-green/60 rounded-tl-2xl" />
@@ -24,10 +24,7 @@ const NewHeader = () => {
           {/* Status indicators */}
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/10 border border-neon-green/40">
-              <div className="relative">
-                <div className="w-2 h-2 bg-neon-green rounded-full animate-pulse" />
-                <div className="absolute inset-0 w-2 h-2 bg-neon-green rounded-full animate-ping opacity-50" />
-              </div>
+              <div className="w-2 h-2 bg-neon-green rounded-full" />
               <span className="text-[10px] font-bold text-neon-green tracking-wider">LIVE</span>
             </div>
             <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
@@ -48,7 +45,7 @@ const NewHeader = () => {
           {/* Logo icon with glow */}
           <div className="inline-flex items-center justify-center mb-2">
             <div className="relative">
-              <div className="absolute -inset-3 bg-neon-green/20 rounded-full blur-xl animate-pulse" />
+              <div className="absolute -inset-3 bg-neon-green/15 rounded-full blur-xl" />
               {settings.headerCustomLogo ? (
                 <img 
                   src={settings.headerCustomLogo} 
