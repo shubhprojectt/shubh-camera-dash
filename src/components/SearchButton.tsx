@@ -199,6 +199,27 @@ const SearchButton = ({ icon: Icon, label, color, active, onClick, size = "small
             : [colors.bg, "border-opacity-60 hover:border-opacity-100"]
         )}
       >
+        {/* Floating Particles around active tab */}
+        {active && (
+          <>
+            <span className={cn(
+              "absolute w-1.5 h-1.5 rounded-full animate-orbit-1",
+              colors.text,
+              "opacity-80 blur-[0.5px]"
+            )} style={{ boxShadow: '0 0 6px currentColor' }} />
+            <span className={cn(
+              "absolute w-1 h-1 rounded-full animate-orbit-2",
+              colors.text,
+              "opacity-70 blur-[0.5px]"
+            )} style={{ boxShadow: '0 0 4px currentColor' }} />
+            <span className={cn(
+              "absolute w-1.5 h-1.5 rounded-full animate-orbit-3",
+              colors.text,
+              "opacity-75 blur-[0.5px]"
+            )} style={{ boxShadow: '0 0 5px currentColor' }} />
+          </>
+        )}
+        
         {/* Animated pulse ring on active */}
         {active && (
           <div className="absolute inset-0 rounded-full border-2 border-current animate-ping opacity-30" />
