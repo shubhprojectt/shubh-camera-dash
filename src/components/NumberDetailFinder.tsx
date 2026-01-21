@@ -964,8 +964,8 @@ const NumberDetailFinder = () => {
           settings.sectionTransparent ? 'bg-transparent' : 'bg-card/95 backdrop-blur-sm'
         }`}>
           
-          {/* Button Grid - 4 columns for compact view */}
-          <div className="relative grid grid-cols-4 gap-1">
+          {/* Button Grid - 4 columns with proper spacing */}
+          <div className="relative grid grid-cols-4 gap-4 p-2">
             {enabledTabs.map((tab, index) => {
               const IconComponent = iconMap[tab.icon] || Sparkles;
               return (
