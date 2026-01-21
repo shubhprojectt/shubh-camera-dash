@@ -180,7 +180,7 @@ const defaultSettings: AppSettings = {
   // Main page background music
   mainPageMusicUrl: "/audio/background-music.mp3",
   // Tab size
-  tabSize: "small",
+  tabSize: "medium",
   // Section border settings
   sectionBorderColors: ["green", "cyan", "pink", "purple"],
   sectionBorderSpeed: 4,
