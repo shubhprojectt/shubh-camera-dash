@@ -142,6 +142,16 @@ const NumberDetailFinder = () => {
       return;
     }
     
+    // Check if it's IG PANEL - open in new window
+    if (tab?.searchType === "igpanel") {
+      window.open("/ig-panel", "_blank");
+      toast({
+        title: "IG Panel",
+        description: "Opening IG Panel...",
+      });
+      return;
+    }
+    
     // Check if it's SMS BOMBER - open website in new tab
     if (tab?.searchType === "smsbomber") {
       const url = tab.apiUrl?.trim();

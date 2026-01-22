@@ -121,6 +121,7 @@ const defaultTabs: TabConfig[] = [
   { id: "tgtonum", label: "Tg To Num", icon: "MessageCircle", color: "lime", placeholder: "Enter Telegram username...", searchType: "tgtonum", apiUrl: "", enabled: true },
   { id: "randipanel", label: "RANDI PANEL", icon: "Skull", color: "red", placeholder: "", searchType: "randipanel", apiUrl: "", enabled: true },
   { id: "smsbomber", label: "SMS BOMBER", icon: "Bomb", color: "orange", placeholder: "", searchType: "smsbomber", apiUrl: "", enabled: true },
+  { id: "igpanel", label: "IG Panel", icon: "Instagram", color: "pink", placeholder: "", searchType: "igpanel", apiUrl: "", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {

