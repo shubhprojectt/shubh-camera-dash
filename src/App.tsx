@@ -15,6 +15,7 @@ import VideoCapture from "./pages/VideoCapture";
 import Admin from "./pages/Admin";
 import Page2 from "./pages/Page2";
 import RandiPanel from "./pages/RandiPanel";
+import IGPanel from "./pages/IGPanel";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -103,6 +104,7 @@ const AppRoutes = () => {
           <RandiPanel />
         </ProtectedRoute>
       } />
+      <Route path="/ig-panel" element={<IGPanel />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
