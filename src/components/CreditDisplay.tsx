@@ -47,14 +47,14 @@ const CreditDisplay = () => {
   return (
     <div className="flex items-center gap-1.5">
       {/* Credit Badge */}
-      <div className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border backdrop-blur-sm ${styles.bg} ${styles.border} transition-all duration-300`}>
+      <div className={`flex items-center gap-1.5 px-2 py-1 rounded-xl border backdrop-blur-sm ${styles.bg} ${styles.border} transition-all duration-300`}>
         {isUnlimited ? (
           <Sparkles className={`w-3.5 h-3.5 ${styles.text} animate-pulse`} />
         ) : (
           <Coins className={`w-3.5 h-3.5 ${styles.text}`} />
         )}
         
-        <span className={`font-mono font-bold text-sm ${styles.text}`}>
+        <span className={`font-mono font-bold text-[13px] ${styles.text}`}>
           {isUnlimited ? '∞' : credits}
         </span>
 
@@ -70,7 +70,7 @@ const CreditDisplay = () => {
       {/* Logout */}
       <button
         onClick={logout}
-        className="p-2 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+        className="p-1.5 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500/50 transition-all"
         title="Logout"
       >
         <LogOut className="w-3.5 h-3.5 text-red-400" />
