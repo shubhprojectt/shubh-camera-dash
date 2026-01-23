@@ -7,9 +7,9 @@ const NewHeader = () => {
   const { settings } = useSettings();
 
   return (
-    <header className="relative px-4 pt-4 pb-2">
+    <header className="relative px-3 pt-3 pb-2">
       {/* Glass morphism header card - optimized */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-background/90 via-card/80 to-background/90 backdrop-blur-sm border border-neon-green/20 p-4 overflow-hidden">
+      <div className="relative rounded-2xl bg-gradient-to-br from-background/90 via-card/80 to-background/90 backdrop-blur-sm border border-neon-green/20 p-3 overflow-hidden">
         {/* Static border glow - no animation */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-neon-green/0 via-neon-green/10 to-neon-green/0" />
         
@@ -20,14 +20,14 @@ const NewHeader = () => {
         <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-neon-purple/60 rounded-br-2xl" />
         
         {/* Top row - Status & Settings */}
-        <div className="relative flex items-center justify-between mb-3">
+        <div className="relative flex items-center justify-between mb-2">
           {/* Status indicators */}
           <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neon-green/10 border border-neon-green/40">
-              <div className="w-2 h-2 bg-neon-green rounded-full" />
-              <span className="text-[10px] font-bold text-neon-green tracking-wider">LIVE</span>
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-neon-green/10 border border-neon-green/40">
+              <div className="w-1.5 h-1.5 bg-neon-green rounded-full" />
+              <span className="text-[9px] font-bold text-neon-green tracking-wider">LIVE</span>
             </div>
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
+            <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neon-cyan/10 border border-neon-cyan/30">
               <Wifi className="w-3 h-3 text-neon-cyan" />
               <span className="text-[9px] text-neon-cyan">SECURE</span>
             </div>
@@ -41,20 +41,20 @@ const NewHeader = () => {
         </div>
 
         {/* Main title section */}
-        <div className="relative text-center py-2">
+        <div className="relative text-center py-1.5">
           {/* Logo icon with glow */}
           <div className="inline-flex items-center justify-center mb-2">
             <div className="relative">
-              <div className="absolute -inset-3 bg-neon-green/15 rounded-full blur-xl" />
+              <div className="absolute -inset-2.5 bg-neon-green/15 rounded-full blur-xl" />
               {settings.headerCustomLogo ? (
                 <img 
                   src={settings.headerCustomLogo} 
                   alt="Logo" 
-                  className="relative w-14 h-14 rounded-xl object-cover border-2 border-neon-green/50"
+                  className="relative w-11 h-11 rounded-xl object-cover border-2 border-neon-green/50"
                 />
               ) : (
-                <div className="relative w-14 h-14 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/50 flex items-center justify-center">
-                  <Zap className="w-7 h-7 text-neon-green" />
+                <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/50 flex items-center justify-center">
+                  <Zap className="w-6 h-6 text-neon-green" />
                 </div>
               )}
             </div>
@@ -62,7 +62,7 @@ const NewHeader = () => {
           
           {/* Title with gradient */}
           <h1 
-            className="text-2xl md:text-3xl font-black tracking-wider"
+            className="text-xl md:text-2xl font-black tracking-wider"
             style={{ fontFamily: settings.headerFont || "'Orbitron', sans-serif" }}
           >
             <span className="bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent animate-gradient-shift bg-[length:200%_auto]">
@@ -75,14 +75,14 @@ const NewHeader = () => {
           </h1>
           
           {/* Subtitle */}
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <div className="w-8 h-px bg-gradient-to-r from-transparent to-neon-green/50" />
+          <div className="flex items-center justify-center gap-2 mt-1.5">
+            <div className="w-7 h-px bg-gradient-to-r from-transparent to-neon-green/50" />
             <Shield className="w-3 h-3 text-neon-green/60" />
-            <p className="text-[10px] text-muted-foreground/70 tracking-[0.2em] uppercase">
+            <p className="text-[9px] text-muted-foreground/70 tracking-[0.18em] uppercase">
               Intelligence Framework
             </p>
             <Shield className="w-3 h-3 text-neon-green/60" />
-            <div className="w-8 h-px bg-gradient-to-l from-transparent to-neon-green/50" />
+            <div className="w-7 h-px bg-gradient-to-l from-transparent to-neon-green/50" />
           </div>
         </div>
       </div>

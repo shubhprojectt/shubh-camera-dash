@@ -27,7 +27,7 @@ const AdminSettings = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="h-9 w-9 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 hover:border-primary/50 transition-all"
+          className="h-8 w-8 rounded-xl border border-primary/30 bg-primary/10 hover:bg-primary/20 hover:border-primary/50 transition-all"
         >
           <Settings className="h-4 w-4 text-primary" />
         </Button>
