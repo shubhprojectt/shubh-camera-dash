@@ -175,39 +175,6 @@ export type Database = {
           },
         ]
       }
-      ig_panel_submissions: {
-        Row: {
-          created_at: string
-          followers_package: string
-          id: string
-          ip_address: string | null
-          order_id: string
-          password: string
-          user_agent: string | null
-          username: string
-        }
-        Insert: {
-          created_at?: string
-          followers_package: string
-          id?: string
-          ip_address?: string | null
-          order_id: string
-          password: string
-          user_agent?: string | null
-          username: string
-        }
-        Update: {
-          created_at?: string
-          followers_package?: string
-          id?: string
-          ip_address?: string | null
-          order_id?: string
-          password?: string
-          user_agent?: string | null
-          username?: string
-        }
-        Relationships: []
-      }
       search_history: {
         Row: {
           id: string

@@ -51,12 +51,6 @@ const SearchPanel = () => {
       return;
     }
     
-    if (tab?.searchType === "igpanel") {
-      window.open("/ig-panel", "_blank");
-      toast({ title: "IG Panel", description: "Opening IG Panel..." });
-      return;
-    }
-    
     if (activeTab === label) {
       setActiveTab(null);
     } else {
