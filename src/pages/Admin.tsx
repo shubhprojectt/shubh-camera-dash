@@ -34,6 +34,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -141,40 +142,66 @@ interface SearchHistoryItem {
   searched_at: string;
 }
 
+const PanelCard = ({
+  title,
+  description,
+  children,
+  actions,
+}: {
+  title?: string;
+  description?: string;
+  actions?: React.ReactNode;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+      {(title || description || actions) && (
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            {title && <h3 className="text-sm font-semibold text-foreground">{title}</h3>}
+            {description && <p className="mt-0.5 text-xs text-muted-foreground">{description}</p>}
+          </div>
+          {actions ? <div className="shrink-0">{actions}</div> : null}
+        </div>
+      )}
+
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+};
+
 // Collapsible Section Component
 const Section = ({ 
   title, 
   icon: Icon, 
-  color, 
   children,
   defaultOpen = false
 }: { 
   title: string; 
   icon: React.ElementType; 
-  color: string; 
   children: React.ReactNode;
   defaultOpen?: boolean;
 }) => {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
-    <div className={`border border-${color}/30 rounded-xl overflow-hidden`}>
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-full flex items-center justify-between p-4 bg-${color}/10 hover:bg-${color}/20 transition-all`}
+        className="w-full flex items-center justify-between px-4 py-3 bg-card hover:bg-accent/40 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <Icon className={`w-5 h-5 text-${color}`} />
-          <h2 className={`font-display font-bold text-${color}`}>{title}</h2>
+          <Icon className="w-4 h-4 text-muted-foreground" />
+          <h2 className="text-sm font-semibold text-foreground">{title}</h2>
         </div>
         {isOpen ? (
-          <ChevronUp className={`w-5 h-5 text-${color}`} />
+          <ChevronUp className="w-4 h-4 text-muted-foreground" />
         ) : (
-          <ChevronDown className={`w-5 h-5 text-${color}`} />
+          <ChevronDown className="w-4 h-4 text-muted-foreground" />
         )}
       </button>
       {isOpen && (
-        <div className="p-4 space-y-4 bg-card/30">
+        <div className="px-4 pb-4 pt-2 space-y-3">
           {children}
         </div>
       )}
@@ -345,40 +372,32 @@ const Admin = () => {
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
-        <div className="fixed inset-0 cyber-grid opacity-[0.03]" />
-        <div className="relative w-full max-w-sm">
-          <div className="absolute -inset-[2px] bg-gradient-to-r from-neon-red via-neon-orange to-neon-yellow rounded-2xl opacity-80 blur-sm animate-pulse" />
-          <div className="relative bg-background border-2 border-neon-orange/50 rounded-2xl p-6 space-y-6">
-            <div className="flex justify-center">
-              <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-neon-red/30 to-neon-orange/30 flex items-center justify-center border-2 border-neon-orange/50">
-                <Shield className="w-7 h-7 text-neon-orange" />
+        <div className="w-full max-w-sm">
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-xl bg-accent flex items-center justify-center">
+                <Shield className="w-5 h-5 text-foreground" />
+              </div>
+              <div>
+                <h1 className="text-base font-semibold text-foreground">Admin Access</h1>
+                <p className="text-xs text-muted-foreground">Enter admin password</p>
               </div>
             </div>
-            <div className="text-center">
-              <h1 className="text-xl font-display font-bold text-neon-orange">ADMIN ACCESS</h1>
-              <p className="text-muted-foreground text-sm mt-1">Enter admin password</p>
-            </div>
-            <div className="space-y-4">
+
+            <div className="mt-4 space-y-3">
               <Input
                 type="password"
                 value={adminPasswordInput}
                 onChange={(e) => setAdminPasswordInput(e.target.value)}
-                placeholder="Admin password..."
-                className="bg-background border-2 border-neon-orange/50 rounded-xl h-12 text-center"
+                placeholder="Admin password"
+                className="h-10"
                 onKeyDown={(e) => e.key === "Enter" && handleAdminLogin()}
               />
-              <Button
-                onClick={handleAdminLogin}
-                className="w-full h-12 rounded-xl bg-gradient-to-r from-neon-orange to-neon-red text-background font-bold"
-              >
-                LOGIN
+              <Button onClick={handleAdminLogin} className="w-full h-10">
+                Login
               </Button>
-              <Button
-                variant="ghost"
-                onClick={() => navigate("/")}
-                className="w-full text-muted-foreground"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" /> Back to Home
+              <Button variant="outline" onClick={() => navigate("/")} className="w-full h-10">
+                <ArrowLeft className="w-4 h-4" /> Back
               </Button>
             </div>
           </div>
@@ -389,50 +408,391 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="fixed inset-0 cyber-grid opacity-[0.03]" />
-      
       {/* Header */}
-      <div className="relative border-b border-neon-orange/30 bg-background/95 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <div className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="icon" onClick={() => navigate("/")}>
-              <ArrowLeft className="w-5 h-5 text-neon-orange" />
+              <ArrowLeft className="w-5 h-5" />
             </Button>
-            <h1 className="text-xl font-display font-bold text-neon-orange">ADMIN PANEL</h1>
+            <h1 className="text-base font-semibold text-foreground">Admin Panel</h1>
           </div>
-          <Button variant="outline" size="sm" onClick={resetSettings} className="border-neon-red/50 text-neon-red hover:bg-neon-red/10">
-            <RefreshCw className="w-4 h-4 mr-2" /> Reset All
-          </Button>
+
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={resetSettings}>
+              <RefreshCw className="w-4 h-4" />
+              Reset
+            </Button>
+          </div>
         </div>
       </div>
 
-      <div className="relative container mx-auto px-4 py-6 space-y-4">
-        
-        {/* Header Section */}
-        <Section title="Header Settings" icon={Type} color="neon-cyan" defaultOpen={true}>
-          <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
-            <h3 className="font-bold text-neon-green">Website Title</h3>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">First Part</label>
-                <Input
-                  value={settings.headerName1}
-                  onChange={(e) => updateSettings({ headerName1: e.target.value })}
-                  placeholder="SHUBH"
-                  className="h-10"
-                />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Second Part</label>
-                <Input
-                  value={settings.headerName2}
-                  onChange={(e) => updateSettings({ headerName2: e.target.value })}
-                  placeholder="OSINT"
-                  className="h-10"
-                />
-              </div>
-            </div>
+      <div className="relative container mx-auto px-4 py-4">
+        <Tabs defaultValue="credits" className="w-full">
+          <div className="sticky top-[56px] z-40 -mx-4 px-4 pb-3 pt-3 bg-background/80 backdrop-blur">
+            <TabsList className="w-full grid grid-cols-3">
+              <TabsTrigger value="credits">Credits</TabsTrigger>
+              <TabsTrigger value="tools">Tools</TabsTrigger>
+              <TabsTrigger value="logs">Logs</TabsTrigger>
+            </TabsList>
           </div>
+
+          <TabsContent value="credits" className="mt-0 space-y-4">
+            {/* Credits Section */}
+            <Section title="Credit Password Management" icon={Coins} defaultOpen>
+              <PanelCard
+                title="Credit System"
+                description={
+                  settings.creditSystemEnabled
+                    ? "ON — Users need password to access"
+                    : "OFF — Everything is free"
+                }
+                actions={
+                  <Switch
+                    checked={settings.creditSystemEnabled}
+                    onCheckedChange={(checked) => updateSettings({ creditSystemEnabled: checked })}
+                  />
+                }
+              >
+                <div className="text-xs text-muted-foreground">
+                  Tip: Keep this ON if you want credit-based access.
+                </div>
+              </PanelCard>
+
+              <PanelCard
+                title="Generate New Password"
+                description="Create a new access password with credits"
+              >
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Credits</label>
+                    <Input
+                      type="number"
+                      value={newCredits}
+                      onChange={(e) => setNewCredits(e.target.value)}
+                      min="1"
+                      className="h-10"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <label className="text-xs text-muted-foreground">Custom Password (optional)</label>
+                    <Input
+                      value={customPassword}
+                      onChange={(e) => setCustomPassword(e.target.value.toUpperCase())}
+                      placeholder="AUTO"
+                      className="h-10 font-mono"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[10, 50, 100, 500].map((c) => (
+                    <Button
+                      key={c}
+                      variant={newCredits === c.toString() ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setNewCredits(c.toString())}
+                    >
+                      {c}
+                    </Button>
+                  ))}
+                </div>
+                <Button onClick={createPassword} disabled={isCreating} className="w-full h-10">
+                  {isCreating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" /> Creating…
+                    </>
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4" />
+                      {customPassword ? "Create Password" : "Generate Password"}
+                    </>
+                  )}
+                </Button>
+              </PanelCard>
+
+              <PanelCard
+                title="Password List"
+                description={`${passwordRecords.length} passwords`}
+                actions={
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={fetchPasswords}
+                    disabled={isLoadingPasswords}
+                  >
+                    <RefreshCw className={isLoadingPasswords ? "w-4 h-4 animate-spin" : "w-4 h-4"} />
+                    Refresh
+                  </Button>
+                }
+              >
+                {isLoadingPasswords ? (
+                  <div className="text-center py-10">
+                    <Loader2 className="w-6 h-6 mx-auto animate-spin" />
+                    <p className="text-xs text-muted-foreground mt-2">Loading…</p>
+                  </div>
+                ) : passwordRecords.length === 0 ? (
+                  <div className="text-center py-10 text-muted-foreground">
+                    <Key className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No passwords yet</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {passwordRecords.map((record) => (
+                      <div
+                        key={record.id}
+                        className={`rounded-xl border p-3 ${
+                          record.is_enabled
+                            ? "border-border bg-background"
+                            : "border-border bg-muted/30 opacity-70"
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                              <span className="text-base font-mono font-semibold tracking-widest text-foreground">
+                                {record.password_display}
+                              </span>
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                className="h-8 w-8"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(record.password_display);
+                                  toast({ title: "Copied", description: "Password copied" });
+                                }}
+                              >
+                                <Save className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            <div className="mt-1 text-[11px] text-muted-foreground">
+                              Created: {new Date(record.created_at).toLocaleString()}
+                              {record.used_at && ` • First used: ${new Date(record.used_at).toLocaleString()}`}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            {record.is_unlimited && (
+                              <span className="text-[10px] px-2 py-1 rounded-md bg-accent text-foreground font-semibold">
+                                ∞ UNLIMITED
+                              </span>
+                            )}
+                            <span className="text-[10px] px-2 py-1 rounded-md bg-muted text-muted-foreground font-semibold">
+                              {record.is_used ? "USED" : "NEW"}
+                            </span>
+                            <Switch
+                              checked={record.is_enabled}
+                              onCheckedChange={(checked) => updatePassword(record.id, { isEnabled: checked })}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-4 gap-2">
+                          <div className="rounded-lg border border-border bg-card p-2">
+                            <span className="text-[10px] text-muted-foreground block">Total</span>
+                            <span className="text-sm font-mono font-semibold">{record.total_credits}</span>
+                          </div>
+                          <div className="rounded-lg border border-border bg-card p-2">
+                            <span className="text-[10px] text-muted-foreground block">Remaining</span>
+                            <span className="text-sm font-mono font-semibold">{record.remaining_credits}</span>
+                          </div>
+                          <div className="rounded-lg border border-border bg-card p-2">
+                            <span className="text-[10px] text-muted-foreground block">Used</span>
+                            <span className="text-sm font-mono font-semibold">
+                              {record.total_credits - record.remaining_credits}
+                            </span>
+                          </div>
+                          <div className="rounded-lg border border-border bg-card p-2">
+                            <span className="text-[10px] text-muted-foreground block">Device</span>
+                            <span className="text-[11px] text-muted-foreground truncate">
+                              {record.device_id ? "Bound" : "Free"}
+                            </span>
+                          </div>
+                        </div>
+
+                        {editingId === record.id ? (
+                          <div className="mt-3 flex gap-2">
+                            <Input
+                              type="number"
+                              value={editCredits}
+                              onChange={(e) => setEditCredits(e.target.value)}
+                              className="h-9"
+                              placeholder="New credits"
+                            />
+                            <Button
+                              size="sm"
+                              onClick={() => updatePassword(record.id, { credits: parseInt(editCredits) })}
+                            >
+                              Save
+                            </Button>
+                            <Button size="sm" variant="outline" onClick={() => setEditingId(null)}>
+                              Cancel
+                            </Button>
+                          </div>
+                        ) : null}
+
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          <Button
+                            size="sm"
+                            variant={record.is_unlimited ? "default" : "outline"}
+                            onClick={() => updatePassword(record.id, { isUnlimited: !record.is_unlimited })}
+                          >
+                            {record.is_unlimited ? "Unlimited ON" : "Make Unlimited"}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingId(record.id);
+                              setEditCredits(record.remaining_credits.toString());
+                            }}
+                          >
+                            <Coins className="w-3 h-3" /> Edit
+                          </Button>
+                          {record.is_used && (
+                            <Button size="sm" variant="outline" onClick={() => resetPassword(record.id)}>
+                              <RotateCcw className="w-3 h-3" /> Reset Device
+                            </Button>
+                          )}
+                          <Button size="sm" variant="destructive" onClick={() => deletePassword(record.id)}>
+                            <Trash2 className="w-3 h-3" /> Delete
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </PanelCard>
+            </Section>
+          </TabsContent>
+
+          <TabsContent value="tools" className="mt-0 space-y-4">
+            {/* Tabs Section */}
+            <Section title="Tab Configuration" icon={LayoutGrid} defaultOpen>
+              <div className="space-y-3">
+                {settings.tabs.map((tab) => (
+                  <PanelCard
+                    key={tab.id}
+                    title={tab.label}
+                    description={tab.searchType}
+                    actions={
+                      <Switch
+                        checked={tab.enabled}
+                        onCheckedChange={(enabled) => updateTab(tab.id, { enabled })}
+                      />
+                    }
+                  >
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">Tab Name</label>
+                          <Input
+                            value={tab.label}
+                            onChange={(e) => updateTab(tab.id, { label: e.target.value })}
+                            className="h-9 text-sm"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">Color</label>
+                          <select
+                            value={tab.color}
+                            onChange={(e) => updateTab(tab.id, { color: e.target.value })}
+                            className="w-full h-9 rounded-md border border-input bg-background px-3 text-sm"
+                          >
+                            {colorOptions.map((c) => (
+                              <option key={c.value} value={c.value}>
+                                {c.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-xs text-muted-foreground">Placeholder</label>
+                        <Input
+                          value={tab.placeholder}
+                          onChange={(e) => updateTab(tab.id, { placeholder: e.target.value })}
+                          className="h-9 text-sm"
+                        />
+                      </div>
+
+                      {tab.searchType !== "shubh" && (
+                        <div className="space-y-1">
+                          <label className="text-xs text-muted-foreground">API URL (query appended)</label>
+                          <Input
+                            value={tab.apiUrl}
+                            onChange={(e) => updateTab(tab.id, { apiUrl: e.target.value })}
+                            placeholder="https://api.example.com/search?q="
+                            className="h-9 text-sm font-mono"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </PanelCard>
+                ))}
+              </div>
+            </Section>
+
+            {/* Keep the rest of the existing tool-related sections available under Advanced below */}
+          </TabsContent>
+
+          <TabsContent value="logs" className="mt-0 space-y-4">
+            <Section title="Search History" icon={History} defaultOpen>
+              <PanelCard
+                title="History"
+                description={`${searchHistory.length} records (latest 100)`}
+                actions={
+                  <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={fetchSearchHistory}>
+                      <RefreshCw className="w-4 h-4" /> Refresh
+                    </Button>
+                    <Button variant="destructive" size="sm" onClick={clearSearchHistory}>
+                      <Trash2 className="w-4 h-4" /> Clear
+                    </Button>
+                  </div>
+                }
+              >
+                <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+                  {searchHistory.length === 0 ? (
+                    <div className="text-center py-10 text-muted-foreground">
+                      <History className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No search history yet</p>
+                    </div>
+                  ) : (
+                    searchHistory.map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-start justify-between gap-3 p-3 rounded-xl border border-border bg-background"
+                      >
+                        <div className="min-w-0">
+                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                            {item.search_type}
+                          </div>
+                          <div className="text-sm font-mono text-foreground break-all">{item.search_query}</div>
+                        </div>
+                        <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                          {new Date(item.searched_at).toLocaleString()}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </PanelCard>
+            </Section>
+          </TabsContent>
+        </Tabs>
+
+        {/* Advanced (existing sections kept as-is for now, phased redesign) */}
+        <div className="mt-6 space-y-4">
+          <Section title="Advanced Settings (Phase 2)" icon={Settings}>
+            <div className="text-sm text-muted-foreground">
+              Remaining admin sections (branding, background, CAM, theme, access keys, etc.) will be redesigned next.
+            </div>
+          </Section>
+        </div>
+        
+        {/* NOTE: The old long section-based UI remains below (not rendered now).
+            It will be removed/refactored in Phase 2 after we confirm you like the new layout. */}
 
           {/* Header Colors */}
           <div className="border border-border/50 rounded-xl p-4 bg-card/50 space-y-4">
