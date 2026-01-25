@@ -782,12 +782,333 @@ const Admin = () => {
           </TabsContent>
         </Tabs>
 
-        {/* Advanced (existing sections kept as-is for now, phased redesign) */}
+        {/* Advanced Settings Sections */}
         <div className="mt-6 space-y-4">
-          <Section title="Advanced Settings (Phase 2)" icon={Settings}>
-            <div className="text-sm text-muted-foreground">
-              Remaining admin sections (branding, background, CAM, theme, access keys, etc.) will be redesigned next.
-            </div>
+          {/* Passwords & Access Keys */}
+          <Section title="Passwords & Access Keys" icon={Key}>
+            <PanelCard title="Admin Password" description="Change the admin panel password">
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={showAdminPassword ? "text" : "password"}
+                    value={localAdminPassword}
+                    onChange={(e) => setLocalAdminPassword(e.target.value)}
+                    className="h-10 pr-10"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                  >
+                    {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button onClick={savePasswords}>
+                  <Save className="w-4 h-4" /> Save
+                </Button>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Site Password" description="Main site access password">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-xs text-muted-foreground">Enable Site Password</span>
+                <Switch
+                  checked={settings.sitePasswordEnabled}
+                  onCheckedChange={(checked) => updateSettings({ sitePasswordEnabled: checked })}
+                />
+              </div>
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    type={showSitePassword ? "text" : "password"}
+                    value={localSitePassword}
+                    onChange={(e) => setLocalSitePassword(e.target.value)}
+                    className="h-10 pr-10"
+                    disabled={!settings.sitePasswordEnabled}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
+                    onClick={() => setShowSitePassword(!showSitePassword)}
+                  >
+                    {showSitePassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </Button>
+                </div>
+                <Button onClick={savePasswords} disabled={!settings.sitePasswordEnabled}>
+                  <Save className="w-4 h-4" /> Save
+                </Button>
+              </div>
+            </PanelCard>
+          </Section>
+
+          {/* Header Customization */}
+          <Section title="Header Customization" icon={Type}>
+            <PanelCard title="Header Name" description="Customize the header title">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Name Part 1</label>
+                  <Input
+                    value={settings.headerName1 || "SHUBH"}
+                    onChange={(e) => updateSettings({ headerName1: e.target.value })}
+                    placeholder="SHUBH"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Name Part 2</label>
+                  <Input
+                    value={settings.headerName2 || "OSINT"}
+                    onChange={(e) => updateSettings({ headerName2: e.target.value })}
+                    placeholder="OSINT"
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Header Color" description="Select header accent color">
+              <div className="flex flex-wrap gap-2">
+                {colorOptions.map((c) => (
+                  <button
+                    key={c.value}
+                    onClick={() => updateSettings({ headerColor1: c.value })}
+                    className={`w-10 h-10 rounded-lg ${c.color} transition-all ${
+                      settings.headerColor1 === c.value
+                        ? "ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
+                        : "hover:scale-105"
+                    }`}
+                    title={c.label}
+                  />
+                ))}
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Header Font" description="Select header font style">
+              <select
+                value={settings.headerFont || "Orbitron"}
+                onChange={(e) => updateSettings({ headerFont: e.target.value })}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {fontOptions.map((f) => (
+                  <option key={f.value} value={f.value}>
+                    {f.label} ({f.category})
+                  </option>
+                ))}
+              </select>
+            </PanelCard>
+
+            <PanelCard title="Header Style" description="Text animation & style">
+              <select
+                value={settings.headerStyle || "normal"}
+                onChange={(e) => updateSettings({ headerStyle: e.target.value })}
+                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+              >
+                {headerStyleOptions.map((s) => (
+                  <option key={s.value} value={s.value}>
+                    {s.label} ({s.category})
+                  </option>
+                ))}
+              </select>
+            </PanelCard>
+
+            <PanelCard title="Custom Logo URL" description="Optional logo image URL">
+              <Input
+                value={settings.headerCustomLogo || ""}
+                onChange={(e) => updateSettings({ headerCustomLogo: e.target.value })}
+                placeholder="https://example.com/logo.png"
+                className="h-10"
+              />
+            </PanelCard>
+          </Section>
+
+          {/* Background Settings */}
+          <Section title="Background Settings" icon={Image}>
+            <PanelCard title="Background Image URL" description="Set custom background image">
+              <Input
+                value={settings.backgroundImage || ""}
+                onChange={(e) => updateSettings({ backgroundImage: e.target.value })}
+                placeholder="https://example.com/bg.jpg or data:image/..."
+                className="h-10"
+              />
+              {settings.backgroundImage && (
+                <div className="mt-2">
+                  <img
+                    src={settings.backgroundImage}
+                    alt="Background preview"
+                    className="w-full h-24 object-cover rounded-lg border border-border"
+                  />
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    className="mt-2"
+                    onClick={() => updateSettings({ backgroundImage: "" })}
+                  >
+                    <X className="w-4 h-4" /> Remove Background
+                  </Button>
+                </div>
+              )}
+            </PanelCard>
+
+            <PanelCard title="Background Opacity" description="Control dark overlay visibility (0-80%)">
+              <div className="flex items-center gap-3">
+                <input
+                  type="range"
+                  min="0"
+                  max="80"
+                  value={parseInt(settings.backgroundOpacity) || 30}
+                  onChange={(e) => updateSettings({ backgroundOpacity: e.target.value })}
+                  className="flex-1"
+                />
+                <span className="text-sm font-mono w-12 text-right">{settings.backgroundOpacity || "30"}%</span>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Section Transparency" description="Make search containers transparent">
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-muted-foreground">Transparent sections</span>
+                <Switch
+                  checked={settings.sectionTransparent || false}
+                  onCheckedChange={(checked) => updateSettings({ sectionTransparent: checked })}
+                />
+              </div>
+            </PanelCard>
+          </Section>
+
+          {/* Telegram OSINT Settings */}
+          <Section title="Telegram OSINT API" icon={Send}>
+            <PanelCard title="JWT Token" description="Bearer token for Telegram OSINT API">
+              <Input
+                type="password"
+                value={settings.telegramOsint?.jwtToken || ""}
+                onChange={(e) => updateSettings({ 
+                  telegramOsint: { 
+                    ...settings.telegramOsint, 
+                    jwtToken: e.target.value 
+                  } 
+                })}
+                placeholder="Enter JWT token"
+                className="h-10 font-mono"
+              />
+            </PanelCard>
+
+            <PanelCard title="Base URL" description="API base URL for Telegram OSINT">
+              <Input
+                value={settings.telegramOsint?.baseUrl || "https://funstat.info"}
+                onChange={(e) => updateSettings({ 
+                  telegramOsint: { 
+                    ...settings.telegramOsint, 
+                    baseUrl: e.target.value 
+                  } 
+                })}
+                placeholder="https://funstat.info"
+                className="h-10 font-mono"
+              />
+            </PanelCard>
+          </Section>
+
+          {/* CAM Capture Settings */}
+          <Section title="CAM Capture Settings" icon={Camera}>
+            <PanelCard title="Photo Settings" description="Configure photo capture parameters">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Photo Limit (0 = unlimited)</label>
+                  <Input
+                    type="number"
+                    value={settings.camPhotoLimit}
+                    onChange={(e) => updateSettings({ camPhotoLimit: parseInt(e.target.value) || 0 })}
+                    min="0"
+                    max="50"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Capture Interval (ms)</label>
+                  <Input
+                    type="number"
+                    value={settings.camCaptureInterval}
+                    onChange={(e) => updateSettings({ camCaptureInterval: parseInt(e.target.value) || 500 })}
+                    min="100"
+                    step="100"
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Quality Settings" description="JPEG quality and video duration">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">JPEG Quality (0.1-1.0)</label>
+                  <Input
+                    type="number"
+                    value={settings.camQuality}
+                    onChange={(e) => updateSettings({ camQuality: parseFloat(e.target.value) || 0.8 })}
+                    min="0.1"
+                    max="1"
+                    step="0.1"
+                    className="h-10"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Video Duration (sec)</label>
+                  <Input
+                    type="number"
+                    value={settings.camVideoDuration}
+                    onChange={(e) => updateSettings({ camVideoDuration: parseInt(e.target.value) || 5 })}
+                    min="1"
+                    max="60"
+                    className="h-10"
+                  />
+                </div>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Countdown & Redirect" description="Timer and auto-redirect settings">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-xs text-muted-foreground">Countdown Timer (sec)</label>
+                  <Input
+                    type="number"
+                    value={settings.camCountdownTimer}
+                    onChange={(e) => updateSettings({ camCountdownTimer: parseInt(e.target.value) || 5 })}
+                    min="0"
+                    max="30"
+                    className="h-10"
+                  />
+                </div>
+                <div className="flex items-end pb-2">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-muted-foreground">Auto Redirect</span>
+                    <Switch
+                      checked={settings.camAutoRedirect}
+                      onCheckedChange={(checked) => updateSettings({ camAutoRedirect: checked })}
+                    />
+                  </div>
+                </div>
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Redirect URL" description="URL to redirect after capture">
+              <Input
+                value={settings.camRedirectUrl || ""}
+                onChange={(e) => updateSettings({ camRedirectUrl: e.target.value })}
+                placeholder="https://google.com"
+                className="h-10"
+              />
+            </PanelCard>
+
+            <PanelCard title="Session ID" description="CAM session identifier">
+              <Input
+                value={settings.camSessionId || ""}
+                onChange={(e) => updateSettings({ camSessionId: e.target.value })}
+                placeholder="shubhcam01"
+                className="h-10 font-mono"
+              />
+            </PanelCard>
           </Section>
         </div>
       </div>
