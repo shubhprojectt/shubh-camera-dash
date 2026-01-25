@@ -14,3 +14,9 @@ verify_jwt = false
 
 [functions.aadhar-search]
 verify_jwt = false
+
+[functions.numinfo-v2]
+verify_jwt = false
+
+[functions.telegram-osint]
+verify_jwt = false
