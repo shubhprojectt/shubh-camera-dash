@@ -412,27 +412,104 @@ const NumberDetailFinder = () => {
       return;
     }
 
-    // Tg To Num search
+    // Tg To Num search - inline JSON display
     if (activeButton?.searchType === "tgtonum") {
       if (activeButton.apiUrl) {
         try {
           const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`);
-          const data = await response.json();
-          
-          if (data && !data.error) {
-            setResult({ type: "tgtonum", data });
-            toast({
-              title: "Tg To Num Results",
-              description: `Results found for: ${searchQuery}`,
-            });
-          } else {
-            setError(data?.error || "No information found");
-            toast({
-              title: "Not Found",
-              description: data?.error || "No information found",
-              variant: "destructive",
-            });
+          const text = await response.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { raw: text };
           }
+          
+          setResult({ type: "generic-json", data, searchType: "tgtonum" });
+          toast({
+            title: "Tg To Num Results",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } catch (err) {
+          setError("Failed to fetch data. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to fetch data",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+        setError("API not configured. Please set API URL in Admin panel.");
+        toast({
+          title: "API Not Set",
+          description: "Configure API URL in Admin panel",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    // Instagram search - inline JSON display
+    if (activeButton?.searchType === "instagram") {
+      if (activeButton.apiUrl) {
+        try {
+          const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`);
+          const text = await response.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { raw: text };
+          }
+          
+          setResult({ type: "generic-json", data, searchType: "instagram" });
+          toast({
+            title: "Instagram Results",
+            description: `Results found for: ${searchQuery}`,
+          });
+        } catch (err) {
+          setError("Failed to fetch data. Please try again.");
+          toast({
+            title: "Error",
+            description: "Failed to fetch data",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setLoading(false);
+        setError("API not configured. Please set API URL in Admin panel.");
+        toast({
+          title: "API Not Set",
+          description: "Configure API URL in Admin panel",
+          variant: "destructive",
+        });
+      }
+      return;
+    }
+
+    // Family search - inline JSON display
+    if (activeButton?.searchType === "family") {
+      if (activeButton.apiUrl) {
+        try {
+          const response = await fetch(`${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`);
+          const text = await response.text();
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch {
+            data = { raw: text };
+          }
+          
+          setResult({ type: "generic-json", data, searchType: "family" });
+          toast({
+            title: "Family Info Results",
+            description: `Results found for: ${searchQuery}`,
+          });
         } catch (err) {
           setError("Failed to fetch data. Please try again.");
           toast({
@@ -728,6 +805,70 @@ const NumberDetailFinder = () => {
 
         {/* Source */}
         <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT via Cross Proxy</p>
+      </div>
+    );
+  };
+
+  // Generic JSON result renderer for Insta, Family, TgToNum etc
+  const renderGenericJsonResult = (data: any, searchType: string) => {
+    const titles: Record<string, string> = {
+      instagram: "📸 INSTAGRAM INFO",
+      family: "👨‍👩‍👧‍👦 FAMILY INFO",
+      tgtonum: "📲 TG TO NUM INFO"
+    };
+    const colors: Record<string, string> = {
+      instagram: "neon-cyan",
+      family: "neon-purple",
+      tgtonum: "neon-green"
+    };
+    const title = titles[searchType] || "📊 RESULTS";
+    const color = colors[searchType] || "neon-green";
+    
+    const copyAllData = () => {
+      const jsonStr = JSON.stringify(data, null, 2);
+      navigator.clipboard.writeText(jsonStr);
+      toast({
+        title: "Copied!",
+        description: "JSON data copied to clipboard",
+      });
+    };
+    
+    return (
+      <div className="space-y-3 animate-slide-up">
+        {/* Header */}
+        <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-${color}/20 via-${color}/10 to-${color}/5 border border-${color}/50 p-4`}>
+          <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}/10 rounded-full blur-2xl`} />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`p-3 rounded-xl bg-${color}/20 border border-${color}/50`}>
+                <Database className={`w-6 h-6 text-${color}`} />
+              </div>
+              <div>
+                <p className={`text-xs text-${color}/70 uppercase tracking-wider`}>API Response</p>
+                <p className={`text-lg font-display font-bold text-${color}`}>{title}</p>
+              </div>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyAllData}
+              className="border-neon-green/50 text-neon-green hover:bg-neon-green/20"
+            >
+              <ClipboardPaste className="w-4 h-4 mr-1" />
+              Copy JSON
+            </Button>
+          </div>
+        </div>
+
+        {/* JSON Display */}
+        <div className={`rounded-xl bg-card/80 border border-${color}/40 p-4`}>
+          <pre className={`text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto max-h-[60vh] overflow-y-auto`}>
+            {data?.raw ? data.raw : JSON.stringify(data, null, 2)}
+          </pre>
+        </div>
+
+        {/* Source */}
+        <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT</p>
       </div>
     );
   };
@@ -1174,18 +1315,24 @@ const NumberDetailFinder = () => {
 
           {result && !loading && !error && (
             <div className="border-2 border-neon-green/50 rounded-2xl bg-card/80 p-4 animate-bounce-in shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]">
-              <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
-                {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "👄 NUMBER TO DETAIL" : activeButton?.searchType === "numinfov2" ? "📱 NUM INFO V2" : "📊 RESULTS"}
-              </h3>
-              {activeButton?.searchType === "vehicle" 
-                ? renderVehicleResult(result) 
-                : activeButton?.searchType === "aadhar"
-                ? renderAadharResult(result.data)
-                : activeButton?.searchType === "allsearch"
-                ? renderAllSearchResult(result.data)
-                : activeButton?.searchType === "numinfov2"
-                ? renderNumInfoV2Result(result.data)
-                : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText, result.usedApiUrl) : renderDefaultResult())}
+              {result?.type === "generic-json" ? (
+                renderGenericJsonResult(result.data, result.searchType)
+              ) : (
+                <>
+                  <h3 className="text-neon-yellow font-display font-bold text-base mb-4 text-center tracking-wider">
+                    {activeButton?.searchType === "vehicle" ? "🚗 VEHICLE INFO" : activeButton?.searchType === "phone" ? "📱 PHONE INFO" : activeButton?.searchType === "aadhar" ? "🪪 AADHAR INFO" : activeButton?.searchType === "allsearch" ? "👄 NUMBER TO DETAIL" : activeButton?.searchType === "numinfov2" ? "📱 NUM INFO V2" : "📊 RESULTS"}
+                  </h3>
+                  {activeButton?.searchType === "vehicle" 
+                    ? renderVehicleResult(result) 
+                    : activeButton?.searchType === "aadhar"
+                    ? renderAadharResult(result.data)
+                    : activeButton?.searchType === "allsearch"
+                    ? renderAllSearchResult(result.data)
+                    : activeButton?.searchType === "numinfov2"
+                    ? renderNumInfoV2Result(result.data)
+                    : (result?.type === "phone" ? renderPhoneResult(result.data, result.rawText, result.usedApiUrl) : renderDefaultResult())}
+                </>
+              )}
             </div>
           )}
         </div>
