@@ -192,6 +192,9 @@ const NumberDetailFinder = () => {
       return;
     }
 
+   // Debug log to check searchType
+   console.log("Search triggered for tab:", activeButton?.searchType, "with API:", activeButton?.apiUrl);
+
     // START LOADING IMMEDIATELY for instant feedback
     setLoading(true);
     setResult(null);
@@ -562,8 +565,9 @@ const NumberDetailFinder = () => {
       } finally {
         setLoading(false);
       }
-    } else if (activeButton?.apiUrl) {
-      // Open API URL in new tab for other tabs with API
+   } else if (activeButton?.apiUrl && !["instagram", "family", "tgtonum"].includes(activeButton.searchType || "")) {
+     // Only open in new tab for tabs that don't have inline handlers
+     console.log("Opening in new tab for searchType:", activeButton.searchType);
       const apiUrl = `${activeButton.apiUrl}${encodeURIComponent(searchQuery.trim())}`;
       window.open(apiUrl, '_blank');
       setLoading(false);
