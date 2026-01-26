@@ -980,19 +980,20 @@ const Admin = () => {
 
           {/* Telegram OSINT Settings */}
           <Section title="Telegram OSINT API" icon={Send}>
-            <PanelCard title="JWT Token" description="Bearer token for Telegram OSINT API">
-              <Input
-                type="password"
-                value={settings.telegramOsint?.jwtToken || ""}
-                onChange={(e) => updateSettings({ 
-                  telegramOsint: { 
-                    ...settings.telegramOsint, 
-                    jwtToken: e.target.value 
-                  } 
-                })}
-                placeholder="Enter JWT token"
-                className="h-10 font-mono"
-              />
+            <PanelCard title="JWT Token" description="Bearer token for Telegram OSINT API (visible for editing)">
+              <div className="space-y-2">
+                <textarea
+                  value={settings.telegramOsint?.jwtToken || ""}
+                  onChange={(e) => updateSettings({ 
+                    telegramOsint: { 
+                      ...settings.telegramOsint, 
+                      jwtToken: e.target.value 
+                    } 
+                  })}
+                  placeholder="Enter JWT token"
+                  className="w-full h-24 p-2 text-xs font-mono border rounded-md bg-background resize-none break-all"
+                />
+              </div>
             </PanelCard>
 
             <PanelCard title="Base URL" description="API base URL for Telegram OSINT">
@@ -1008,6 +1009,17 @@ const Admin = () => {
                 className="h-10 font-mono"
               />
             </PanelCard>
+
+            <Button 
+              onClick={async () => {
+                await saveNow();
+                toast({ title: "Saved!", description: "Telegram OSINT settings saved successfully." });
+              }}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save Telegram Settings
+            </Button>
           </Section>
 
           {/* CAM Capture Settings */}
