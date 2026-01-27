@@ -79,6 +79,44 @@ const SearchPanel = () => {
     }
   };
 
+  const runInlineJsonSearch = async (opts: {
+    searchType: string;
+    query: string;
+    apiUrl?: string | null;
+    toastTitle: string;
+  }) => {
+    const apiUrl = opts.apiUrl?.trim();
+    if (!apiUrl) {
+      setLoading(false);
+      setError("API not configured");
+      toast({
+        title: "API Not Set",
+        description: "Admin panel me API URL set karo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const response = await fetch(`${apiUrl}${encodeURIComponent(opts.query)}`);
+      const text = await response.text();
+
+      let data: any;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { raw: text };
+      }
+
+      setResult({ type: opts.searchType, data });
+      toast({ title: opts.toastTitle, description: "Results found" });
+    } catch (err) {
+      setError("Failed to fetch data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearch = async () => {
     if (!searchQuery.trim()) {
       toast({ title: "Error", description: "Please enter a value to search", variant: "destructive" });
@@ -99,6 +137,39 @@ const SearchPanel = () => {
     }
 
     logSearchHistory(activeButton?.searchType || "unknown", searchQuery.trim());
+
+    // Instagram Search (inline JSON)
+    if (activeButton?.searchType === "instagram") {
+      await runInlineJsonSearch({
+        searchType: "instagram",
+        query: searchQuery.trim(),
+        apiUrl: activeButton.apiUrl,
+        toastTitle: "Instagram Results",
+      });
+      return;
+    }
+
+    // Family Search (inline JSON)
+    if (activeButton?.searchType === "family") {
+      await runInlineJsonSearch({
+        searchType: "family",
+        query: searchQuery.trim(),
+        apiUrl: activeButton.apiUrl,
+        toastTitle: "Family Results",
+      });
+      return;
+    }
+
+    // TG to Num (inline JSON)
+    if (activeButton?.searchType === "tgtonum") {
+      await runInlineJsonSearch({
+        searchType: "tgtonum",
+        query: searchQuery.trim(),
+        apiUrl: activeButton.apiUrl,
+        toastTitle: "TG to Num Results",
+      });
+      return;
+    }
 
     // Phone search
     if (activeButton?.searchType === "phone") {
