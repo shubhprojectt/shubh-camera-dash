@@ -35,6 +35,7 @@ import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import HackerLoader from "./HackerLoader";
+import AnimatedJsonViewer from "./AnimatedJsonViewer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -820,58 +821,23 @@ const NumberDetailFinder = () => {
       family: "👨‍👩‍👧‍👦 FAMILY INFO",
       tgtonum: "📲 TG TO NUM INFO"
     };
-    const colors: Record<string, string> = {
-      instagram: "neon-cyan",
-      family: "neon-purple",
-      tgtonum: "neon-green"
+    const colors: Record<string, "green" | "cyan" | "pink" | "purple" | "yellow" | "orange"> = {
+      instagram: "pink",
+      family: "purple",
+      tgtonum: "cyan"
     };
     const title = titles[searchType] || "📊 RESULTS";
-    const color = colors[searchType] || "neon-green";
-    
-    const copyAllData = () => {
-      const jsonStr = JSON.stringify(data, null, 2);
-      navigator.clipboard.writeText(jsonStr);
-      toast({
-        title: "Copied!",
-        description: "JSON data copied to clipboard",
-      });
-    };
+    const color = colors[searchType] || "green";
     
     return (
       <div className="space-y-3 animate-slide-up">
-        {/* Header */}
-        <div className={`relative overflow-hidden rounded-2xl bg-gradient-to-br from-${color}/20 via-${color}/10 to-${color}/5 border border-${color}/50 p-4`}>
-          <div className={`absolute top-0 right-0 w-20 h-20 bg-${color}/10 rounded-full blur-2xl`} />
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className={`p-3 rounded-xl bg-${color}/20 border border-${color}/50`}>
-                <Database className={`w-6 h-6 text-${color}`} />
-              </div>
-              <div>
-                <p className={`text-xs text-${color}/70 uppercase tracking-wider`}>API Response</p>
-                <p className={`text-lg font-display font-bold text-${color}`}>{title}</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={copyAllData}
-              className="border-neon-green/50 text-neon-green hover:bg-neon-green/20"
-            >
-              <ClipboardPaste className="w-4 h-4 mr-1" />
-              Copy JSON
-            </Button>
-          </div>
-        </div>
-
-        {/* JSON Display */}
-        <div className={`rounded-xl bg-card/80 border border-${color}/40 p-4`}>
-          <pre className={`text-sm text-foreground font-mono whitespace-pre-wrap break-all bg-background/50 rounded-lg p-3 border border-border/50 overflow-x-auto max-h-[60vh] overflow-y-auto`}>
-            {data?.raw ? data.raw : JSON.stringify(data, null, 2)}
-          </pre>
-        </div>
-
-        {/* Source */}
+        <AnimatedJsonViewer
+          data={data?.raw ? { raw: data.raw } : data}
+          title={title}
+          accentColor={color}
+          animationSpeed={25}
+          showLineNumbers={true}
+        />
         <p className="text-xs text-center text-muted-foreground/60 pt-2">Source: SHUBH OSINT</p>
       </div>
     );

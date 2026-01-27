@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSettings } from '@/contexts/SettingsContext';
 import { supabase } from '@/integrations/supabase/client';
+import AnimatedJsonViewer from './AnimatedJsonViewer';
 
 const CACHE_KEY = 'telegram_osint_cache';
 const SEARCH_HISTORY_KEY = 'telegram_osint_search_history';
@@ -344,9 +345,13 @@ const TelegramOSINT: React.FC = () => {
   };
 
   const renderGenericResult = (data: any) => (
-    <pre className="bg-black/50 border border-neon-green/30 rounded-lg p-4 text-sm text-neon-green overflow-auto max-h-96">
-      {JSON.stringify(data, null, 2)}
-    </pre>
+    <AnimatedJsonViewer
+      data={data}
+      title="📊 TELEGRAM DATA"
+      accentColor="cyan"
+      animationSpeed={25}
+      showLineNumbers={true}
+    />
   );
 
   const renderResult = () => {
