@@ -104,10 +104,23 @@ const SearchPanel = () => {
         body: { number: opts.query, apiUrl },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        console.error("Edge function error:", fnError);
+        throw fnError;
+      }
 
-      const hasData = data && (data.responses?.length > 0 || data.status === "success" || Object.keys(data).length > 0);
-      if (hasData) {
+      // Check for valid data - support multiple response formats
+      const hasValidData = data && (
+        data.results || 
+        data.responses || 
+        data.data || 
+        data.status === true || 
+        data.status === "success" || 
+        (data.raw && data.raw.length > 0) ||
+        (typeof data === 'object' && Object.keys(data).length > 0)
+      );
+
+      if (hasValidData) {
         setResult({ type: opts.searchType, data });
         toast({ title: opts.toastTitle, description: "Results found" });
       } else {
@@ -115,7 +128,7 @@ const SearchPanel = () => {
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setError("Failed to fetch data");
+      setError("Failed to fetch data. Check console for details.");
     } finally {
       setLoading(false);
     }
