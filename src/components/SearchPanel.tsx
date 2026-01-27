@@ -79,38 +79,42 @@ const SearchPanel = () => {
     }
   };
 
+  // Generic inline JSON search using edge function proxy to bypass CORS
   const runInlineJsonSearch = async (opts: {
     searchType: string;
     query: string;
-    apiUrl?: string | null;
+    apiUrl?: string;
     toastTitle: string;
   }) => {
     const apiUrl = opts.apiUrl?.trim();
     if (!apiUrl) {
       setLoading(false);
-      setError("API not configured");
+      setError("API not configured. Admin panel me API URL set karo.");
       toast({
         title: "API Not Set",
-        description: "Admin panel me API URL set karo",
+        description: "Configure API URL in Admin panel",
         variant: "destructive",
       });
       return;
     }
 
     try {
-      const response = await fetch(`${apiUrl}${encodeURIComponent(opts.query)}`);
-      const text = await response.text();
+      // Use edge function proxy to bypass CORS
+      const { data, error: fnError } = await supabase.functions.invoke("numinfo-v2", {
+        body: { number: opts.query, apiUrl },
+      });
 
-      let data: any;
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { raw: text };
+      if (fnError) throw fnError;
+
+      const hasData = data && (data.responses?.length > 0 || data.status === "success" || Object.keys(data).length > 0);
+      if (hasData) {
+        setResult({ type: opts.searchType, data });
+        toast({ title: opts.toastTitle, description: "Results found" });
+      } else {
+        setError("No information found");
       }
-
-      setResult({ type: opts.searchType, data });
-      toast({ title: opts.toastTitle, description: "Results found" });
     } catch (err) {
+      console.error("Fetch error:", err);
       setError("Failed to fetch data");
     } finally {
       setLoading(false);
