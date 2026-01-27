@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import HackerLoader from "./HackerLoader";
+import AnimatedJsonViewer from "./AnimatedJsonViewer";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -307,27 +308,49 @@ const SearchPanel = () => {
     }
   };
 
+  // Get accent color based on search type
+  const getAccentColor = (searchType: string): "green" | "cyan" | "pink" | "purple" | "yellow" | "orange" => {
+    const colorMap: Record<string, "green" | "cyan" | "pink" | "purple" | "yellow" | "orange"> = {
+      instagram: "pink",
+      family: "purple",
+      tgtonum: "cyan",
+      phone: "green",
+      numinfov2: "yellow",
+      aadhar: "orange",
+      vehicle: "cyan",
+      allsearch: "pink",
+    };
+    return colorMap[searchType] || "green";
+  };
+
+  // Get title based on search type
+  const getResultTitle = (searchType: string): string => {
+    const titles: Record<string, string> = {
+      instagram: "📸 INSTAGRAM RESULTS",
+      family: "👨‍👩‍👧‍👦 FAMILY INFO",
+      tgtonum: "📲 TG TO NUM",
+      phone: "📱 PHONE INFO",
+      numinfov2: "📱 NUM INFO V2",
+      aadhar: "🪪 AADHAR INFO",
+      vehicle: "🚗 VEHICLE INFO",
+      allsearch: "🔍 ALL SEARCH",
+    };
+    return titles[searchType] || "📊 RESULTS";
+  };
+
   const renderResult = () => {
     if (!result) return null;
 
-    // Show raw JSON for all results
+    const searchType = result.type || activeButton?.searchType || "unknown";
+    
     return (
-      <div className="space-y-3">
-        <pre className="text-xs font-mono bg-background/80 p-3 rounded-lg border border-neon-green/20 overflow-x-auto whitespace-pre-wrap break-words text-foreground max-h-[400px] overflow-y-auto">
-          {JSON.stringify(result.data, null, 2)}
-        </pre>
-        <button
-          onClick={() => copyToClipboard(JSON.stringify(result.data, null, 2), "JSON Data")}
-          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-neon-green/10 border border-neon-green/30 hover:bg-neon-green/20 transition-colors text-sm text-neon-green"
-        >
-          {copiedField === "JSON Data" ? (
-            <Check className="w-4 h-4" />
-          ) : (
-            <Copy className="w-4 h-4" />
-          )}
-          Copy JSON
-        </button>
-      </div>
+      <AnimatedJsonViewer
+        data={result.data}
+        title={getResultTitle(searchType)}
+        accentColor={getAccentColor(searchType)}
+        animationSpeed={25}
+        showLineNumbers={true}
+      />
     );
   };
 
