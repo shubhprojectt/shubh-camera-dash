@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { Copy, Check, ChevronDown, ChevronRight } from "lucide-react";
+import { Copy, Check, FileDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AnimatedJsonViewerProps {
   data: any;
   title?: string;
   accentColor?: "green" | "cyan" | "pink" | "purple" | "yellow" | "orange";
-  animationSpeed?: number; // ms per line
+  animationSpeed?: number;
   showLineNumbers?: boolean;
 }
 
@@ -37,7 +37,6 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
 }) => {
   const [visibleLines, setVisibleLines] = useState(0);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [isExpanded, setIsExpanded] = useState(true);
   const [animationComplete, setAnimationComplete] = useState(false);
 
   const neonColor = colorMap[accentColor];
@@ -52,12 +51,10 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
       const indent = line.search(/\S|$/);
       const trimmed = line.trim();
 
-      // Detect line type
       let type: JsonLine["type"] = "string";
       let keyName: string | undefined;
       let value: string | undefined;
 
-      // Check for key-value pairs
       const keyMatch = trimmed.match(/^"([^"]+)":\s*(.*)$/);
       if (keyMatch) {
         keyName = keyMatch[1];
@@ -118,12 +115,70 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
     copyToClipboard(JSON.stringify(data, null, 2), "all");
   };
 
+  const exportToPdf = () => {
+    const jsonStr = JSON.stringify(data, null, 2);
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>${title} - Export</title>
+          <style>
+            body {
+              font-family: 'Courier New', monospace;
+              padding: 40px;
+              background: #0a0a0a;
+              color: #00ff88;
+              font-size: 12px;
+              line-height: 1.6;
+            }
+            h1 {
+              color: #00ff88;
+              font-size: 18px;
+              margin-bottom: 20px;
+              border-bottom: 2px solid #00ff88;
+              padding-bottom: 10px;
+            }
+            pre {
+              white-space: pre-wrap;
+              word-wrap: break-word;
+            }
+            .key { color: #00ff88; font-weight: bold; }
+            .string { color: #ffff00; }
+            .number { color: #00ffff; }
+            .boolean { color: #ff69b4; }
+            .null { color: #888888; font-style: italic; }
+            @media print {
+              body { background: white; color: #000; }
+              h1 { color: #000; border-color: #000; }
+              pre { color: #000; }
+              .key { color: #006600; }
+              .string { color: #996600; }
+              .number { color: #000099; }
+              .boolean { color: #990066; }
+              .null { color: #666666; }
+            }
+          </style>
+        </head>
+        <body>
+          <h1>${title}</h1>
+          <pre>${jsonStr}</pre>
+          <script>
+            setTimeout(() => { window.print(); }, 300);
+          </script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }
+  };
+
   // Render syntax highlighted line
   const renderLine = (line: JsonLine, index: number) => {
     const parts: React.ReactNode[] = [];
     
     if (line.keyName) {
-      // Key-value line
       const keyMatch = line.content.match(/^(\s*)"([^"]+)":\s*(.*)$/);
       if (keyMatch) {
         const [, spaces, key, rest] = keyMatch;
@@ -135,7 +190,6 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
           <span key="colon" className="text-muted-foreground">: </span>
         );
 
-        // Render value with appropriate color
         let valueColor = "text-foreground";
         if (rest.startsWith('"')) valueColor = "text-neon-yellow";
         else if (rest === "true" || rest === "false" || rest.startsWith("true") || rest.startsWith("false")) valueColor = "text-neon-pink";
@@ -147,7 +201,6 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
           <span key="value" className={valueColor}>{rest}</span>
         );
 
-        // Add copy button for values
         if (!rest.includes("{") && !rest.includes("[")) {
           const cleanValue = rest.replace(/^"|"$/g, "").replace(/,$/g, "");
           parts.push(
@@ -170,7 +223,6 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
         }
       }
     } else {
-      // Bracket or plain line
       const bracketColor = line.type === "bracket" ? `text-neon-orange` : "text-foreground";
       parts.push(
         <span key="content" className={bracketColor}>{line.content}</span>
@@ -181,105 +233,82 @@ export const AnimatedJsonViewer: React.FC<AnimatedJsonViewerProps> = ({
   };
 
   return (
-    <div className={cn(
-      "relative rounded-xl overflow-hidden",
-      `bg-gradient-to-br from-${neonColor}/10 via-black/60 to-${neonColor}/5`,
-      `border border-${neonColor}/40`,
-      `shadow-[0_0_30px_hsl(var(--${neonColor})/0.15)]`
-    )}>
-      {/* Header */}
-      <div className={cn(
-        "flex items-center justify-between px-4 py-3",
-        `bg-${neonColor}/10 border-b border-${neonColor}/30`
-      )}>
+    <div className="relative">
+      {/* Action buttons - floating */}
+      <div className="flex items-center justify-end gap-2 mb-3">
+        {!animationComplete && (
+          <span className="text-xs text-muted-foreground animate-pulse mr-2">
+            Loading...
+          </span>
+        )}
         <button
-          onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+          onClick={copyAll}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+            `bg-${neonColor}/20 border border-${neonColor}/40`,
+            `hover:bg-${neonColor}/30 hover:border-${neonColor}/60`,
+            `text-${neonColor}`
+          )}
         >
-          {isExpanded ? (
-            <ChevronDown className={`w-4 h-4 text-${neonColor}`} />
+          {copiedField === "all" ? (
+            <>
+              <Check className="w-3 h-3" />
+              Copied!
+            </>
           ) : (
-            <ChevronRight className={`w-4 h-4 text-${neonColor}`} />
+            <>
+              <Copy className="w-3 h-3" />
+              Copy All
+            </>
           )}
-          <span className={`text-${neonColor} font-mono font-bold text-sm`}>{title}</span>
         </button>
-        
-        <div className="flex items-center gap-2">
-          {!animationComplete && (
-            <span className="text-xs text-muted-foreground animate-pulse">
-              Loading...
-            </span>
+        <button
+          onClick={exportToPdf}
+          className={cn(
+            "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
+            `bg-${neonColor}/20 border border-${neonColor}/40`,
+            `hover:bg-${neonColor}/30 hover:border-${neonColor}/60`,
+            `text-${neonColor}`
           )}
-          <button
-            onClick={copyAll}
-            className={cn(
-              "flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all",
-              `bg-${neonColor}/20 border border-${neonColor}/40`,
-              `hover:bg-${neonColor}/30 hover:border-${neonColor}/60`,
-              `text-${neonColor}`
-            )}
-          >
-            {copiedField === "all" ? (
-              <>
-                <Check className="w-3 h-3" />
-                Copied!
-              </>
-            ) : (
-              <>
-                <Copy className="w-3 h-3" />
-                Copy All
-              </>
-            )}
-          </button>
-        </div>
+        >
+          <FileDown className="w-3 h-3" />
+          Export PDF
+        </button>
       </div>
 
-      {/* JSON Content */}
-      {isExpanded && (
-        <div className="relative overflow-auto max-h-[500px] custom-scrollbar">
-          {/* Scanline effect */}
-          <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.1)_50%)] bg-[length:100%_4px] opacity-20" />
-          
-          <div className="p-4 font-mono text-sm">
-            {jsonLines.slice(0, visibleLines).map((line, index) => (
-              <div
-                key={index}
-                className={cn(
-                  "group flex items-start gap-3 leading-relaxed",
-                  "animate-fade-in",
-                  index === visibleLines - 1 && !animationComplete && "relative"
-                )}
-                style={{
-                  animationDelay: `${index * 10}ms`,
-                }}
-              >
-                {/* Line number */}
-                {showLineNumbers && (
-                  <span className="select-none text-muted-foreground/40 text-xs w-6 text-right flex-shrink-0 pt-0.5">
-                    {index + 1}
-                  </span>
-                )}
-                
-                {/* Line content */}
-                <div className="flex-1 whitespace-pre-wrap break-all">
-                  {renderLine(line, index)}
-                </div>
+      {/* JSON Content - no card, just raw text */}
+      <div className="overflow-auto max-h-[500px] font-mono text-sm">
+        {jsonLines.slice(0, visibleLines).map((line, index) => (
+          <div
+            key={index}
+            className={cn(
+              "group flex items-start gap-3 leading-relaxed",
+              "animate-fade-in",
+              index === visibleLines - 1 && !animationComplete && "relative"
+            )}
+            style={{
+              animationDelay: `${index * 10}ms`,
+            }}
+          >
+            {/* Line number */}
+            {showLineNumbers && (
+              <span className="select-none text-muted-foreground/40 text-xs w-6 text-right flex-shrink-0 pt-0.5">
+                {index + 1}
+              </span>
+            )}
+            
+            {/* Line content */}
+            <div className="flex-1 whitespace-pre-wrap break-all">
+              {renderLine(line, index)}
+            </div>
 
-                {/* Typing cursor for last line during animation */}
-                {index === visibleLines - 1 && !animationComplete && (
-                  <span className={`inline-block w-2 h-4 bg-${neonColor} animate-pulse ml-1`} />
-                )}
-              </div>
-            ))}
+            {/* Typing cursor for last line during animation */}
+            {index === visibleLines - 1 && !animationComplete && (
+              <span className={`inline-block w-2 h-4 bg-${neonColor} animate-pulse ml-1`} />
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Corner accents */}
-      <div className={`absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-${neonColor}/60 rounded-tl-xl`} />
-      <div className={`absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-${neonColor}/60 rounded-tr-xl`} />
-      <div className={`absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-${neonColor}/60 rounded-bl-xl`} />
-      <div className={`absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-${neonColor}/60 rounded-br-xl`} />
+        ))}
+      </div>
     </div>
   );
 };
