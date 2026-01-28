@@ -249,14 +249,6 @@ const ShubhCam = () => {
               <span className="w-1 h-1 rounded-full bg-neon-green animate-pulse" />
             </div>
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            onClick={generateNewSession}
-            className="h-8 w-8 text-neon-green hover:bg-neon-green/10"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </Button>
         </div>
       </div>
 
