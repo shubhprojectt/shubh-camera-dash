@@ -870,20 +870,42 @@ const Admin = () => {
               </div>
             </PanelCard>
 
-            <PanelCard title="Header Color" description="Select header accent color">
-              <div className="flex flex-wrap gap-2">
-                {colorOptions.map((c) => (
-                  <button
-                    key={c.value}
-                    onClick={() => updateSettings({ headerColor1: c.value })}
-                    className={`w-10 h-10 rounded-lg ${c.color} transition-all ${
-                      settings.headerColor1 === c.value
-                        ? "ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
-                        : "hover:scale-105"
-                    }`}
-                    title={c.label}
-                  />
-                ))}
+            <PanelCard title="Header Colors" description="Select colors for both name parts">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">Name 1 Color ({settings.headerName1 || "SHUBH"})</label>
+                  <div className="flex flex-wrap gap-2">
+                    {colorOptions.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => updateSettings({ headerColor1: c.value })}
+                        className={`w-9 h-9 rounded-lg ${c.color} transition-all ${
+                          settings.headerColor1 === c.value
+                            ? "ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
+                            : "hover:scale-105"
+                        }`}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-medium text-muted-foreground">Name 2 Color ({settings.headerName2 || "OSINT"})</label>
+                  <div className="flex flex-wrap gap-2">
+                    {colorOptions.map((c) => (
+                      <button
+                        key={c.value}
+                        onClick={() => updateSettings({ headerColor2: c.value })}
+                        className={`w-9 h-9 rounded-lg ${c.color} transition-all ${
+                          settings.headerColor2 === c.value
+                            ? "ring-2 ring-offset-2 ring-offset-background ring-primary scale-110"
+                            : "hover:scale-105"
+                        }`}
+                        title={c.label}
+                      />
+                    ))}
+                  </div>
+                </div>
               </div>
             </PanelCard>
 
