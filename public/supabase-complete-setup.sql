@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-25
--- Version: 3.1 (Latest sync with edge functions)
+-- Last Updated: 2026-01-28
+-- Version: 3.2 (Session control update - admin only)
 -- =====================================================
 
 -- =====================================================
@@ -284,6 +284,7 @@ CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON public.credit_usage(created_
 -- =====================================================
 
 -- Main Settings (includes admin password, session ID, search tabs, etc.)
+-- NOTE: camSessionId is ONLY changeable via Admin Panel now (v3.2)
 INSERT INTO public.app_settings (setting_key, setting_value)
 VALUES ('main_settings', '{
   "sitePassword": "dark",
@@ -362,26 +363,31 @@ VALUES ('main_settings', '{
 ON CONFLICT (setting_key) DO NOTHING;
 
 -- =====================================================
--- EDGE FUNCTIONS (deploy from supabase/functions/)
+-- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- 1. auth-login       - User login with credit password
--- 2. auth-verify      - Verify session token
--- 3. credits-deduct   - Deduct credits for search
--- 4. admin-passwords  - Admin CRUD for passwords
--- 5. aadhar-search    - Aadhar lookup proxy
--- 6. numinfo-v2       - Phone number lookup proxy
--- 7. telegram-osint   - Telegram OSINT proxy
+-- Version 3.2 Edge Functions:
+-- 1. auth-login        - User login with credit password
+-- 2. auth-verify       - Verify session token & get credits
+-- 3. credits-deduct    - Deduct credits for search operations
+-- 4. admin-passwords   - Admin CRUD for password management
+-- 5. aadhar-search     - Aadhar lookup API
+-- 6. numinfo-v2        - Phone number info API
+-- 7. telegram-osint    - Telegram OSINT API integration
+--
+-- IMPORTANT CHANGES in v3.2:
+-- - CAM Session ID can ONLY be changed via Admin Panel
+-- - Session change button removed from ShubhCam component
+-- - All capture pages use session from app_settings
 -- =====================================================
 
 -- =====================================================
--- SETUP COMPLETE!
+-- QUICK REFERENCE: Tables & Their Purpose
 -- =====================================================
--- Version 3.1 Changes:
--- - Synced with latest edge functions config
--- - Added numinfo-v2 and telegram-osint edge function refs
--- - Updated date to 2026-01-25
---
--- After running this SQL:
--- 1. Edge functions auto-deploy from supabase/functions/
--- 2. Configure Telegram OSINT JWT token in Admin panel
+-- access_passwords  : Stores login credentials with credit info
+-- user_sessions     : Active login sessions tracking
+-- credit_usage      : Logs all credit deductions
+-- app_settings      : Global app configuration (JSON)
+-- captured_photos   : Camera capture photo metadata
+-- captured_videos   : Video capture metadata & URLs
+-- search_history    : All search queries log
 -- =====================================================
