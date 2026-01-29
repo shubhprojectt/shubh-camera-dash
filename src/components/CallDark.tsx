@@ -187,7 +187,7 @@ const CallDark = () => {
 
           {/* Consent Text */}
           <p className="text-[10px] text-muted-foreground/60 text-center font-mono">
-            Submit karne par aap automated call receive karne ke liye agree karte hain.
+            Submit karne par aap automated call send karne ke liye agree karte hain.
           </p>
         </div>
       </div>
