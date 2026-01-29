@@ -87,6 +87,11 @@ export interface AppSettings {
   tabParticleEnabled: boolean;
   tabParticleCount: number; // 1-5 particles
   tabParticleSpeed: number; // Animation speed multiplier
+  // Call Dark settings
+  callDarkEnabled: boolean;
+  callDarkApiKey: string;
+  callDarkAgentId: string;
+  callDarkMaxDuration: number; // in seconds
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -121,6 +126,7 @@ const defaultTabs: TabConfig[] = [
   { id: "tgtonum", label: "Tg To Num", icon: "MessageCircle", color: "lime", placeholder: "Enter Telegram username...", searchType: "tgtonum", apiUrl: "", enabled: true },
   { id: "randipanel", label: "RANDI PANEL", icon: "Skull", color: "red", placeholder: "", searchType: "randipanel", apiUrl: "", enabled: true },
   { id: "smsbomber", label: "SMS BOMBER", icon: "Bomb", color: "orange", placeholder: "", searchType: "smsbomber", apiUrl: "", enabled: true },
+  { id: "calldark", label: "CALL DARK", icon: "PhoneCall", color: "red", placeholder: "", searchType: "calldark", apiUrl: "", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
@@ -189,6 +195,11 @@ const defaultSettings: AppSettings = {
   tabParticleEnabled: true,
   tabParticleCount: 3,
   tabParticleSpeed: 1,
+  // Call Dark settings
+  callDarkEnabled: false,
+  callDarkApiKey: "",
+  callDarkAgentId: "",
+  callDarkMaxDuration: 20,
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {

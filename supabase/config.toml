@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.telegram-osint]
 verify_jwt = false
+
+[functions.call-dark]
+verify_jwt = false

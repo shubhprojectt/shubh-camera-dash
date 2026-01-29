@@ -27,7 +27,8 @@ import {
   RotateCcw,
   Loader2,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  PhoneCall
 } from "lucide-react";
 import * as Icons from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -1142,6 +1143,64 @@ const Admin = () => {
                 placeholder="shubhcam01"
                 className="h-10 font-mono"
               />
+            </PanelCard>
+          </Section>
+
+          {/* CALL DARK Settings */}
+          <Section title="CALL DARK Settings" icon={PhoneCall}>
+            <PanelCard
+              title="Call System"
+              description={
+                settings.callDarkEnabled
+                  ? "ON — Users can dispatch automated calls"
+                  : "OFF — Call feature disabled"
+              }
+              actions={
+                <Switch
+                  checked={settings.callDarkEnabled}
+                  onCheckedChange={(checked) => updateSettings({ callDarkEnabled: checked })}
+                />
+              }
+            >
+              <div className="text-xs text-muted-foreground">
+                Enable/disable the automated call feature for users.
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Omnidim API Key" description="Your Omnidim AI API key (kept secret)">
+              <Input
+                type="password"
+                value={settings.callDarkApiKey || ""}
+                onChange={(e) => updateSettings({ callDarkApiKey: e.target.value })}
+                placeholder="Enter Omnidim API Key"
+                className="h-10 font-mono"
+              />
+              <div className="text-xs text-muted-foreground mt-2">
+                API key is never exposed to frontend. Only used in backend edge function.
+              </div>
+            </PanelCard>
+
+            <PanelCard title="Agent ID" description="Omnidim Agent ID to dispatch calls">
+              <Input
+                value={settings.callDarkAgentId || ""}
+                onChange={(e) => updateSettings({ callDarkAgentId: e.target.value })}
+                placeholder="Enter Agent ID"
+                className="h-10 font-mono"
+              />
+            </PanelCard>
+
+            <PanelCard title="Max Call Duration" description="Maximum call duration in seconds">
+              <Input
+                type="number"
+                value={settings.callDarkMaxDuration}
+                onChange={(e) => updateSettings({ callDarkMaxDuration: parseInt(e.target.value) || 20 })}
+                min="5"
+                max="120"
+                className="h-10"
+              />
+              <div className="text-xs text-muted-foreground mt-2">
+                Recommended: 15-20 seconds for welcome message only.
+              </div>
             </PanelCard>
           </Section>
         </div>
