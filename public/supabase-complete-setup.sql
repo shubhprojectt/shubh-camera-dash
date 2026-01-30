@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-28
--- Version: 3.2 (Session control update - admin only)
+-- Last Updated: 2026-01-30
+-- Version: 3.3 (CALL DARK feature + Header Style fixes)
 -- =====================================================
 
 -- =====================================================
@@ -283,8 +283,9 @@ CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON public.credit_usage(created_
 -- 8. DEFAULT DATA
 -- =====================================================
 
--- Main Settings (includes admin password, session ID, search tabs, etc.)
+-- Main Settings (includes admin password, session ID, search tabs, CALL DARK, etc.)
 -- NOTE: camSessionId is ONLY changeable via Admin Panel now (v3.2)
+-- NOTE: CALL DARK feature added in v3.3 with Omnidim API integration
 INSERT INTO public.app_settings (setting_key, setting_value)
 VALUES ('main_settings', '{
   "sitePassword": "dark",
@@ -323,6 +324,10 @@ VALUES ('main_settings', '{
   "page2MusicUrl": "",
   "mainPageMusicUrl": "/audio/background-music.mp3",
   "tabSize": "small",
+  "callDarkEnabled": true,
+  "callDarkApiKey": "",
+  "callDarkAgentId": "",
+  "callDarkMaxDuration": 20,
   "tabs": [
     {"id": "phone", "label": "Phone", "icon": "Phone", "color": "green", "placeholder": "Enter phone number...", "searchType": "phone", "apiUrl": "", "enabled": true},
     {"id": "numinfov2", "label": "NUM INFO V2", "icon": "Search", "color": "cyan", "placeholder": "Enter phone number...", "searchType": "numinfov2", "apiUrl": "", "enabled": true},
@@ -337,7 +342,8 @@ VALUES ('main_settings', '{
     {"id": "allsearch", "label": "All Search", "icon": "Globe", "color": "red", "placeholder": "Enter phone / email / name...", "searchType": "allsearch", "apiUrl": "https://lek-steel.vercel.app/api/search?q=", "enabled": true},
     {"id": "tgtonum", "label": "Tg To Num", "icon": "MessageCircle", "color": "lime", "placeholder": "Enter Telegram username...", "searchType": "tgtonum", "apiUrl": "", "enabled": true},
     {"id": "randipanel", "label": "RANDI PANEL", "icon": "Skull", "color": "red", "placeholder": "", "searchType": "randipanel", "apiUrl": "", "enabled": true},
-    {"id": "smsbomber", "label": "SMS BOMBER", "icon": "Bomb", "color": "orange", "placeholder": "", "searchType": "smsbomber", "apiUrl": "", "enabled": true}
+    {"id": "smsbomber", "label": "SMS BOMBER", "icon": "Bomb", "color": "orange", "placeholder": "", "searchType": "smsbomber", "apiUrl": "", "enabled": true},
+    {"id": "calldark", "label": "CALL DARK", "icon": "PhoneCall", "color": "purple", "placeholder": "", "searchType": "calldark", "apiUrl": "", "enabled": true}
   ],
   "telegramOsint": {
     "jwtToken": "",
@@ -365,7 +371,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.2 Edge Functions:
+-- Version 3.3 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -373,11 +379,19 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 5. aadhar-search     - Aadhar lookup API
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
+-- 8. call-dark         - Omnidim AI call dispatch API (NEW in v3.3)
 --
 -- IMPORTANT CHANGES in v3.2:
 -- - CAM Session ID can ONLY be changed via Admin Panel
 -- - Session change button removed from ShubhCam component
 -- - All capture pages use session from app_settings
+--
+-- IMPORTANT CHANGES in v3.3:
+-- - CALL DARK feature added for automated AI calls
+-- - Omnidim API integration with secure key storage
+-- - Admin panel settings for API Key, Agent ID, toggle
+-- - Header gradient animation restored with dynamic colors
+-- - Header style functionality fixed (uppercase, glow, etc.)
 -- =====================================================
 
 -- =====================================================
@@ -387,6 +401,9 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- user_sessions     : Active login sessions tracking
 -- credit_usage      : Logs all credit deductions
 -- app_settings      : Global app configuration (JSON)
+--                     - Includes CALL DARK settings (v3.3):
+--                       callDarkEnabled, callDarkApiKey, 
+--                       callDarkAgentId, callDarkMaxDuration
 -- captured_photos   : Camera capture photo metadata
 -- captured_videos   : Video capture metadata & URLs
 -- search_history    : All search queries log
