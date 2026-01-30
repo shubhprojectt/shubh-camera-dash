@@ -56,12 +56,49 @@ const NewHeader = () => {
   
   const IconComponent = (Icons[settings.headerIcon as keyof typeof Icons] as LucideIcon) || Icons.Zap;
 
+  const getStyleClasses = () => {
+    switch (settings.headerStyle) {
+      // Basic transforms
+      case "uppercase": return "uppercase";
+      case "lowercase": return "lowercase";
+      case "capitalize": return "capitalize";
+      // Weight
+      case "italic": return "italic";
+      case "bold": return "font-black";
+      case "light": return "font-light";
+      case "thin": return "font-thin";
+      // Spacing
+      case "wide": return "tracking-[0.5em]";
+      case "tight": return "tracking-tighter";
+      // Animations
+      case "glow": return "animate-glow-pulse";
+      case "flicker": return "animate-flicker";
+      case "bounce": return "animate-bounce";
+      case "shake": return "animate-shake";
+      case "pulse": return "animate-pulse";
+      // Effects
+      case "shadow": return "drop-shadow-[0_0_10px_currentColor]";
+      case "outline": return "[text-shadow:_-1px_-1px_0_currentColor,_1px_-1px_0_currentColor,_-1px_1px_0_currentColor,_1px_1px_0_currentColor]";
+      case "gradient": return "bg-clip-text text-transparent";
+      case "glitch": return "animate-glitch";
+      case "blur": return "hover:blur-[1px] transition-all";
+      default: return "";
+    }
+  };
+
   return (
     <header className="relative px-3 pt-3 pb-2">
       {/* Glass morphism header card - optimized */}
       <div className={`relative rounded-2xl bg-gradient-to-br from-background/90 via-card/80 to-background/90 backdrop-blur-sm border ${getBorderClass(color1)}/20 p-3 overflow-hidden`}>
-        {/* Static border glow - no animation */}
-        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-r from-transparent via-current to-transparent opacity-10 ${getColorClass(color1)}`} />
+        {/* Animated rainbow border glow */}
+        <div 
+          className="absolute inset-0 rounded-2xl opacity-30 animate-rainbow-border"
+          style={{
+            background: `linear-gradient(90deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})), hsl(var(--neon-cyan)), hsl(var(--neon-${color1})))`,
+            backgroundSize: '300% 100%',
+          }}
+        />
+        <div className="absolute inset-[1px] rounded-2xl bg-background/95" />
         
         {/* Corner accents - dynamic colors */}
         <div className={`absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 ${getBorderClass(color1)}/60 rounded-tl-2xl`} />
@@ -110,16 +147,21 @@ const NewHeader = () => {
             </div>
           </div>
           
-          {/* Title with dynamic colors */}
+          {/* Title with dynamic colors and styles */}
           <h1 
-            className="text-xl md:text-2xl font-black tracking-wider"
-            style={{ fontFamily: settings.headerFont || "'Orbitron', sans-serif" }}
+            className={`text-xl md:text-2xl font-black tracking-wider ${getStyleClasses()}`}
+            style={{ 
+              fontFamily: settings.headerFont || "'Orbitron', sans-serif",
+              ...(settings.headerStyle === 'gradient' && {
+                backgroundImage: `linear-gradient(135deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})))`,
+              })
+            }}
           >
-            <span className={`${getColorClass(color1)}`}>
+            <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color1)}`}>
               {settings.headerName1 || "SHUBH"}
             </span>
-            <span className="mx-2 text-muted-foreground/30">×</span>
-            <span className={`${getColorClass(color2)}`}>
+            <span className={`mx-2 ${settings.headerStyle === 'gradient' ? '' : 'text-muted-foreground/30'}`}>×</span>
+            <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color2)}`}>
               {settings.headerName2 || "OSINT"}
             </span>
           </h1>
