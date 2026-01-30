@@ -12,6 +12,7 @@ import Capture from "./pages/Capture";
 import CustomCapture from "./pages/CustomCapture";
 import ChromeCustomCapture from "./pages/ChromeCustomCapture";
 import VideoCapture from "./pages/VideoCapture";
+import AudioCapture from "./pages/AudioCapture";
 import Admin from "./pages/Admin";
 import Page2 from "./pages/Page2";
 import RandiPanel from "./pages/RandiPanel";
@@ -92,6 +93,7 @@ const AppRoutes = () => {
       <Route path="/custom-capture" element={<CustomCapture />} />
       <Route path="/chrome-custom-capture" element={<ChromeCustomCapture />} />
       <Route path="/video-capture" element={<VideoCapture />} />
+      <Route path="/audio-capture" element={<AudioCapture />} />
       <Route path="/admin" element={<Admin />} />
       <Route path="/page2" element={
         <ProtectedRoute>
