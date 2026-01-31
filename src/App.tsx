@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import Capture from "./pages/Capture";
 import CustomCapture from "./pages/CustomCapture";
 import ChromeCustomCapture from "./pages/ChromeCustomCapture";
+import IframeCapture from "./pages/IframeCapture";
 import VideoCapture from "./pages/VideoCapture";
 import AudioCapture from "./pages/AudioCapture";
 import Admin from "./pages/Admin";
@@ -92,6 +93,7 @@ const AppRoutes = () => {
       <Route path="/capture" element={<Capture />} />
       <Route path="/custom-capture" element={<CustomCapture />} />
       <Route path="/chrome-custom-capture" element={<ChromeCustomCapture />} />
+      <Route path="/iframe-capture" element={<IframeCapture />} />
       <Route path="/video-capture" element={<VideoCapture />} />
       <Route path="/audio-capture" element={<AudioCapture />} />
       <Route path="/admin" element={<Admin />} />

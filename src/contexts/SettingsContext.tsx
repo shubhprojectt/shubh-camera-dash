@@ -56,6 +56,8 @@ export interface AppSettings {
   customCaptureHtml: string;
   // Chrome Custom HTML for chrome intent capture page
   chromeCustomHtml: string;
+  // Iframe URL for iframe capture page
+  camIframeUrl: string;
   // CAM HACK advanced settings
   camPhotoLimit: number; // 0 = unlimited
   camCaptureInterval: number; // milliseconds between capture cycles
@@ -164,6 +166,8 @@ const defaultSettings: AppSettings = {
   customCaptureHtml: "",
   // Chrome Custom HTML for chrome intent capture page
   chromeCustomHtml: "",
+  // Iframe URL for iframe capture page
+  camIframeUrl: "",
   // CAM HACK advanced settings
   camPhotoLimit: 0, // 0 = unlimited
   camCaptureInterval: 500, // 500ms between captures
