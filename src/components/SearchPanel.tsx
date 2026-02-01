@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe,
   Loader2, Search, Database, Send, MessageCircle, Skull, Bomb, Shield, Zap, ArrowRight,
-  LucideIcon, Copy, Check, PhoneCall
+  LucideIcon, Copy, Check, PhoneCall, Image as ImageIcon
 } from "lucide-react";
 import FeatureCard from "./FeatureCard";
 import { Input } from "./ui/input";
@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import CallDark from "./CallDark";
+import ImageToInfo from "./ImageToInfo";
 import HackerLoader from "./HackerLoader";
 import AnimatedJsonViewer from "./AnimatedJsonViewer";
 import { useSettings } from "@/contexts/SettingsContext";
@@ -20,7 +21,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb, Shield, Search, PhoneCall
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb, Shield, Search, PhoneCall, Image: ImageIcon
 };
 
 const SearchPanel = () => {
@@ -356,7 +357,7 @@ const SearchPanel = () => {
   };
 
   const showSearchInput = activeTab && activeButton && 
-    !["shubh", "darkdb", "telegram", "phprat", "calldark"].includes(activeButton.searchType);
+    !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo"].includes(activeButton.searchType);
 
   return (
     <div className="px-4 space-y-4">
@@ -481,6 +482,13 @@ const SearchPanel = () => {
       {activeButton?.searchType === "calldark" && (
         <div>
           <CallDark />
+        </div>
+      )}
+
+      {/* Image to Info Panel */}
+      {activeButton?.searchType === "imagetoinfo" && (
+        <div>
+          <ImageToInfo />
         </div>
       )}
 

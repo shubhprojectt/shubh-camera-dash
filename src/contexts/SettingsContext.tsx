@@ -129,6 +129,7 @@ const defaultTabs: TabConfig[] = [
   { id: "randipanel", label: "RANDI PANEL", icon: "Skull", color: "red", placeholder: "", searchType: "randipanel", apiUrl: "", enabled: true },
   { id: "smsbomber", label: "SMS BOMBER", icon: "Bomb", color: "orange", placeholder: "", searchType: "smsbomber", apiUrl: "", enabled: true },
   { id: "calldark", label: "CALL DARK", icon: "PhoneCall", color: "red", placeholder: "", searchType: "calldark", apiUrl: "", enabled: true },
+  { id: "imagetoinfo", label: "Image to Info", icon: "Camera", color: "pink", placeholder: "", searchType: "imagetoinfo", apiUrl: "", enabled: true },
 ];
 
 const defaultSettings: AppSettings = {
