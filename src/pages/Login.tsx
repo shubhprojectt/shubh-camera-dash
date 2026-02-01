@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Lock, Shield } from "lucide-react";
+import { Loader2, Lock, Shield, Sparkles } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,7 +16,6 @@ const Login = () => {
   const { settings } = useSettings();
   const navigate = useNavigate();
 
-  // Show loader animation for 2.5 seconds before showing login form
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowLoader(false);
@@ -66,87 +65,112 @@ const Login = () => {
     }
   };
 
-  // Show hacker loader first OR during login
   if (showLoader || isLoading) {
     return <HackerLoader />;
   }
 
   return (
-    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-6">
-      {/* Background effects */}
+    <div className="min-h-[100dvh] bg-background flex items-center justify-center p-4 overflow-hidden">
+      {/* Optimized Background - Static gradients for performance */}
       <div className="fixed inset-0 pointer-events-none">
-        {/* Gradient orbs */}
-        <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-neon-green/10 rounded-full blur-[80px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[200px] h-[200px] bg-neon-cyan/10 rounded-full blur-[80px]" />
+        {/* Main gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-background via-card to-background" />
         
-        {/* Subtle grid */}
+        {/* Static accent orbs - no animations */}
+        <div className="absolute top-1/4 left-1/4 w-[300px] h-[300px] bg-neon-green/8 rounded-full blur-[120px]" />
+        <div className="absolute bottom-1/4 right-1/4 w-[250px] h-[250px] bg-neon-cyan/8 rounded-full blur-[100px]" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-neon-pink/5 rounded-full blur-[150px]" />
+        
+        {/* Subtle grid pattern */}
         <div 
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.03]"
           style={{
-            backgroundImage: `
-              linear-gradient(hsl(var(--neon-green)) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--neon-green)) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px'
+            backgroundImage: `linear-gradient(hsl(var(--neon-green)) 1px, transparent 1px),
+                              linear-gradient(90deg, hsl(var(--neon-green)) 1px, transparent 1px)`,
+            backgroundSize: '60px 60px'
           }}
         />
       </div>
 
-      {/* Lock Card */}
-      <div className="relative w-full max-w-sm">
-        {/* Animated border glow */}
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 animate-gradient-shift bg-[length:200%_auto]" />
+      {/* Login Card */}
+      <div className="relative w-full max-w-[320px]">
+        {/* Card glow effect */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-3xl opacity-40 blur-xl" />
         
-        <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-          {/* Lock icon with glow */}
-          <div className="flex justify-center mb-5">
+        {/* Animated border */}
+        <div className="absolute -inset-[2px] rounded-3xl overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+            style={{ backgroundSize: '300% 100%' }}
+          />
+        </div>
+        
+        <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-6 border border-white/10">
+          {/* Decorative corners */}
+          <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-neon-green/60 rounded-tl-lg" />
+          <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-neon-cyan/60 rounded-tr-lg" />
+          <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-neon-cyan/60 rounded-bl-lg" />
+          <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-neon-green/60 rounded-br-lg" />
+
+          {/* Icon with glow */}
+          <div className="flex justify-center mb-4">
             <div className="relative">
-              <div className="absolute -inset-4 bg-neon-green/20 rounded-full blur-xl animate-pulse" />
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
-                <Lock className="w-8 h-8 text-neon-green" />
+              <div className="absolute -inset-3 bg-neon-green/20 rounded-2xl blur-xl" />
+              <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
+                <Lock className="w-7 h-7 text-neon-green" />
               </div>
+              {/* Floating sparkle */}
+              <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-neon-cyan" />
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-5">
-            <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent mb-1">
-              {settings.headerName1 || "SHUBH"} {settings.headerName2 || "OSINT"}
+            <h1 className="text-xl font-display font-black tracking-wide">
+              <span className="bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent">
+                {settings.headerName1 || "SHUBH"} {settings.headerName2 || "OSINT"}
+              </span>
             </h1>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-xs text-muted-foreground/70 mt-1 font-medium">
               Enter password to continue
             </p>
           </div>
 
-          {/* Password Input */}
-          <form onSubmit={handleSubmit} className="space-y-3">
-            <Input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value.toUpperCase())}
-              placeholder="Enter password..."
-              className="h-12 bg-background/80 border-neon-green/30 text-foreground text-center text-base placeholder:text-muted-foreground/50 focus:border-neon-green rounded-xl"
-              disabled={isLoading}
-              autoFocus
-            />
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="relative">
+              <Input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value.toUpperCase())}
+                placeholder="••••••••"
+                className="h-12 bg-background/60 border-2 border-neon-green/20 text-foreground text-center text-base placeholder:text-muted-foreground/30 focus:border-neon-green/60 focus:bg-background/80 rounded-xl transition-all"
+                disabled={isLoading}
+                autoFocus
+              />
+              <div className="absolute inset-0 rounded-xl pointer-events-none border border-neon-green/10" />
+            </div>
 
             <Button
               type="submit"
               disabled={isLoading || !password.trim()}
-              className="w-full h-12 rounded-xl text-base font-bold bg-gradient-to-r from-neon-green to-neon-cyan text-background hover:shadow-[0_0_25px_hsl(var(--neon-green)/0.5)] transition-all active:scale-[0.98]"
+              className="w-full h-12 rounded-xl text-sm font-black tracking-wider bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green text-background hover:shadow-[0_0_30px_hsl(var(--neon-green)/0.5)] transition-all duration-300 active:scale-[0.98]"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                "UNLOCK ACCESS"
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  UNLOCK ACCESS
+                </>
               )}
             </Button>
           </form>
 
           {/* Footer */}
           <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-white/5">
-            <Shield className="w-3.5 h-3.5 text-neon-green/60" />
-            <p className="text-[11px] text-muted-foreground/60">
+            <div className="w-1.5 h-1.5 rounded-full bg-neon-green" />
+            <p className="text-[10px] text-muted-foreground/50 font-medium tracking-wide">
               Protected Access
             </p>
           </div>
