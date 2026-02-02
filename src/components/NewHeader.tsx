@@ -82,106 +82,101 @@ const NewHeader = () => {
   };
 
   return (
-    <header className="relative px-3 pt-3 pb-2">
-      {/* Main header card with enhanced glassmorphism */}
-      <div className={`relative rounded-2xl bg-gradient-to-br from-background/95 via-card/90 to-background/95 backdrop-blur-md border ${getBorderClass(color1)}/30 p-3 overflow-hidden`}>
+    <header className="relative px-2 pt-2 pb-1">
+      {/* Main header card - compact with rainbow border */}
+      <div className="relative">
+        {/* Animated rainbow border - like login page */}
+        <div className="absolute -inset-[1.5px] rounded-xl overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+            style={{ backgroundSize: '300% 100%' }}
+          />
+        </div>
         
-        {/* Subtle animated gradient border */}
-        <div 
-          className="absolute inset-0 rounded-2xl opacity-20"
-          style={{
-            background: `linear-gradient(135deg, hsl(var(--neon-${color1})) 0%, transparent 40%, transparent 60%, hsl(var(--neon-${color2})) 100%)`,
-          }}
-        />
-        <div className="absolute inset-[1px] rounded-2xl bg-background/98" />
-        
-        {/* Corner accents with glow */}
-        <div className={`absolute top-0 left-0 w-10 h-10 border-t-2 border-l-2 ${getBorderClass(color1)}/70 rounded-tl-2xl`} />
-        <div className={`absolute top-0 right-0 w-10 h-10 border-t-2 border-r-2 ${getBorderClass(color2)}/70 rounded-tr-2xl`} />
-        <div className={`absolute bottom-0 left-0 w-10 h-10 border-b-2 border-l-2 ${getBorderClass(color2)}/70 rounded-bl-2xl`} />
-        <div className={`absolute bottom-0 right-0 w-10 h-10 border-b-2 border-r-2 ${getBorderClass(color1)}/70 rounded-br-2xl`} />
-        
-        {/* Top row - Status & Settings */}
-        <div className="relative flex items-center justify-between mb-3">
-          {/* Status indicators with enhanced design */}
-          <div className="flex items-center gap-2">
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${getBgClass(color1)}/15 border ${getBorderClass(color1)}/50 backdrop-blur-sm`}>
-              <Activity className={`w-3 h-3 ${getColorClass(color1)}`} />
-              <span className={`text-[9px] font-bold ${getColorClass(color1)} tracking-wider`}>LIVE</span>
+        <div className={`relative rounded-xl bg-card/95 backdrop-blur-md p-2 overflow-hidden`}>
+          {/* Corner accents - smaller */}
+          <div className={`absolute top-0 left-0 w-6 h-6 border-t border-l ${getBorderClass(color1)}/60 rounded-tl-xl`} />
+          <div className={`absolute top-0 right-0 w-6 h-6 border-t border-r ${getBorderClass(color2)}/60 rounded-tr-xl`} />
+          <div className={`absolute bottom-0 left-0 w-6 h-6 border-b border-l ${getBorderClass(color2)}/60 rounded-bl-xl`} />
+          <div className={`absolute bottom-0 right-0 w-6 h-6 border-b border-r ${getBorderClass(color1)}/60 rounded-br-xl`} />
+          
+          {/* Top row - Status & Settings - more compact */}
+          <div className="relative flex items-center justify-between mb-1.5">
+            {/* Status indicators - smaller */}
+            <div className="flex items-center gap-1.5">
+              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${getBgClass(color1)}/15 border ${getBorderClass(color1)}/50`}>
+                <Activity className={`w-2.5 h-2.5 ${getColorClass(color1)}`} />
+                <span className={`text-[8px] font-bold ${getColorClass(color1)} tracking-wider`}>LIVE</span>
+              </div>
+              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${getBgClass(color2)}/15 border ${getBorderClass(color2)}/40`}>
+                <Signal className={`w-2.5 h-2.5 ${getColorClass(color2)}`} />
+                <span className={`text-[8px] font-medium ${getColorClass(color2)} tracking-wide`}>SECURE</span>
+              </div>
             </div>
-            <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full ${getBgClass(color2)}/15 border ${getBorderClass(color2)}/40 backdrop-blur-sm`}>
-              <Signal className={`w-3 h-3 ${getColorClass(color2)}`} />
-              <span className={`text-[9px] font-medium ${getColorClass(color2)} tracking-wide`}>SECURE</span>
+
+            {/* Right - Credits & Settings */}
+            <div className="flex items-center gap-1.5">
+              <CreditDisplay />
+              <AdminSettings />
             </div>
           </div>
 
-          {/* Right - Credits & Settings */}
-          <div className="flex items-center gap-2">
-            <CreditDisplay />
-            <AdminSettings />
-          </div>
-        </div>
-
-        {/* Main title section */}
-        <div className="relative text-center py-2">
-          {/* Logo with enhanced glow effect */}
-          <div className="inline-flex items-center justify-center mb-3">
-            <div className="relative">
-              {/* Multi-layer glow */}
-              <div className={`absolute -inset-3 ${getBgClass(color1)}/20 rounded-2xl blur-xl`} />
-              <div className={`absolute -inset-1.5 ${getBgClass(color1)}/10 rounded-xl blur-md`} />
-              
-              {settings.headerCustomLogo ? (
-                <img 
-                  src={settings.headerCustomLogo} 
-                  alt="Logo" 
-                  className={`relative w-12 h-12 rounded-xl object-cover border-2 ${getBorderClass(color1)}/60 shadow-lg`}
-                  style={{ boxShadow: `0 0 20px hsl(var(--neon-${color1}) / 0.3)` }}
-                />
-              ) : (
-                <div 
-                  className={`relative w-12 h-12 rounded-xl bg-gradient-to-br from-background/90 to-card/80 border-2 ${getBorderClass(color1)}/60 flex items-center justify-center`}
-                  style={{ boxShadow: `0 0 20px hsl(var(--neon-${color1}) / 0.3)` }}
-                >
-                  <IconComponent className={`w-6 h-6 ${getColorClass(color1)}`} />
-                </div>
-              )}
+          {/* Main title section - compact */}
+          <div className="relative text-center py-1">
+            {/* Logo with glow - smaller */}
+            <div className="inline-flex items-center justify-center mb-1.5">
+              <div className="relative">
+                <div className={`absolute -inset-2 ${getBgClass(color1)}/15 rounded-xl blur-lg`} />
+                
+                {settings.headerCustomLogo ? (
+                  <img 
+                    src={settings.headerCustomLogo} 
+                    alt="Logo" 
+                    className={`relative w-9 h-9 rounded-lg object-cover border ${getBorderClass(color1)}/60`}
+                    style={{ boxShadow: `0 0 12px hsl(var(--neon-${color1}) / 0.3)` }}
+                  />
+                ) : (
+                  <div 
+                    className={`relative w-9 h-9 rounded-lg bg-gradient-to-br from-background/90 to-card/80 border ${getBorderClass(color1)}/60 flex items-center justify-center`}
+                    style={{ boxShadow: `0 0 12px hsl(var(--neon-${color1}) / 0.3)` }}
+                  >
+                    <IconComponent className={`w-5 h-5 ${getColorClass(color1)}`} />
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Title - smaller */}
+            <h1 
+              className={`text-base md:text-lg font-black tracking-wider ${getStyleClasses()}`}
+              style={{ 
+                fontFamily: settings.headerFont || "'Orbitron', sans-serif",
+                ...(settings.headerStyle === 'gradient' && {
+                  backgroundImage: `linear-gradient(135deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})))`,
+                })
+              }}
+            >
+              <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color1)}`}>
+                {settings.headerName1 || "SHUBH"}
+              </span>
+              <span className={`mx-1.5 ${settings.headerStyle === 'gradient' ? '' : 'text-muted-foreground/40'}`}>×</span>
+              <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color2)}`}>
+                {settings.headerName2 || "OSINT"}
+              </span>
+            </h1>
+            
+            {/* Subtitle - smaller */}
+            <div className="flex items-center justify-center gap-1.5 mt-1">
+              <div className={`w-6 h-px bg-gradient-to-r from-transparent to-current ${getColorClass(color1)}/40`} />
+              <Shield className={`w-2.5 h-2.5 ${getColorClass(color1)}/70`} />
+              <p className="text-[7px] text-muted-foreground/80 tracking-[0.15em] uppercase font-medium">
+                Intelligence Framework
+              </p>
+              <Shield className={`w-2.5 h-2.5 ${getColorClass(color2)}/70`} />
+              <div className={`w-6 h-px bg-gradient-to-l from-transparent to-current ${getColorClass(color2)}/40`} />
             </div>
           </div>
-          
-          {/* Title with dynamic colors and styles */}
-          <h1 
-            className={`text-xl md:text-2xl font-black tracking-wider ${getStyleClasses()}`}
-            style={{ 
-              fontFamily: settings.headerFont || "'Orbitron', sans-serif",
-              ...(settings.headerStyle === 'gradient' && {
-                backgroundImage: `linear-gradient(135deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})))`,
-              })
-            }}
-          >
-            <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color1)}`}>
-              {settings.headerName1 || "SHUBH"}
-            </span>
-            <span className={`mx-2 ${settings.headerStyle === 'gradient' ? '' : 'text-muted-foreground/40'}`}>×</span>
-            <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color2)}`}>
-              {settings.headerName2 || "OSINT"}
-            </span>
-          </h1>
-          
-          {/* Subtitle with enhanced styling */}
-          <div className="flex items-center justify-center gap-2 mt-2">
-            <div className={`w-8 h-px bg-gradient-to-r from-transparent via-current to-current ${getColorClass(color1)}/40`} />
-            <Shield className={`w-3 h-3 ${getColorClass(color1)}/70`} />
-            <p className="text-[9px] text-muted-foreground/80 tracking-[0.2em] uppercase font-medium">
-              Intelligence Framework
-            </p>
-            <Shield className={`w-3 h-3 ${getColorClass(color2)}/70`} />
-            <div className={`w-8 h-px bg-gradient-to-l from-transparent via-current to-current ${getColorClass(color2)}/40`} />
-          </div>
         </div>
-        
-        {/* Bottom decorative line */}
-        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-px bg-gradient-to-r from-transparent via-neon-cyan/30 to-transparent" />
       </div>
     </header>
   );
