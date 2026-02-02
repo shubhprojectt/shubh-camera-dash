@@ -103,7 +103,7 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardP
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-200",
+        "relative flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-200",
         "backdrop-blur-sm bg-gradient-to-br",
         colors.gradient,
         colors.border,
@@ -114,39 +114,39 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardP
       {/* Active glow ring */}
       {active && (
         <div className={cn(
-          "absolute -inset-0.5 rounded-xl opacity-40 blur-sm",
+          "absolute -inset-0.5 rounded-lg opacity-40 blur-sm",
           `bg-gradient-to-br ${colors.gradient}`
         )} />
       )}
       
-      {/* Icon container */}
+      {/* Icon container - compact */}
       <div className={cn(
-        "relative w-8 h-8 rounded-lg flex items-center justify-center",
+        "relative w-7 h-7 rounded-md flex items-center justify-center",
         "bg-gradient-to-br from-background/90 to-background/50",
         "border border-current/20",
         colors.text
       )}>
         {active && (
-          <div className="absolute inset-0 rounded-lg bg-current/15" />
+          <div className="absolute inset-0 rounded-md bg-current/15" />
         )}
         <Icon className={cn(
-          "w-4 h-4 transition-all duration-200",
-          active && "drop-shadow-[0_0_6px_currentColor] scale-110"
+          "w-3.5 h-3.5 transition-all duration-200",
+          active && "drop-shadow-[0_0_4px_currentColor] scale-110"
         )} />
       </div>
       
-      {/* Label */}
+      {/* Label - compact */}
       <span className={cn(
-        "text-[9px] font-bold tracking-wider uppercase text-center leading-tight",
+        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
         colors.text,
-        active && "drop-shadow-[0_0_4px_currentColor]"
+        active && "drop-shadow-[0_0_3px_currentColor]"
       )}>
         {label}
       </span>
       
       {/* Active indicator */}
       {active && (
-        <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-4 h-0.5 rounded-full", colors.bg)} />
+        <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
       )}
     </button>
   );
