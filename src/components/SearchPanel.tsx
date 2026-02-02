@@ -360,68 +360,90 @@ const SearchPanel = () => {
     !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo"].includes(activeButton.searchType);
 
   return (
-    <div className="px-4 space-y-4">
-      {/* Feature Cards Grid */}
-      <div className="grid grid-cols-4 gap-2">
-        {enabledTabs.map((tab) => {
-          const IconComponent = iconMap[tab.icon] || Sparkles;
-          return (
-            <div key={tab.id}>
-              <FeatureCard
-                icon={IconComponent}
-                label={tab.label}
-                color={tab.color}
-                active={tab.label === activeTab}
-                onClick={() => handleTabClick(tab.label)}
-              />
-            </div>
-          );
-        })}
+    <div className="px-3 space-y-4">
+      {/* Feature Cards Grid with enhanced container */}
+      <div className="relative rounded-2xl bg-gradient-to-br from-card/60 via-background/80 to-card/60 border border-neon-cyan/20 p-3 overflow-hidden">
+        {/* Subtle corner accents */}
+        <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-green/40 rounded-tl-2xl" />
+        <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-pink/40 rounded-tr-2xl" />
+        <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-neon-pink/40 rounded-bl-2xl" />
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-b border-r border-neon-green/40 rounded-br-2xl" />
         
-        {/* More Button */}
-        <div>
-          <Link to="/page2">
-            <div className={cn(
-              "flex flex-col items-center gap-1 p-2 rounded-lg border transition-colors",
-              "bg-gradient-to-br from-neon-yellow/20 to-neon-yellow/5",
-              "border-neon-yellow/40 hover:border-neon-yellow"
-            )}>
-              <div className="w-7 h-7 rounded-md bg-gradient-to-br from-background/80 to-background/40 border border-neon-yellow/30 flex items-center justify-center text-neon-yellow">
-                <ArrowRight className="w-3.5 h-3.5" />
+        <div className="relative grid grid-cols-4 gap-2">
+          {enabledTabs.map((tab) => {
+            const IconComponent = iconMap[tab.icon] || Sparkles;
+            return (
+              <div key={tab.id}>
+                <FeatureCard
+                  icon={IconComponent}
+                  label={tab.label}
+                  color={tab.color}
+                  active={tab.label === activeTab}
+                  onClick={() => handleTabClick(tab.label)}
+                />
               </div>
-              <span className="text-[8px] font-bold tracking-wide uppercase text-neon-yellow">More</span>
-            </div>
-          </Link>
+            );
+          })}
+          
+          {/* More Button with enhanced styling */}
+          <div>
+            <Link to="/page2">
+              <div className={cn(
+                "flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all duration-200",
+                "bg-gradient-to-br from-neon-yellow/15 to-neon-yellow/5",
+                "border-neon-yellow/40 hover:border-neon-yellow hover:scale-[1.03]",
+                "backdrop-blur-sm"
+              )}>
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-background/90 to-background/50 border border-neon-yellow/30 flex items-center justify-center text-neon-yellow">
+                  <ArrowRight className="w-4 h-4" />
+                </div>
+                <span className="text-[9px] font-bold tracking-wider uppercase text-neon-yellow">More</span>
+              </div>
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Search Input Section */}
+      {/* Search Input Section with enhanced design */}
       {showSearchInput && (
-        <div>
-          <div className="relative rounded-xl bg-gradient-to-br from-card/90 to-card/70 border border-neon-cyan/30 p-3 overflow-hidden">
-            <div className="relative flex gap-2">
-              <Input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={activeButton?.placeholder || "Enter search query..."}
-                className="flex-1 bg-background/80 border-neon-green/30 text-foreground placeholder:text-muted-foreground/50 focus:border-neon-green h-11 text-sm font-mono rounded-lg"
-                onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <Button
-                onClick={handleSearch}
-                disabled={loading}
-                className={cn(
-                  "h-11 px-4 rounded-lg font-bold",
-                  "bg-gradient-to-r from-neon-green to-neon-cyan text-background"
-                )}
-              >
-                {loading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Search className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
+        <div className="relative rounded-2xl bg-gradient-to-br from-card/80 via-background/90 to-card/80 border border-neon-cyan/30 p-4 overflow-hidden">
+          {/* Corner accents */}
+          <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-neon-green/50 rounded-tl-2xl" />
+          <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-neon-cyan/50 rounded-tr-2xl" />
+          <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-neon-cyan/50 rounded-bl-2xl" />
+          <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-neon-green/50 rounded-br-2xl" />
+          
+          {/* Search label */}
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-1.5 h-1.5 rounded-full bg-neon-green" />
+            <span className="text-[10px] font-bold text-neon-green tracking-wider uppercase">
+              {activeButton?.label || "SEARCH"}
+            </span>
+          </div>
+          
+          <div className="relative flex gap-2">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={activeButton?.placeholder || "Enter search query..."}
+              className="flex-1 bg-background/90 border-neon-green/30 text-foreground placeholder:text-muted-foreground/50 focus:border-neon-green h-12 text-sm font-mono rounded-xl"
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+            />
+            <Button
+              onClick={handleSearch}
+              disabled={loading}
+              className={cn(
+                "h-12 px-5 rounded-xl font-bold transition-all duration-200",
+                "bg-gradient-to-r from-neon-green to-neon-cyan text-background",
+                "hover:shadow-[0_0_20px_hsl(var(--neon-green)/0.4)] hover:scale-[1.02]"
+              )}
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Search className="w-5 h-5" />
+              )}
+            </Button>
           </div>
         </div>
       )}
@@ -440,41 +462,41 @@ const SearchPanel = () => {
         </div>
       )}
 
-      {/* DARK DB iframe */}
+      {/* DARK DB iframe with enhanced container */}
       {activeButton?.searchType === "darkdb" && (
-        <div>
-          <div className="rounded-xl border-2 border-neon-purple/40 overflow-hidden">
-            <div className="flex items-center gap-2 px-3 py-2 bg-neon-purple/10 border-b border-neon-purple/20">
-              <Database className="w-4 h-4 text-neon-purple" />
-              <span className="text-xs font-bold text-neon-purple uppercase tracking-wider">Secure OSINT Database</span>
-            </div>
-            <iframe
-              src={settings.darkDbUrl}
-              className="w-full bg-background"
-              style={{ height: `${settings.darkDbHeight}vh`, minHeight: '400px' }}
-              title="DARK DB"
-              sandbox="allow-scripts allow-forms allow-same-origin"
-            />
+        <div className="relative rounded-2xl border-2 border-neon-purple/40 overflow-hidden">
+          <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-purple/60 rounded-tl-2xl" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-purple/60 rounded-tr-2xl" />
+          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-neon-purple/15 to-transparent border-b border-neon-purple/20">
+            <Database className="w-4 h-4 text-neon-purple" />
+            <span className="text-xs font-bold text-neon-purple uppercase tracking-wider">Secure OSINT Database</span>
           </div>
+          <iframe
+            src={settings.darkDbUrl}
+            className="w-full bg-background"
+            style={{ height: `${settings.darkDbHeight}vh`, minHeight: '400px' }}
+            title="DARK DB"
+            sandbox="allow-scripts allow-forms allow-same-origin"
+          />
         </div>
       )}
 
-      {/* PHPRAT Panel */}
+      {/* PHPRAT Panel with enhanced container */}
       {activeButton?.searchType === "phprat" && (
-        <div>
-          <div className="rounded-xl border-2 border-neon-green/40 overflow-hidden">
-            <div className="flex items-center gap-2 px-3 py-2 bg-neon-green/10 border-b border-neon-green/20">
-              <Code className="w-4 h-4 text-neon-green" />
-              <span className="text-xs font-bold text-neon-green uppercase tracking-wider">PHPRAT Control Panel</span>
-            </div>
-            <iframe
-              src={activeButton?.apiUrl || "https://userb-92mn.onrender.com/"}
-              className="w-full bg-background"
-              style={{ height: '70vh', minHeight: '400px' }}
-              title="PHPRAT"
-              sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
-            />
+        <div className="relative rounded-2xl border-2 border-neon-green/40 overflow-hidden">
+          <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-green/60 rounded-tl-2xl" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-green/60 rounded-tr-2xl" />
+          <div className="flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-neon-green/15 to-transparent border-b border-neon-green/20">
+            <Code className="w-4 h-4 text-neon-green" />
+            <span className="text-xs font-bold text-neon-green uppercase tracking-wider">PHPRAT Control Panel</span>
           </div>
+          <iframe
+            src={activeButton?.apiUrl || "https://userb-92mn.onrender.com/"}
+            className="w-full bg-background"
+            style={{ height: '70vh', minHeight: '400px' }}
+            title="PHPRAT"
+            sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
+          />
         </div>
       )}
 
@@ -492,20 +514,29 @@ const SearchPanel = () => {
         </div>
       )}
 
-      {/* Results Section */}
+      {/* Results Section with enhanced styling */}
       {showSearchInput && (
         <div className="min-h-[100px]">
           {loading && <HackerLoader inline />}
           
           {error && !loading && (
-            <div className="text-center py-6 rounded-xl border border-neon-red/40 bg-neon-red/5">
-              <p className="text-neon-red text-sm">{error}</p>
+            <div className="relative text-center py-6 rounded-2xl border border-neon-red/40 bg-gradient-to-br from-neon-red/10 to-transparent overflow-hidden">
+              <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-red/50 rounded-tl-2xl" />
+              <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-red/50 rounded-tr-2xl" />
+              <p className="text-neon-red text-sm font-medium">{error}</p>
             </div>
           )}
           
           {result && !loading && !error && (
-            <div className="rounded-xl border border-neon-green/40 bg-gradient-to-br from-card/90 to-card/70 p-4">
-              <div className="flex items-center gap-2 mb-3 pb-2 border-b border-neon-green/20">
+            <div className="relative rounded-2xl border border-neon-green/40 bg-gradient-to-br from-card/90 via-background/80 to-card/90 p-4 overflow-hidden">
+              {/* Corner accents */}
+              <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-neon-green/60 rounded-tl-2xl" />
+              <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-neon-cyan/60 rounded-tr-2xl" />
+              <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-neon-cyan/60 rounded-bl-2xl" />
+              <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-neon-green/60 rounded-br-2xl" />
+              
+              <div className="relative flex items-center gap-2 mb-3 pb-2 border-b border-neon-green/20">
+                <div className="w-2 h-2 rounded-full bg-neon-green" />
                 <Zap className="w-4 h-4 text-neon-green" />
                 <h3 className="text-sm font-bold text-neon-green uppercase tracking-wider">
                   {activeButton?.label} Results
