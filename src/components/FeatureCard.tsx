@@ -102,52 +102,62 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardP
   return (
     <button
       onClick={onClick}
-      className={cn(
-        "relative flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-200",
-        "backdrop-blur-sm bg-gradient-to-br",
-        colors.gradient,
-        colors.border,
-        "hover:scale-[1.03] active:scale-95",
-        active && [colors.glow, "border-2 scale-[1.02]"]
-      )}
+      className="relative p-[1.5px] rounded-lg transition-all duration-200 hover:scale-[1.03] active:scale-95"
     >
-      {/* Active glow ring */}
-      {active && (
-        <div className={cn(
-          "absolute -inset-0.5 rounded-lg opacity-40 blur-sm",
-          `bg-gradient-to-br ${colors.gradient}`
-        )} />
-      )}
-      
-      {/* Icon container - compact */}
-      <div className={cn(
-        "relative w-7 h-7 rounded-md flex items-center justify-center",
-        "bg-gradient-to-br from-background/90 to-background/50",
-        "border border-current/20",
-        colors.text
-      )}>
-        {active && (
-          <div className="absolute inset-0 rounded-md bg-current/15" />
-        )}
-        <Icon className={cn(
-          "w-3.5 h-3.5 transition-all duration-200",
-          active && "drop-shadow-[0_0_4px_currentColor] scale-110"
-        )} />
+      {/* Animated rainbow border */}
+      <div className="absolute inset-0 rounded-lg overflow-hidden">
+        <div 
+          className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+          style={{ backgroundSize: '300% 100%' }}
+        />
       </div>
       
-      {/* Label - compact */}
-      <span className={cn(
-        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
-        colors.text,
-        active && "drop-shadow-[0_0_3px_currentColor]"
+      {/* Inner content */}
+      <div className={cn(
+        "relative flex flex-col items-center gap-1 p-2 rounded-[6px]",
+        "backdrop-blur-sm bg-gradient-to-br",
+        colors.gradient,
+        "bg-card/95",
+        active && [colors.glow, "scale-[1.02]"]
       )}>
-        {label}
-      </span>
-      
-      {/* Active indicator */}
-      {active && (
-        <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
-      )}
+        {/* Active glow ring */}
+        {active && (
+          <div className={cn(
+            "absolute -inset-0.5 rounded-[6px] opacity-40 blur-sm",
+            `bg-gradient-to-br ${colors.gradient}`
+          )} />
+        )}
+        
+        {/* Icon container - compact */}
+        <div className={cn(
+          "relative w-7 h-7 rounded-md flex items-center justify-center",
+          "bg-gradient-to-br from-background/90 to-background/50",
+          "border border-current/20",
+          colors.text
+        )}>
+          {active && (
+            <div className="absolute inset-0 rounded-md bg-current/15" />
+          )}
+          <Icon className={cn(
+            "w-3.5 h-3.5 transition-all duration-200",
+            active && "drop-shadow-[0_0_4px_currentColor] scale-110"
+          )} />
+        </div>
+        
+        {/* Label - compact */}
+        <span className={cn(
+          "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
+          colors.text,
+          active && "drop-shadow-[0_0_3px_currentColor]"
+        )}>
+          {label}
+        </span>
+        
+        {/* Active indicator */}
+        {active && (
+          <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
+        )}
+      </div>
     </button>
   );
 };
