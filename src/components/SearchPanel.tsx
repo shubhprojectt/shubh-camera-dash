@@ -361,13 +361,23 @@ const SearchPanel = () => {
 
   return (
     <div className="px-3 space-y-4">
-      {/* Feature Cards Grid with enhanced container */}
-      <div className="relative rounded-2xl bg-gradient-to-br from-card/60 via-background/80 to-card/60 border border-neon-cyan/20 p-3 overflow-hidden">
-        {/* Subtle corner accents */}
-        <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-green/40 rounded-tl-2xl" />
-        <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-pink/40 rounded-tr-2xl" />
-        <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-neon-pink/40 rounded-bl-2xl" />
-        <div className="absolute bottom-0 right-0 w-6 h-6 border-b border-r border-neon-green/40 rounded-br-2xl" />
+      {/* Feature Cards Grid with animated rainbow border */}
+      <div className="relative p-[2px] rounded-2xl overflow-hidden">
+        {/* Animated rainbow border */}
+        <div className="absolute inset-0 rounded-2xl overflow-hidden">
+          <div 
+            className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+            style={{ backgroundSize: '300% 100%' }}
+          />
+        </div>
+        
+        {/* Inner container */}
+        <div className="relative rounded-[14px] bg-gradient-to-br from-card/90 via-background/95 to-card/90 p-3">
+          {/* Subtle corner accents */}
+          <div className="absolute top-0 left-0 w-6 h-6 border-t border-l border-neon-green/40 rounded-tl-xl" />
+          <div className="absolute top-0 right-0 w-6 h-6 border-t border-r border-neon-pink/40 rounded-tr-xl" />
+          <div className="absolute bottom-0 left-0 w-6 h-6 border-b border-l border-neon-pink/40 rounded-bl-xl" />
+          <div className="absolute bottom-0 right-0 w-6 h-6 border-b border-r border-neon-green/40 rounded-br-xl" />
         
         <div className="relative grid grid-cols-4 gap-2">
           {enabledTabs.map((tab) => {
@@ -401,6 +411,7 @@ const SearchPanel = () => {
               </div>
             </Link>
           </div>
+        </div>
         </div>
       </div>
 
