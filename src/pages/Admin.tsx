@@ -999,6 +999,25 @@ const Admin = () => {
                 />
               </div>
             </PanelCard>
+
+            <PanelCard title="Border Effects" description="Enable/disable rainbow borders">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Header Rainbow Border</span>
+                  <Switch
+                    checked={settings.headerBorderEnabled ?? true}
+                    onCheckedChange={(checked) => updateSettings({ headerBorderEnabled: checked })}
+                  />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Tab Container Rainbow Border</span>
+                  <Switch
+                    checked={settings.tabContainerBorderEnabled ?? true}
+                    onCheckedChange={(checked) => updateSettings({ tabContainerBorderEnabled: checked })}
+                  />
+                </div>
+              </div>
+            </PanelCard>
           </Section>
 
           {/* Telegram OSINT Settings */}

@@ -363,13 +363,15 @@ const SearchPanel = () => {
     <div className="px-3 space-y-4">
       {/* Feature Cards Grid with animated rainbow border */}
       <div className="relative p-[2px] rounded-2xl overflow-hidden">
-        {/* Animated rainbow border */}
-        <div className="absolute inset-0 rounded-2xl overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
-            style={{ backgroundSize: '300% 100%' }}
-          />
-        </div>
+        {/* Animated rainbow border (conditional) */}
+        {(settings.tabContainerBorderEnabled ?? true) && (
+          <div className="absolute inset-0 rounded-2xl overflow-hidden">
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+              style={{ backgroundSize: '300% 100%' }}
+            />
+          </div>
+        )}
         
         {/* Inner container */}
         <div className="relative rounded-[14px] bg-gradient-to-br from-card/90 via-background/95 to-card/90 p-3">

@@ -94,6 +94,9 @@ export interface AppSettings {
   callDarkApiKey: string;
   callDarkAgentId: string;
   callDarkMaxDuration: number; // in seconds
+  // Border enable/disable toggles
+  headerBorderEnabled: boolean;
+  tabContainerBorderEnabled: boolean;
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -205,6 +208,9 @@ const defaultSettings: AppSettings = {
   callDarkApiKey: "",
   callDarkAgentId: "",
   callDarkMaxDuration: 20,
+  // Border toggles defaults
+  headerBorderEnabled: true,
+  tabContainerBorderEnabled: true,
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {

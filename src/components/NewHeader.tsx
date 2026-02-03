@@ -85,13 +85,15 @@ const NewHeader = () => {
     <header className="relative px-2 pt-2 pb-1">
       {/* Main header card - compact with rainbow border */}
       <div className="relative">
-        {/* Animated rainbow border - like login page */}
-        <div className="absolute -inset-[1.5px] rounded-xl overflow-hidden">
-          <div 
-            className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
-            style={{ backgroundSize: '300% 100%' }}
-          />
-        </div>
+        {/* Animated rainbow border - like login page (conditional) */}
+        {(settings.headerBorderEnabled ?? true) && (
+          <div className="absolute -inset-[1.5px] rounded-xl overflow-hidden">
+            <div 
+              className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
+              style={{ backgroundSize: '300% 100%' }}
+            />
+          </div>
+        )}
         
         <div className={`relative rounded-xl bg-card/95 backdrop-blur-md p-2 overflow-hidden`}>
           {/* Corner accents - smaller */}
