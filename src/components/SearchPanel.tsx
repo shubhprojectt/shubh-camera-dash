@@ -382,6 +382,7 @@ const SearchPanel = () => {
         <div className="relative grid grid-cols-4 gap-2">
           {enabledTabs.map((tab) => {
             const IconComponent = iconMap[tab.icon] || Sparkles;
+            const isPhoneSearch = tab.searchType === "phone";
             return (
               <div key={tab.id}>
                 <FeatureCard
@@ -390,6 +391,7 @@ const SearchPanel = () => {
                   color={tab.color}
                   active={tab.label === activeTab}
                   onClick={() => handleTabClick(tab.label)}
+                  curved={isPhoneSearch}
                 />
               </div>
             );
