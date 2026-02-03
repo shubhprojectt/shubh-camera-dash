@@ -146,7 +146,7 @@ const NewHeader = () => {
               </div>
             </div>
             
-            {/* Title - smaller */}
+            {/* Title - with color cycling animation */}
             <h1 
               className={`text-base md:text-lg font-black tracking-wider ${getStyleClasses()}`}
               style={{ 
@@ -156,11 +156,11 @@ const NewHeader = () => {
                 })
               }}
             >
-              <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color1)}`}>
+              <span className="animate-color-cycle">
                 {settings.headerName1 || "SHUBH"}
               </span>
-              <span className={`mx-1.5 ${settings.headerStyle === 'gradient' ? '' : 'text-muted-foreground/40'}`}>×</span>
-              <span className={`${settings.headerStyle === 'gradient' ? '' : getColorClass(color2)}`}>
+              <span className="mx-1.5 text-muted-foreground/40">×</span>
+              <span className="animate-color-cycle" style={{ animationDelay: '-4s' }}>
                 {settings.headerName2 || "OSINT"}
               </span>
             </h1>
