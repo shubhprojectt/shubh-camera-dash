@@ -7,6 +7,7 @@ interface FeatureCardProps {
   color: string;
   active?: boolean;
   onClick?: () => void;
+  curved?: boolean;
 }
 
 const colorMap: Record<string, { gradient: string; border: string; text: string; glow: string; bg: string }> = {
@@ -96,8 +97,63 @@ const colorMap: Record<string, { gradient: string; border: string; text: string;
   },
 };
 
-const FeatureCard = ({ icon: Icon, label, color, active, onClick }: FeatureCardProps) => {
+const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved }: FeatureCardProps) => {
   const colors = colorMap[color] || colorMap.green;
+
+  // Curved style for special tabs
+  if (curved) {
+    return (
+      <button
+        onClick={onClick}
+        className={cn(
+          "relative flex flex-col items-center gap-1 p-2 rounded-2xl border transition-all duration-200",
+          "backdrop-blur-sm bg-gradient-to-br",
+          colors.gradient,
+          colors.border,
+          "hover:scale-[1.03] active:scale-95",
+          active && [colors.glow, "border-2 scale-[1.02]"]
+        )}
+      >
+        {/* Active glow ring */}
+        {active && (
+          <div className={cn(
+            "absolute -inset-0.5 rounded-2xl opacity-40 blur-sm",
+            `bg-gradient-to-br ${colors.gradient}`
+          )} />
+        )}
+          
+        {/* Icon container - circular */}
+        <div className={cn(
+          "relative w-7 h-7 rounded-full flex items-center justify-center",
+          "bg-gradient-to-br from-background/90 to-background/50",
+          "border border-current/30",
+          colors.text
+        )}>
+          {active && (
+            <div className="absolute inset-0 rounded-full bg-current/15" />
+          )}
+          <Icon className={cn(
+            "w-3.5 h-3.5 transition-all duration-200",
+            active && "drop-shadow-[0_0_4px_currentColor] scale-110"
+          )} />
+        </div>
+        
+        {/* Label - compact */}
+        <span className={cn(
+          "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
+          colors.text,
+          active && "drop-shadow-[0_0_3px_currentColor]"
+        )}>
+          {label}
+        </span>
+        
+        {/* Active indicator */}
+        {active && (
+          <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
+        )}
+      </button>
+    );
+  }
 
   return (
     <button
