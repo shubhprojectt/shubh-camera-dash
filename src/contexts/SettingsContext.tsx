@@ -97,6 +97,11 @@ export interface AppSettings {
   // Border enable/disable toggles
   headerBorderEnabled: boolean;
   tabContainerBorderEnabled: boolean;
+  // QR Code settings
+  qrSize: number; // QR code size in pixels (100-300)
+  qrFgColor: string; // Foreground color
+  qrBgColor: string; // Background color
+  qrIncludeLogo: boolean; // Include logo in center
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -211,6 +216,11 @@ const defaultSettings: AppSettings = {
   // Border toggles defaults
   headerBorderEnabled: true,
   tabContainerBorderEnabled: true,
+  // QR Code defaults
+  qrSize: 180,
+  qrFgColor: "#22c55e", // neon-green
+  qrBgColor: "#000000", // black
+  qrIncludeLogo: false,
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {
