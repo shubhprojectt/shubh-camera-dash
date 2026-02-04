@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-01-31
--- Version: 3.4 (Iframe Capture + Session Config cleanup)
+-- Last Updated: 2026-02-04
+-- Version: 3.5 (Border Effects Toggle Settings)
 -- =====================================================
 
 -- =====================================================
@@ -329,6 +329,8 @@ VALUES ('main_settings', '{
   "callDarkApiKey": "",
   "callDarkAgentId": "",
   "callDarkMaxDuration": 20,
+  "headerBorderEnabled": true,
+  "tabContainerBorderEnabled": true,
   "tabs": [
     {"id": "phone", "label": "Phone", "icon": "Phone", "color": "green", "placeholder": "Enter phone number...", "searchType": "phone", "apiUrl": "", "enabled": true},
     {"id": "numinfov2", "label": "NUM INFO V2", "icon": "Search", "color": "cyan", "placeholder": "Enter phone number...", "searchType": "numinfov2", "apiUrl": "", "enabled": true},
@@ -372,7 +374,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.4 Edge Functions:
+-- Version 3.5 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -381,6 +383,12 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
+--
+-- IMPORTANT CHANGES in v3.5:
+-- - Border Effects toggle added in Admin Panel
+-- - headerBorderEnabled setting for header rainbow border
+-- - tabContainerBorderEnabled setting for tab container border
+-- - Header text auto color cycling animation (10 colors)
 --
 -- IMPORTANT CHANGES in v3.4:
 -- - Iframe Capture page added for embedding any URL
@@ -408,6 +416,8 @@ ON CONFLICT (setting_key) DO NOTHING;
 --                       callDarkAgentId, callDarkMaxDuration
 --                     - Includes Iframe Capture (v3.4):
 --                       camIframeUrl for embedding external URLs
+--                     - Includes Border Effects (v3.5):
+--                       headerBorderEnabled, tabContainerBorderEnabled
 -- captured_photos   : Camera capture photo metadata + device info
 -- captured_videos   : Video capture metadata & URLs
 -- search_history    : All search queries log
