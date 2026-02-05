@@ -97,6 +97,8 @@ export interface AppSettings {
   // Border enable/disable toggles
   headerBorderEnabled: boolean;
   tabContainerBorderEnabled: boolean;
+   // Tab container separate border colors (10+ unique)
+   tabContainerBorderColors: string[];
   // QR Code settings
   qrSize: number; // QR code size in pixels (100-300)
   qrFgColor: string; // Foreground color
@@ -216,6 +218,8 @@ const defaultSettings: AppSettings = {
   // Border toggles defaults
   headerBorderEnabled: true,
   tabContainerBorderEnabled: true,
+   // Tab container border colors (10+ unique, different from header)
+   tabContainerBorderColors: ["lime", "aqua", "rose", "gold", "teal", "magenta", "coral", "violet", "sunset", "electric", "mint", "emerald"],
   // QR Code defaults
   qrSize: 180,
   qrFgColor: "#22c55e", // neon-green

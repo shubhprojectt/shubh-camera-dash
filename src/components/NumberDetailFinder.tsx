@@ -1044,11 +1044,13 @@ const NumberDetailFinder = () => {
       <div className="relative">
         {/* Dynamic Multicolor running glow border (disabled in transparent mode) */}
         {!settings.sectionTransparent &&
-          (() => {
-            const colors = settings.sectionBorderColors || ["green", "cyan", "pink", "purple"];
-            const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
-            const speed = settings.sectionBorderSpeed || 4;
-            const gradient = `linear-gradient(90deg, ${gradientColors}, ${gradientColors.split(", ")[0]})`;
+           settings.tabContainerBorderEnabled !== false &&
+           (() => {
+             // Use 12-color palette for tab container (different from header)
+             const colors = settings.tabContainerBorderColors || ["lime", "aqua", "rose", "gold", "teal", "magenta", "coral", "violet", "sunset", "electric", "mint", "emerald"];
+             const gradientColors = colors.map((c) => `hsl(var(--neon-${c}))`).join(", ");
+             const speed = settings.sectionBorderSpeed || 4;
+             const gradient = `linear-gradient(90deg, ${gradientColors}, ${gradientColors.split(", ")[0]})`;
 
             return (
               <>
