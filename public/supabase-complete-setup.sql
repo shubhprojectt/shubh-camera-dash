@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-02-04
--- Version: 3.6 (QR Code Generator + Settings)
+-- Last Updated: 2026-02-05
+-- Version: 3.7 (Tab Container 12-Color Rainbow Border)
 -- =====================================================
 
 -- =====================================================
@@ -387,6 +387,13 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
+--
+-- IMPORTANT CHANGES in v3.7:
+-- - Tab Container rainbow border now uses 12 UNIQUE colors
+-- - tabContainerBorderColors setting (different from header)
+-- - New neon colors: lime, magenta, teal, coral, gold, violet
+-- - Additional: aqua, rose, emerald, sunset, electric, mint
+-- - Header keeps original rainbow, tabs get 12-color palette
 --
 -- IMPORTANT CHANGES in v3.6:
 -- - QR Code Generator added to CAM CAPTURE section
