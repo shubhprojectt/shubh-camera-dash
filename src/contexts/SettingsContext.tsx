@@ -104,6 +104,8 @@ export interface AppSettings {
   qrFgColor: string; // Foreground color
   qrBgColor: string; // Background color
   qrIncludeLogo: boolean; // Include logo in center
+   // Loader settings
+   loaderImageUrl: string; // Custom loader image URL
 }
 
 const defaultTelegramTools: TelegramToolConfig[] = [
@@ -225,6 +227,8 @@ const defaultSettings: AppSettings = {
   qrFgColor: "#22c55e", // neon-green
   qrBgColor: "#000000", // black
   qrIncludeLogo: false,
+   // Loader defaults
+   loaderImageUrl: "", // Empty means use default bundled image
 };
 
 const mergeTabsWithDefaults = (tabs?: TabConfig[]): TabConfig[] => {

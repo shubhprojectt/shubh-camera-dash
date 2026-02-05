@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { Settings, X, Minimize2, Maximize2, Square } from "lucide-react";
+import { Settings, Minimize2, Maximize2, Square, Image, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
 import { useSettings } from "@/contexts/SettingsContext";
+import defaultLoaderImage from "@/assets/loader-logo.jpg";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +16,7 @@ import { cn } from "@/lib/utils";
 const AdminSettings = () => {
   const { settings, updateSettings } = useSettings();
   const [isOpen, setIsOpen] = useState(false);
+   const [loaderUrlInput, setLoaderUrlInput] = useState(settings.loaderImageUrl || "");
 
   const tabSizes = [
     { value: "small", label: "Small", icon: Minimize2 },
@@ -94,6 +97,55 @@ const AdminSettings = () => {
               </div>
             </div>
           </div>
+
+           {/* Loader Image Setting */}
+           <div className="space-y-3 pt-2 border-t border-border">
+             <label className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+               <Image className="w-4 h-4" />
+               Loader Image
+             </label>
+             <p className="text-xs text-muted-foreground/70">
+               Custom image URL for loading screen (leave empty for default)
+             </p>
+             <div className="flex gap-2">
+               <Input
+                 value={loaderUrlInput}
+                 onChange={(e) => setLoaderUrlInput(e.target.value)}
+                 placeholder="https://example.com/image.png"
+                 className="flex-1 text-xs"
+               />
+               <Button
+                 size="sm"
+                 onClick={() => updateSettings({ loaderImageUrl: loaderUrlInput })}
+                 className="bg-primary/20 text-primary hover:bg-primary/30 border border-primary/40"
+               >
+                 Save
+               </Button>
+               {settings.loaderImageUrl && (
+                 <Button
+                   size="sm"
+                   variant="ghost"
+                   onClick={() => {
+                     setLoaderUrlInput("");
+                     updateSettings({ loaderImageUrl: "" });
+                   }}
+                   className="text-destructive hover:bg-destructive/20"
+                 >
+                   <Trash2 className="w-4 h-4" />
+                 </Button>
+               )}
+             </div>
+             {/* Loader Preview */}
+             <div className="flex justify-center p-4 rounded-xl border border-neon-purple/30 bg-background">
+               <div className="w-20 h-20 rounded-full overflow-hidden border-2 border-neon-purple/50">
+                 <img 
+                   src={settings.loaderImageUrl?.trim() || defaultLoaderImage} 
+                   alt="Loader Preview" 
+                   className="w-full h-full object-cover"
+                 />
+               </div>
+             </div>
+           </div>
         </div>
       </DialogContent>
     </Dialog>
