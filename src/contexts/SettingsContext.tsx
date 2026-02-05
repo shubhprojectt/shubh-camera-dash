@@ -256,10 +256,17 @@ const hydrateSettings = (partial?: Partial<AppSettings>): AppSettings => {
     ? merged.page2MusicUrl
     : defaultSettings.page2MusicUrl;
 
+   // Force new 12-color palette for tab container if not set or empty
+   const tabContainerBorderColors = 
+     merged.tabContainerBorderColors?.length > 0
+       ? merged.tabContainerBorderColors
+       : defaultSettings.tabContainerBorderColors;
+
   return {
     ...merged,
     mainPageMusicUrl,
     page2MusicUrl,
+     tabContainerBorderColors,
     tabs: mergeTabsWithDefaults(partial?.tabs as TabConfig[] | undefined),
   };
 };
