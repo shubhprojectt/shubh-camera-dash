@@ -16,6 +16,9 @@ import VideoCapture from "./pages/VideoCapture";
 import AudioCapture from "./pages/AudioCapture";
 import Admin from "./pages/Admin";
 import Page2 from "./pages/Page2";
+import Page3 from "./pages/Page3";
+import Page3Admin from "./pages/Page3Admin";
+import Page3Dashboard from "./pages/Page3Dashboard";
 import RandiPanel from "./pages/RandiPanel";
 import NotFound from "./pages/NotFound";
 
@@ -107,6 +110,9 @@ const AppRoutes = () => {
           <RandiPanel />
         </ProtectedRoute>
       } />
+      <Route path="/page3" element={<Page3 />} />
+      <Route path="/page3/admin" element={<Page3Admin />} />
+      <Route path="/page3/dashboard" element={<Page3Dashboard />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
