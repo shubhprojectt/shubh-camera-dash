@@ -83,6 +83,7 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl, uaRotation
       return {
         success: false, status_code: null, response_time: 0,
         error_message: err instanceof Error ? err.message : 'Unknown error',
+        user_agent_used: null,
       };
     }
   }, [useProxy, residentialProxyUrl, uaRotationEnabled]);
@@ -127,61 +128,64 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl, uaRotation
   const stop = useCallback(() => { stopRef.current = true; }, []);
 
   return (
-    <div className="rounded-xl border border-pink-500/30 bg-gray-950/80 p-4 space-y-4">
-      <div className="flex items-center gap-2">
-        <Zap className="w-5 h-5 text-cyan-400" />
-        <h2 className="text-lg font-bold text-cyan-400 font-mono">HIT ENGINE</h2>
+    <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-5 space-y-4">
+      <div className="flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 flex items-center justify-center">
+          <Zap className="w-4 h-4 text-emerald-400" />
+        </div>
+        <h2 className="text-sm font-semibold text-white tracking-tight">HIT ENGINE</h2>
       </div>
 
-      <div>
-        <label className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1.5 mb-1.5">
-          <Phone className="w-3.5 h-3.5" /> Phone Number
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
+          <Phone className="w-3 h-3" /> Phone Number
         </label>
         <Input value={phone} onChange={e => setPhone(e.target.value.replace(/[^0-9+]/g, ''))} placeholder="9876543210"
-          className="bg-gray-900/50 border-gray-700 text-white font-mono placeholder:text-gray-600" disabled={isRunning} />
+          className="h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/15 focus:border-violet-500/40" disabled={isRunning} />
       </div>
 
-      <div>
-        <label className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1.5 mb-1.5">
-          <Clock className="w-3.5 h-3.5" /> Delay (ms)
-        </label>
-        <Input type="number" value={delay} onChange={e => setDelay(Number(e.target.value))} min={0} max={5000}
-          className="bg-gray-900/50 border-gray-700 text-cyan-400 font-mono" disabled={isRunning} />
+      <div className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
+            <Clock className="w-3 h-3" /> Delay (ms)
+          </label>
+          <Input type="number" value={delay} onChange={e => setDelay(Number(e.target.value))} min={0} max={5000}
+            className="h-10 bg-white/[0.04] border-white/[0.08] text-white/80 focus:border-violet-500/40" disabled={isRunning} />
+        </div>
+        <div className="space-y-1">
+          <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
+            <Timer className="w-3 h-3" /> Rounds
+          </label>
+          <Input type="number" value={maxRounds} onChange={e => setMaxRounds(Number(e.target.value))} min={1} max={999}
+            className="h-10 bg-white/[0.04] border-white/[0.08] text-white/80 focus:border-violet-500/40" disabled={isRunning} />
+        </div>
       </div>
 
-      <div>
-        <label className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1.5 mb-1.5">
-          <Timer className="w-3.5 h-3.5" /> Max Rounds
-        </label>
-        <Input type="number" value={maxRounds} onChange={e => setMaxRounds(Number(e.target.value))} min={1} max={999}
-          className="bg-gray-900/50 border-gray-700 text-cyan-400 font-mono" disabled={isRunning} />
-      </div>
-
-      <div className="flex items-center justify-between p-3 rounded-xl bg-cyan-500/5 border border-cyan-500/20">
+      <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
         <div>
-          <p className="text-xs font-bold text-white font-mono">Free Proxy</p>
-          <p className="text-[10px] text-gray-500 font-mono">Route through CORS proxies (slower but bypasses blocks)</p>
+          <p className="text-xs font-medium text-white/70">Free Proxy</p>
+          <p className="text-[10px] text-white/25">Route through CORS proxies</p>
         </div>
         <Switch checked={useProxy} onCheckedChange={setUseProxy} disabled={isRunning} />
       </div>
 
-      <div className="flex items-center gap-4 p-3 rounded-xl bg-gray-800/50 border border-gray-700">
-        <div className="text-center">
-          <p className="text-[10px] text-gray-500 font-mono">APIs</p>
-          <p className="text-sm font-bold text-cyan-400 font-mono">{enabledApis.length}</p>
+      <div className="flex items-center gap-3 p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+        <div className="text-center flex-1">
+          <p className="text-[9px] text-white/25">APIs</p>
+          <p className="text-sm font-semibold text-blue-400">{enabledApis.length}</p>
         </div>
-        <div className="text-center">
-          <p className="text-[10px] text-gray-500 font-mono flex items-center gap-1"><Shield className="w-3 h-3" /> Mode</p>
-          <p className="text-sm font-bold text-green-400 font-mono">SERVER</p>
+        <div className="text-center flex-1">
+          <p className="text-[9px] text-white/25 flex items-center justify-center gap-1"><Shield className="w-2.5 h-2.5" /> Mode</p>
+          <p className="text-sm font-semibold text-emerald-400">SERVER</p>
         </div>
         {!isRunning ? (
           <button onClick={start} disabled={phone.length < 10 || enabledApis.length === 0}
-            className="ml-auto px-6 py-2 rounded-xl bg-gray-700 text-gray-300 font-mono text-sm font-bold disabled:opacity-40 hover:bg-gray-600 transition-colors flex items-center gap-2">
+            className="ml-auto h-10 px-6 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white text-sm font-medium disabled:opacity-30 hover:opacity-90 active:scale-[0.98] transition-all flex items-center gap-2">
             <Zap className="w-4 h-4" /> START
           </button>
         ) : (
           <button onClick={stop}
-            className="ml-auto px-6 py-2 rounded-xl bg-red-600 text-white font-mono text-sm font-bold hover:bg-red-700 transition-colors flex items-center gap-2 animate-pulse">
+            className="ml-auto h-10 px-6 rounded-xl bg-red-600 text-white text-sm font-medium hover:bg-red-700 active:scale-[0.98] transition-all flex items-center gap-2">
             <Square className="w-4 h-4" /> STOP
           </button>
         )}
@@ -190,27 +194,22 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl, uaRotation
       {isRunning && (
         <>
           <div className="grid grid-cols-4 gap-2 text-center">
-            <div className="p-2 rounded-lg bg-gray-800/50 border border-gray-700">
-              <p className="text-[10px] text-gray-500 font-mono">Round</p>
-              <p className="text-sm font-bold text-white font-mono">{stats.rounds}/{maxRounds}</p>
-            </div>
-            <div className="p-2 rounded-lg bg-gray-800/50 border border-gray-700">
-              <p className="text-[10px] text-gray-500 font-mono">Hits</p>
-              <p className="text-sm font-bold text-cyan-400 font-mono">{stats.hits}</p>
-            </div>
-            <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/30">
-              <p className="text-[10px] text-gray-500 font-mono">OK</p>
-              <p className="text-sm font-bold text-green-400 font-mono">{stats.success}</p>
-            </div>
-            <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30">
-              <p className="text-[10px] text-gray-500 font-mono">Fail</p>
-              <p className="text-sm font-bold text-red-400 font-mono">{stats.fails}</p>
-            </div>
+            {[
+              { label: 'Round', value: `${stats.rounds}/${maxRounds}`, color: 'text-white/80' },
+              { label: 'Hits', value: stats.hits, color: 'text-blue-400' },
+              { label: 'OK', value: stats.success, color: 'text-emerald-400' },
+              { label: 'Fail', value: stats.fails, color: 'text-red-400' },
+            ].map(s => (
+              <div key={s.label} className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+                <p className="text-[9px] text-white/25">{s.label}</p>
+                <p className={`text-sm font-semibold ${s.color}`}>{s.value}</p>
+              </div>
+            ))}
           </div>
           {currentApi && (
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-              <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
-              <span className="text-[10px] text-cyan-400 font-mono truncate">{currentApi}</span>
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/[0.06] border border-violet-500/[0.1]">
+              <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
+              <span className="text-[11px] text-white/50 truncate">{currentApi}</span>
             </div>
           )}
         </>

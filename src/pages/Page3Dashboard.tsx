@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, List, Code, Settings, AlertTriangle, Plus, Database, Download, Upload, Fingerprint } from 'lucide-react';
+import { LogOut, List, Code, Settings, Info, Plus, Database, Download, Fingerprint } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useHitApis } from '@/hooks/useHitApis';
 import { useHitLogs } from '@/hooks/useHitLogs';
@@ -85,114 +85,121 @@ const Page3Dashboard = () => {
     toggleAll(enabled);
   };
 
+  const tabItems = [
+    { key: 'apis' as const, label: 'APIs', icon: List, count: apis.length },
+    { key: 'import' as const, label: 'Import', icon: Code },
+    { key: 'settings' as const, label: 'Settings', icon: Settings },
+  ];
+
   return (
-    <div className="min-h-[100dvh] bg-[#0a0a0a] relative overflow-hidden">
-      {/* Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(236,72,153,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(236,72,153,0.3) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
-          }} />
-        <div className="absolute top-0 left-0 w-full h-[200px] bg-gradient-to-b from-purple-900/10 to-transparent" />
+    <div className="min-h-[100dvh] bg-[#09090b] relative overflow-hidden">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-violet-600/[0.06] blur-[100px]" />
+        <div className="absolute bottom-[-10%] left-[-5%] w-[350px] h-[350px] rounded-full bg-blue-600/[0.04] blur-[100px]" />
       </div>
 
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Header */}
-        <header className="px-4 py-3 border-b border-pink-500/20 bg-black/60 backdrop-blur-xl sticky top-0 z-20">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+        <header className="px-4 py-3 bg-white/[0.03] backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-20">
+          <div className="flex items-center justify-between max-w-xl mx-auto">
             <div className="flex items-center gap-3">
-              {settings.logoUrl && (
-                <img src={settings.logoUrl} alt="Logo" className="w-9 h-9 rounded-full object-cover border border-pink-500/30" />
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 rounded-xl object-cover ring-1 ring-white/10" />
+              ) : (
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                  A
+                </div>
               )}
-              <h1 className="text-sm font-bold text-pink-400 font-mono">{settings.adminPanelTitle}</h1>
+              <h1 className="text-sm font-semibold text-white tracking-tight">{settings.adminPanelTitle}</h1>
             </div>
             <button onClick={handleLogout}
-              className="w-10 h-10 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all">
+              className="h-9 w-9 rounded-xl bg-white/[0.06] hover:bg-red-500/20 border border-white/[0.08] text-white/50 hover:text-red-400 flex items-center justify-center transition-all">
               <LogOut className="w-4 h-4" />
             </button>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 px-4 py-4 space-y-4 max-w-2xl mx-auto w-full pb-20">
+        <main className="flex-1 px-4 py-4 space-y-4 max-w-xl mx-auto w-full pb-20">
           {/* Disclaimer */}
-          <div className="p-3 rounded-xl border border-pink-500/30 bg-pink-500/5">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-xs font-bold text-yellow-400 font-mono">{settings.disclaimerTitle}</p>
-                <p className="text-[10px] text-gray-400 font-mono mt-1">{settings.disclaimerText}</p>
-              </div>
+          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.1]">
+            <Info className="w-4 h-4 text-amber-400/70 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[11px] font-medium text-amber-400/80">{settings.disclaimerTitle}</p>
+              <p className="text-[10px] text-white/30 mt-0.5">{settings.disclaimerText}</p>
             </div>
           </div>
 
           {/* Hit Engine */}
           <HitEngine apis={apis} onLog={addLog} residentialProxyUrl={settings.residentialProxyUrl} uaRotationEnabled={settings.uaRotationEnabled} />
 
-          {/* Bottom Tabs */}
-          <div className="flex items-center gap-2 p-1 rounded-xl bg-gray-900/50 border border-gray-800">
-            <button onClick={() => setActiveTab('apis')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'apis' ? 'bg-green-500 text-white' : 'text-gray-400 hover:text-white'}`}>
-              <List className="w-3.5 h-3.5" /> ({apis.length})
-            </button>
-            <button onClick={() => setActiveTab('import')}
-              className={`flex-1 py-2 px-3 rounded-lg text-xs font-mono font-bold transition-all flex items-center justify-center gap-1.5 ${activeTab === 'import' ? 'bg-pink-500 text-white' : 'text-gray-400 hover:text-white'}`}>
-              <Code className="w-3.5 h-3.5" /> Import
-            </button>
-            <button onClick={() => setActiveTab('settings')}
-              className={`py-2 px-3 rounded-lg text-xs font-mono transition-all ${activeTab === 'settings' ? 'text-cyan-400' : 'text-gray-500 hover:text-gray-300'}`}>
-              <Settings className="w-4 h-4" />
-            </button>
+          {/* Tab Bar */}
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            {tabItems.map(tab => (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                className={`flex-1 h-9 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 ${
+                  activeTab === tab.key
+                    ? 'bg-white/[0.08] text-white shadow-sm'
+                    : 'text-white/35 hover:text-white/60'
+                }`}>
+                <tab.icon className="w-3.5 h-3.5" />
+                {tab.label}
+                {tab.count !== undefined && (
+                  <span className="text-[10px] opacity-60">({tab.count})</span>
+                )}
+              </button>
+            ))}
           </div>
 
           {/* Tab Content */}
           {activeTab === 'apis' && (
-            <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="space-y-3 animate-fade-in">
+              {/* Controls Row */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Database className="w-4 h-4 text-green-400" />
-                  <span className="text-xs font-bold text-green-400 font-mono">{settings.apiListTitle}</span>
+                  <span className="text-xs font-medium text-white/60">{settings.apiListTitle}</span>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-gray-500 font-mono">ALL</span>
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5 mr-1">
+                    <span className="text-[10px] text-white/30">All</span>
                     <Switch checked={allEnabled} onCheckedChange={handleToggleAll} />
                   </div>
                   <button onClick={() => { setEditingApi(null); setShowApiForm(true); }}
-                    className="px-3 py-1.5 rounded-lg bg-pink-600 text-white text-xs font-mono font-bold flex items-center gap-1 hover:bg-pink-700 transition-all">
+                    className="h-8 px-3 rounded-lg bg-violet-600 hover:bg-violet-700 text-white text-xs font-medium flex items-center gap-1 transition-colors">
                     <Plus className="w-3.5 h-3.5" /> {settings.addApiButtonText}
                   </button>
                 </div>
               </div>
 
-              {/* UA Rotation Toggle */}
-              <div className="flex items-center justify-between p-3 rounded-xl bg-purple-500/5 border border-purple-500/20">
-                <div className="flex items-center gap-2">
-                  <Fingerprint className="w-4 h-4 text-purple-400" />
+              {/* UA Rotation */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-lg bg-violet-500/10 flex items-center justify-center">
+                    <Fingerprint className="w-4 h-4 text-violet-400" />
+                  </div>
                   <div>
-                    <p className="text-xs font-bold text-purple-400 font-mono">UA Rotation</p>
-                    <p className="text-[9px] text-gray-500 font-mono">Har request alag browser fingerprint se jayegi</p>
+                    <p className="text-xs font-medium text-white/80">UA Rotation</p>
+                    <p className="text-[10px] text-white/30">Different browser fingerprint per request</p>
                   </div>
                 </div>
                 <Switch checked={settings.uaRotationEnabled} onCheckedChange={(v) => updateSettings({ uaRotationEnabled: v })} />
               </div>
 
-              {/* Export / Bulk Import Buttons */}
-              <div className="flex gap-2">
-                <button onClick={handleExportAll}
-                  className="flex-1 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold hover:bg-cyan-500/20 transition-all flex items-center justify-center gap-1.5">
-                  <Download className="w-3.5 h-3.5" /> Export All ({apis.length})
-                </button>
-              </div>
+              {/* Export */}
+              <button onClick={handleExportAll}
+                className="w-full h-9 rounded-xl bg-white/[0.03] border border-white/[0.06] text-white/40 text-xs font-medium hover:bg-white/[0.06] hover:text-white/60 transition-all flex items-center justify-center gap-1.5">
+                <Download className="w-3.5 h-3.5" /> Export All ({apis.length})
+              </button>
 
+              {/* API List */}
               {apis.length === 0 ? (
-                <div className="text-center py-12 rounded-xl bg-gray-900/30 border border-gray-800">
-                  <Database className="w-12 h-12 mx-auto mb-3 text-gray-700" />
-                  <p className="text-sm font-medium text-gray-500 font-mono">{settings.noApisText}</p>
+                <div className="text-center py-16 rounded-xl bg-white/[0.02] border border-white/[0.04]">
+                  <Database className="w-10 h-10 mx-auto mb-3 text-white/10" />
+                  <p className="text-sm text-white/25">{settings.noApisText}</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {apis.map(api => (
                     <ApiCard key={api.id} api={api}
                       onToggle={() => toggleApi(api.id)}
@@ -210,27 +217,19 @@ const Page3Dashboard = () => {
           )}
 
           {activeTab === 'import' && (
-            <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="space-y-4 animate-fade-in">
               <BulkImporter onBulkImport={handleBulkImport} />
               <ApiImporter onImport={handleImport} />
             </div>
           )}
 
           {activeTab === 'settings' && (
-            <div className="space-y-4 animate-in fade-in duration-200">
+            <div className="space-y-4 animate-fade-in">
               <SiteSettingsPanel settings={settings} onUpdate={updateSettings} onReset={resetSettings} />
-              
-              <div className="p-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5">
-                <div className="flex items-center gap-2 mb-1">
-                  <Database className="w-4 h-4 text-cyan-400" />
-                  <span className="text-xs font-bold text-cyan-400 font-mono">Preview</span>
-                </div>
-                <p className="text-[10px] text-gray-500 font-mono">Changes will reflect instantly on the main page.</p>
-              </div>
             </div>
           )}
 
-          {/* Logs (always visible at bottom) */}
+          {/* Logs */}
           <LogsPanel logs={logs} onClear={clearLogs} />
         </main>
       </div>
