@@ -81,6 +81,7 @@ interface HitApiRequest {
   useProxy?: boolean;
   useResidentialProxy?: boolean;
   residentialProxyUrl?: string;
+  uaRotation?: boolean;
 }
 
 function buildBody(body: Record<string, unknown> | string | undefined, bodyType: string): { serialized: string | null; contentType: string | null } {
@@ -144,7 +145,7 @@ serve(async (req) => {
 
   try {
     const data: HitApiRequest = await req.json();
-    const { url, method = 'GET', headers: customHeaders = {}, body, bodyType = 'none', useProxy = false, useResidentialProxy = false, residentialProxyUrl } = data;
+    const { url, method = 'GET', headers: customHeaders = {}, body, bodyType = 'none', useProxy = false, useResidentialProxy = false, residentialProxyUrl, uaRotation = true } = data;
 
     if (!url) {
       return new Response(JSON.stringify({ success: false, error_message: 'URL is required' }), {
@@ -153,8 +154,8 @@ serve(async (req) => {
       });
     }
 
-    // Pick a random User-Agent from the rotation pool
-    const rotatedUA = getRandomUserAgent();
+    // Pick a User-Agent based on rotation setting
+    const rotatedUA = uaRotation ? getRandomUserAgent() : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
     // Build browser-like headers with rotated User-Agent
     const parsedUrl = new URL(url);

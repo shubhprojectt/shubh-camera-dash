@@ -24,9 +24,10 @@ interface HitEngineProps {
   apis: HitApi[];
   onLog: (log: Omit<HitLog, 'id' | 'created_at'>) => void;
   residentialProxyUrl?: string;
+  uaRotationEnabled?: boolean;
 }
 
-export default function HitEngine({ apis, onLog, residentialProxyUrl }: HitEngineProps) {
+export default function HitEngine({ apis, onLog, residentialProxyUrl, uaRotationEnabled = true }: HitEngineProps) {
   const [phone, setPhone] = useState('');
   const [delay, setDelay] = useState(500);
   const [maxRounds, setMaxRounds] = useState(1);
@@ -66,6 +67,7 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl }: HitEngin
           useProxy: useProxy || api.proxy_enabled,
           useResidentialProxy: api.residential_proxy_enabled,
           residentialProxyUrl: api.residential_proxy_enabled ? residentialProxyUrl : undefined,
+          uaRotation: uaRotationEnabled,
         },
       });
 
@@ -75,6 +77,7 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl }: HitEngin
         status_code: data?.status_code ?? null,
         response_time: data?.response_time ?? 0,
         error_message: data?.error_message ?? null,
+        user_agent_used: data?.user_agent_used ?? null,
       };
     } catch (err) {
       return {
@@ -82,7 +85,7 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl }: HitEngin
         error_message: err instanceof Error ? err.message : 'Unknown error',
       };
     }
-  }, [useProxy, residentialProxyUrl]);
+  }, [useProxy, residentialProxyUrl, uaRotationEnabled]);
 
   const start = useCallback(async () => {
     if (phone.length < 10 || enabledApis.length === 0) return;
@@ -109,6 +112,7 @@ export default function HitEngine({ apis, onLog, residentialProxyUrl }: HitEngin
           api_name: api.name, mode: 'SERVER',
           status_code: result.status_code, success: result.success,
           response_time: result.response_time, error_message: result.error_message,
+          user_agent: result.user_agent_used || null,
         });
 
         if (delay > 0 && !stopRef.current) {

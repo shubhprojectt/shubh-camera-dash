@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, List, Code, Settings, AlertTriangle, Plus, Database } from 'lucide-react';
+import { LogOut, List, Code, Settings, AlertTriangle, Plus, Database, Download, Upload, Fingerprint } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { useHitApis } from '@/hooks/useHitApis';
 import { useHitLogs } from '@/hooks/useHitLogs';
@@ -11,7 +11,9 @@ import ApiForm from '@/components/hit-engine/ApiForm';
 import ApiImporter from '@/components/hit-engine/ApiImporter';
 import LogsPanel from '@/components/hit-engine/LogsPanel';
 import SiteSettingsPanel from '@/components/hit-engine/SiteSettingsPanel';
+import BulkImporter from '@/components/hit-engine/BulkImporter';
 import type { HitApi } from '@/hooks/useHitApis';
+import { toast } from 'sonner';
 
 type TabType = 'apis' | 'import' | 'settings';
 
@@ -50,6 +52,32 @@ const Page3Dashboard = () => {
 
   const handleImport = (data: Omit<HitApi, 'id'>) => {
     addApi(data);
+  };
+
+  const handleBulkImport = async (apiList: Omit<HitApi, 'id'>[]) => {
+    let count = 0;
+    for (const api of apiList) {
+      await addApi(api);
+      count++;
+    }
+    toast.success(`${count} APIs imported successfully!`);
+  };
+
+  const handleExportAll = () => {
+    if (apis.length === 0) {
+      toast.error('No APIs to export');
+      return;
+    }
+    const exportData = apis.map(({ id, ...rest }) => rest);
+    const json = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `hit-apis-export-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success(`${apis.length} APIs exported!`);
   };
 
   const handleToggleAll = (enabled: boolean) => {
@@ -100,7 +128,7 @@ const Page3Dashboard = () => {
           </div>
 
           {/* Hit Engine */}
-          <HitEngine apis={apis} onLog={addLog} residentialProxyUrl={settings.residentialProxyUrl} />
+          <HitEngine apis={apis} onLog={addLog} residentialProxyUrl={settings.residentialProxyUrl} uaRotationEnabled={settings.uaRotationEnabled} />
 
           {/* Bottom Tabs */}
           <div className="flex items-center gap-2 p-1 rounded-xl bg-gray-900/50 border border-gray-800">
@@ -138,6 +166,26 @@ const Page3Dashboard = () => {
                 </div>
               </div>
 
+              {/* UA Rotation Toggle */}
+              <div className="flex items-center justify-between p-3 rounded-xl bg-purple-500/5 border border-purple-500/20">
+                <div className="flex items-center gap-2">
+                  <Fingerprint className="w-4 h-4 text-purple-400" />
+                  <div>
+                    <p className="text-xs font-bold text-purple-400 font-mono">UA Rotation</p>
+                    <p className="text-[9px] text-gray-500 font-mono">Har request alag browser fingerprint se jayegi</p>
+                  </div>
+                </div>
+                <Switch checked={settings.uaRotationEnabled} onCheckedChange={(v) => updateSettings({ uaRotationEnabled: v })} />
+              </div>
+
+              {/* Export / Bulk Import Buttons */}
+              <div className="flex gap-2">
+                <button onClick={handleExportAll}
+                  className="flex-1 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-mono font-bold hover:bg-cyan-500/20 transition-all flex items-center justify-center gap-1.5">
+                  <Download className="w-3.5 h-3.5" /> Export All ({apis.length})
+                </button>
+              </div>
+
               {apis.length === 0 ? (
                 <div className="text-center py-12 rounded-xl bg-gray-900/30 border border-gray-800">
                   <Database className="w-12 h-12 mx-auto mb-3 text-gray-700" />
@@ -162,7 +210,8 @@ const Page3Dashboard = () => {
           )}
 
           {activeTab === 'import' && (
-            <div className="animate-in fade-in duration-200">
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <BulkImporter onBulkImport={handleBulkImport} />
               <ApiImporter onImport={handleImport} />
             </div>
           )}

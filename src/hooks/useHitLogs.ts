@@ -8,6 +8,7 @@ export interface HitLog {
   success: boolean;
   response_time: number | null;
   error_message: string | null;
+  user_agent: string | null;
   created_at: string;
 }
 

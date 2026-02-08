@@ -88,6 +88,7 @@ export default function QuickHitEngine({
         status_code: data?.status_code ?? null,
         response_time: data?.response_time ?? 0,
         error_message: data?.error_message ?? null,
+        user_agent_used: data?.user_agent_used ?? null,
       };
     } catch (err) {
       return {
@@ -95,6 +96,7 @@ export default function QuickHitEngine({
         status_code: null,
         response_time: 0,
         error_message: err instanceof Error ? err.message : 'Unknown error',
+        user_agent_used: null,
       };
     }
   }, []);
@@ -131,6 +133,7 @@ export default function QuickHitEngine({
           success: result.success,
           response_time: result.response_time,
           error_message: result.error_message,
+          user_agent: result.user_agent_used || null,
         });
 
         if (delay > 0 && !stopRef.current) {
