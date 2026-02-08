@@ -67,43 +67,39 @@ export default function BulkImporter({ onBulkImport }: BulkImporterProps) {
   };
 
   return (
-    <div className="rounded-xl border border-orange-500/30 bg-gray-950/80 p-4 space-y-4">
-      <div className="flex items-center gap-2">
-        <Upload className="w-5 h-5 text-orange-400" />
-        <h3 className="text-sm font-bold text-orange-400 font-mono">Bulk Import (JSON)</h3>
+    <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-5 space-y-4">
+      <div className="flex items-center gap-2.5">
+        <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center">
+          <Upload className="w-4 h-4 text-amber-400" />
+        </div>
+        <div>
+          <h3 className="text-sm font-semibold text-white/90">Bulk Import</h3>
+          <p className="text-[10px] text-white/25">Import exported JSON file</p>
+        </div>
       </div>
 
-      <p className="text-[10px] text-gray-500 font-mono">
-        Export kiya hua JSON file select karo — saari APIs ek sath import ho jayegi.
-      </p>
-
-      <input
-        ref={fileRef}
-        type="file"
-        accept=".json"
-        onChange={handleFile}
-        className="hidden"
-      />
+      <input ref={fileRef} type="file" accept=".json" onChange={handleFile} className="hidden" />
 
       <button
         onClick={() => fileRef.current?.click()}
-        className="w-full py-3 rounded-xl border-2 border-dashed border-orange-500/30 bg-orange-500/5 text-orange-400 font-mono text-sm font-bold hover:bg-orange-500/10 transition-all flex items-center justify-center gap-2"
+        className="w-full py-8 rounded-xl border-2 border-dashed border-white/[0.08] bg-white/[0.02] text-white/30 text-sm font-medium hover:bg-white/[0.04] hover:border-white/[0.12] hover:text-white/50 transition-all flex flex-col items-center justify-center gap-2"
       >
-        <FileJson className="w-4 h-4" /> Select JSON File
+        <FileJson className="w-6 h-6" />
+        Select JSON File
       </button>
 
       {preview && (
         <div className="space-y-3">
-          <div className="p-3 rounded-xl bg-gray-900/50 border border-green-500/20">
+          <div className="p-3 rounded-xl bg-white/[0.02] border border-emerald-500/[0.12]">
             <div className="flex items-center gap-2 mb-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
-              <span className="text-xs font-bold text-green-400 font-mono">{preview.length} APIs Ready</span>
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span className="text-xs font-medium text-emerald-400">{preview.length} APIs Ready</span>
             </div>
             <div className="max-h-40 overflow-y-auto space-y-1">
               {preview.map((api, i) => (
-                <div key={i} className="flex items-center gap-2 text-[10px] font-mono">
-                  <span className="px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">{api.method}</span>
-                  <span className="text-pink-400 truncate">{api.name}</span>
+                <div key={i} className="flex items-center gap-2 text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-blue-500/15 text-blue-400 border border-blue-500/20">{api.method}</span>
+                  <span className="text-white/50 truncate">{api.name}</span>
                 </div>
               ))}
             </div>
@@ -111,7 +107,7 @@ export default function BulkImporter({ onBulkImport }: BulkImporterProps) {
 
           <button
             onClick={handleImportAll}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-green-600 to-cyan-600 text-white font-mono font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2"
+            className="w-full h-10 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-sm font-medium hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
           >
             <Upload className="w-4 h-4" /> Import All {preview.length} APIs
           </button>

@@ -49,7 +49,6 @@ export default function ApiForm({ open, onClose, onSubmit, editApi }: ApiFormPro
       const headers = JSON.parse(headersStr);
       let body = {};
       
-      // Smart parsing for form-urlencoded
       if (form.bodyType === 'form-urlencoded' && bodyStr.includes('=') && !bodyStr.startsWith('{')) {
         const params = new URLSearchParams(bodyStr);
         body = Object.fromEntries(params);
@@ -67,78 +66,78 @@ export default function ApiForm({ open, onClose, onSubmit, editApi }: ApiFormPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="bg-gray-950 border-pink-500/30 text-white max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-[#0e0e11] border-white/[0.08] text-white max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-pink-400 font-mono">{editApi ? 'Edit API' : 'Add API'}</DialogTitle>
+          <DialogTitle className="text-white/90 font-semibold">{editApi ? 'Edit API' : 'Add API'}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          <div>
-            <Label className="text-cyan-400 font-mono text-xs">Name</Label>
+          <div className="space-y-1.5">
+            <Label className="text-white/40 text-xs">Name</Label>
             <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
-              className="bg-gray-900 border-gray-700 text-white font-mono" placeholder="API Name" />
+              className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/15 focus:border-violet-500/40" placeholder="API Name" />
           </div>
-          <div>
-            <Label className="text-cyan-400 font-mono text-xs">URL</Label>
+          <div className="space-y-1.5">
+            <Label className="text-white/40 text-xs">URL</Label>
             <Input value={form.url} onChange={e => setForm(p => ({ ...p, url: e.target.value }))}
-              className="bg-gray-900 border-gray-700 text-white font-mono" placeholder="https://api.example.com/{PHONE}" />
+              className="bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/15 focus:border-violet-500/40" placeholder="https://api.example.com/{PHONE}" />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label className="text-cyan-400 font-mono text-xs">Method</Label>
+            <div className="space-y-1.5">
+              <Label className="text-white/40 text-xs">Method</Label>
               <Select value={form.method} onValueChange={v => setForm(p => ({ ...p, method: v as HitApi['method'] }))}>
-                <SelectTrigger className="bg-gray-900 border-gray-700 text-white font-mono">
+                <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-700">
+                <SelectContent className="bg-[#141418] border-white/[0.08]">
                   {['GET', 'POST', 'PUT', 'DELETE', 'PATCH'].map(m => (
-                    <SelectItem key={m} value={m} className="text-white font-mono">{m}</SelectItem>
+                    <SelectItem key={m} value={m} className="text-white/80">{m}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label className="text-cyan-400 font-mono text-xs">Body Type</Label>
+            <div className="space-y-1.5">
+              <Label className="text-white/40 text-xs">Body Type</Label>
               <Select value={form.bodyType} onValueChange={v => setForm(p => ({ ...p, bodyType: v as HitApi['bodyType'] }))}>
-                <SelectTrigger className="bg-gray-900 border-gray-700 text-white font-mono">
+                <SelectTrigger className="bg-white/[0.04] border-white/[0.08] text-white">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-900 border-gray-700">
+                <SelectContent className="bg-[#141418] border-white/[0.08]">
                   {['json', 'form-urlencoded', 'multipart', 'text', 'none'].map(t => (
-                    <SelectItem key={t} value={t} className="text-white font-mono">{t}</SelectItem>
+                    <SelectItem key={t} value={t} className="text-white/80">{t}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
           </div>
-          <div>
-            <Label className="text-cyan-400 font-mono text-xs">Headers (JSON)</Label>
+          <div className="space-y-1.5">
+            <Label className="text-white/40 text-xs">Headers (JSON)</Label>
             <Textarea value={headersStr} onChange={e => setHeadersStr(e.target.value)}
-              className="bg-gray-900 border-gray-700 text-white font-mono text-xs h-20" placeholder='{"Content-Type": "application/json"}' />
+              className="bg-white/[0.04] border-white/[0.08] text-white/80 text-xs h-20 placeholder:text-white/15 focus:border-violet-500/40" placeholder='{"Content-Type": "application/json"}' />
           </div>
-          <div>
-            <Label className="text-cyan-400 font-mono text-xs">Body (JSON)</Label>
+          <div className="space-y-1.5">
+            <Label className="text-white/40 text-xs">Body (JSON)</Label>
             <Textarea value={bodyStr} onChange={e => setBodyStr(e.target.value)}
-              className="bg-gray-900 border-gray-700 text-white font-mono text-xs h-20" placeholder='{"phone": "{PHONE}"}' />
+              className="bg-white/[0.04] border-white/[0.08] text-white/80 text-xs h-20 placeholder:text-white/15 focus:border-violet-500/40" placeholder='{"phone": "{PHONE}"}' />
           </div>
-          <div>
-            <Label className="text-cyan-400 font-mono text-xs">Query Params (JSON)</Label>
+          <div className="space-y-1.5">
+            <Label className="text-white/40 text-xs">Query Params (JSON)</Label>
             <Textarea value={queryStr} onChange={e => setQueryStr(e.target.value)}
-              className="bg-gray-900 border-gray-700 text-white font-mono text-xs h-16" placeholder='{"key": "value"}' />
+              className="bg-white/[0.04] border-white/[0.08] text-white/80 text-xs h-16 placeholder:text-white/15 focus:border-violet-500/40" placeholder='{"key": "value"}' />
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50">
-              <span className="text-[10px] text-gray-400 font-mono">Enabled</span>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[11px] text-white/40">Enabled</span>
               <Switch checked={form.enabled} onCheckedChange={v => setForm(p => ({ ...p, enabled: v }))} />
             </div>
-            <div className="flex items-center justify-between p-2 rounded-lg bg-gray-800/50">
-              <span className="text-[10px] text-gray-400 font-mono">Proxy</span>
+            <div className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <span className="text-[11px] text-white/40">Proxy</span>
               <Switch checked={form.proxy_enabled} onCheckedChange={v => setForm(p => ({ ...p, proxy_enabled: v }))} />
             </div>
           </div>
 
           <button onClick={handleSubmit}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-pink-600 to-pink-500 text-white font-mono font-bold hover:opacity-90 transition-all">
+            className="w-full h-11 rounded-xl bg-gradient-to-r from-violet-600 to-blue-600 text-white font-medium text-sm hover:opacity-90 active:scale-[0.98] transition-all">
             {editApi ? 'Update API' : 'Add API'}
           </button>
         </div>

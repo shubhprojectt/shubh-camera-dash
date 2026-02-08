@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Shield, Zap } from 'lucide-react';
+import { Info, Settings2 } from 'lucide-react';
 import { useHitApis } from '@/hooks/useHitApis';
 import { useHitLogs } from '@/hooks/useHitLogs';
 import { useHitSiteSettings } from '@/hooks/useHitSiteSettings';
@@ -12,51 +12,41 @@ const Page3 = () => {
   const { settings } = useHitSiteSettings();
 
   return (
-    <div className="min-h-[100dvh] bg-[#0a0a0a] relative overflow-hidden">
-      {/* Background effects */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(34,197,94,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(34,197,94,0.3) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }} />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-green-600/5 rounded-full blur-[120px]" />
-        <div className="absolute bottom-0 right-0 w-[400px] h-[200px] bg-pink-600/5 rounded-full blur-[100px]" />
+    <div className="min-h-[100dvh] bg-[#09090b] relative overflow-hidden">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-600/[0.07] blur-[100px]" />
+        <div className="absolute bottom-[-15%] left-[-10%] w-[400px] h-[400px] rounded-full bg-blue-600/[0.05] blur-[100px]" />
       </div>
 
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Header */}
-        <header className="px-4 py-3 border-b border-pink-500/20 bg-black/60 backdrop-blur-xl">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+        <header className="px-4 py-4 bg-white/[0.03] backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-20">
+          <div className="flex items-center justify-between max-w-xl mx-auto">
             <div className="flex items-center gap-3">
-              {settings.logoUrl && (
-                <img src={settings.logoUrl} alt="Logo" className="w-9 h-9 rounded-full object-cover border border-pink-500/30" />
+              {settings.logoUrl ? (
+                <img src={settings.logoUrl} alt="Logo" className="w-8 h-8 rounded-xl object-cover ring-1 ring-white/10" />
+              ) : (
+                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center text-white text-xs font-bold">
+                  {settings.siteName.charAt(0)}
+                </div>
               )}
-              <h1 className="text-lg font-bold font-mono">
-                <span className="text-green-400">{settings.siteName.split(' ')[0] || 'SHUBH'}</span>
-                {' '}
-                <span className="text-pink-400">{settings.siteName.split(' ').slice(1).join(' ') || 'OSINT'}</span>
-              </h1>
+              <h1 className="text-base font-semibold text-white tracking-tight">{settings.siteName}</h1>
             </div>
             <Link to="/page3/admin"
-              className="px-4 py-2 rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 text-xs font-mono font-bold hover:bg-cyan-500/10 transition-all flex items-center gap-1.5">
-              <Shield className="w-3.5 h-3.5" /> {settings.adminButtonText}
+              className="h-9 px-4 rounded-xl bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] text-white/70 text-xs font-medium transition-all flex items-center gap-1.5">
+              <Settings2 className="w-3.5 h-3.5" /> {settings.adminButtonText}
             </Link>
           </div>
         </header>
 
         {/* Main Content */}
-        <main className="flex-1 px-4 py-4 space-y-4 max-w-2xl mx-auto w-full">
-          {/* Warning Banner */}
-          <div className="p-3 rounded-xl border border-pink-500/30 bg-pink-500/5">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-4 h-4 text-yellow-400 flex-shrink-0 mt-0.5" />
-              <p className="text-xs text-gray-400 font-mono">{settings.warningText}</p>
-            </div>
+        <main className="flex-1 px-4 py-5 space-y-4 max-w-xl mx-auto w-full">
+          {/* Info Banner */}
+          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.12]">
+            <Info className="w-4 h-4 text-amber-400/80 flex-shrink-0 mt-0.5" />
+            <p className="text-[11px] text-white/50 leading-relaxed">{settings.warningText}</p>
           </div>
-
-          {/* Logs */}
-          <LogsPanel logs={logs} onClear={clearLogs} />
 
           {/* Quick Hit Engine */}
           <QuickHitEngine
@@ -70,10 +60,13 @@ const Page3 = () => {
             noApisWarning={settings.noApisWarning}
           />
 
-          {/* Back to main */}
+          {/* Logs */}
+          <LogsPanel logs={logs} onClear={clearLogs} />
+
+          {/* Back */}
           <Link to="/"
-            className="block w-full py-3 rounded-xl border border-green-500/20 bg-green-500/5 text-green-400 text-xs font-mono font-bold text-center hover:bg-green-500/10 transition-all">
-            ← Back to Main Page
+            className="block w-full py-2.5 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white/40 text-xs font-medium text-center hover:bg-white/[0.07] hover:text-white/60 transition-all">
+            ← Back to Main
           </Link>
         </main>
       </div>

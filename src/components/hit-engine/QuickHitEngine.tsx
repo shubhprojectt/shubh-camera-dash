@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { Zap, Phone, Clock, Square, Loader2 } from 'lucide-react';
+import { Zap, Phone, Clock, Square, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
@@ -58,7 +58,6 @@ export default function QuickHitEngine({
     }
     const finalBody = api.body && Object.keys(api.body).length > 0 ? replaceInObj(api.body, phoneNumber) : undefined;
 
-    // Add query params
     let urlWithParams = finalUrl;
     if (api.query_params && Object.keys(api.query_params).length > 0) {
       const url = new URL(finalUrl);
@@ -108,7 +107,6 @@ export default function QuickHitEngine({
     setStats({ rounds: 0, hits: 0, success: 0, fails: 0 });
 
     let round = 0;
-    // Continuous looping for public
     while (!stopRef.current) {
       round++;
       setStats(prev => ({ ...prev, rounds: round }));
@@ -150,41 +148,44 @@ export default function QuickHitEngine({
   }, []);
 
   return (
-    <div className="rounded-xl border border-pink-500/30 bg-gray-950/80 p-4 space-y-4">
+    <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-5 space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Zap className="w-5 h-5 text-cyan-400" />
-          <h2 className="text-lg font-bold text-cyan-400 font-mono">{title}</h2>
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">
+            <Zap className="w-4 h-4 text-violet-400" />
+          </div>
+          <h2 className="text-sm font-semibold text-white tracking-tight">{title}</h2>
         </div>
         {enabledApis.length > 0 && (
-          <span className="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-bold font-mono border border-cyan-500/30">
-            {enabledApis.length}/{apis.length} APIs
+          <span className="h-6 px-2.5 rounded-full bg-white/[0.06] text-white/50 text-[10px] font-medium flex items-center">
+            {enabledApis.length}/{apis.length}
           </span>
         )}
       </div>
 
       {enabledApis.length === 0 && (
-        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-xs font-mono">
-          ⚠ {noApisWarning}
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.1]">
+          <AlertCircle className="w-3.5 h-3.5 text-amber-400/70" />
+          <p className="text-[11px] text-white/40">{noApisWarning}</p>
         </div>
       )}
 
-      <div>
-        <label className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1.5 mb-1.5">
-          <Phone className="w-3.5 h-3.5" /> {phoneLabel}
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
+          <Phone className="w-3 h-3" /> {phoneLabel}
         </label>
         <Input
           value={phone}
           onChange={e => setPhone(e.target.value.replace(/[^0-9+]/g, ''))}
           placeholder={phonePlaceholder}
-          className="bg-gray-900/50 border-gray-700 text-white font-mono placeholder:text-gray-600 focus:border-cyan-500"
+          className="h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/15 focus:border-violet-500/40"
           disabled={isRunning}
         />
       </div>
 
-      <div>
-        <label className="text-xs font-bold text-cyan-400 font-mono flex items-center gap-1.5 mb-1.5">
-          <Clock className="w-3.5 h-3.5" /> {delay}ms
+      <div className="space-y-1">
+        <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
+          <Clock className="w-3 h-3" /> Delay: {delay}ms
         </label>
         <Slider
           value={[delay]}
@@ -198,29 +199,24 @@ export default function QuickHitEngine({
 
       {isRunning && (
         <div className="grid grid-cols-4 gap-2 text-center">
-          <div className="p-2 rounded-lg bg-gray-800/50 border border-gray-700">
-            <p className="text-[10px] text-gray-500 font-mono">Round</p>
-            <p className="text-sm font-bold text-white font-mono">{stats.rounds}</p>
-          </div>
-          <div className="p-2 rounded-lg bg-gray-800/50 border border-gray-700">
-            <p className="text-[10px] text-gray-500 font-mono">Hits</p>
-            <p className="text-sm font-bold text-cyan-400 font-mono">{stats.hits}</p>
-          </div>
-          <div className="p-2 rounded-lg bg-green-500/10 border border-green-500/30">
-            <p className="text-[10px] text-gray-500 font-mono">OK</p>
-            <p className="text-sm font-bold text-green-400 font-mono">{stats.success}</p>
-          </div>
-          <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30">
-            <p className="text-[10px] text-gray-500 font-mono">Fail</p>
-            <p className="text-sm font-bold text-red-400 font-mono">{stats.fails}</p>
-          </div>
+          {[
+            { label: 'Round', value: stats.rounds, color: 'text-white/80' },
+            { label: 'Hits', value: stats.hits, color: 'text-blue-400' },
+            { label: 'OK', value: stats.success, color: 'text-emerald-400' },
+            { label: 'Fail', value: stats.fails, color: 'text-red-400' },
+          ].map(s => (
+            <div key={s.label} className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+              <p className="text-[9px] text-white/30">{s.label}</p>
+              <p className={`text-sm font-semibold ${s.color}`}>{s.value}</p>
+            </div>
+          ))}
         </div>
       )}
 
       {currentApi && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-cyan-500/10 border border-cyan-500/20">
-          <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin" />
-          <span className="text-[10px] text-cyan-400 font-mono truncate">{currentApi}</span>
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/[0.06] border border-violet-500/[0.1]">
+          <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
+          <span className="text-[11px] text-white/50 truncate">{currentApi}</span>
         </div>
       )}
 
@@ -228,7 +224,7 @@ export default function QuickHitEngine({
         <button
           onClick={start}
           disabled={phone.length < 10 || enabledApis.length === 0}
-          className="w-full py-3 rounded-xl font-bold font-mono text-sm bg-gradient-to-r from-green-600 to-green-500 text-white hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-500/20"
+          className="w-full h-11 rounded-xl font-medium text-sm bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
         >
           <Zap className="w-4 h-4" />
           {hitButtonText} ({enabledApis.length})
@@ -236,7 +232,7 @@ export default function QuickHitEngine({
       ) : (
         <button
           onClick={stop}
-          className="w-full py-3 rounded-xl font-bold font-mono text-sm bg-gradient-to-r from-red-600 to-red-500 text-white hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-lg shadow-red-500/20 animate-pulse"
+          className="w-full h-11 rounded-xl font-medium text-sm bg-red-600 text-white hover:bg-red-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
         >
           <Square className="w-4 h-4" />
           {stopButtonText}
