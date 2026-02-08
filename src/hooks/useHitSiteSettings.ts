@@ -20,6 +20,7 @@ export interface HitSiteSettings {
   logoUrl: string;
   adminPassword: string;
   residentialProxyUrl: string;
+  uaRotationEnabled: boolean;
 }
 
 const defaultSettings: HitSiteSettings = {
@@ -42,6 +43,7 @@ const defaultSettings: HitSiteSettings = {
   logoUrl: '',
   adminPassword: 'dark',
   residentialProxyUrl: '',
+  uaRotationEnabled: true,
 };
 
 const STORAGE_KEY = 'hit_site_settings';
