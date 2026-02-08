@@ -175,6 +175,60 @@ export type Database = {
           },
         ]
       }
+      hit_apis: {
+        Row: {
+          body: Json
+          body_type: string
+          created_at: string
+          enabled: boolean
+          force_proxy: boolean
+          headers: Json
+          id: string
+          method: string
+          name: string
+          proxy_enabled: boolean
+          query_params: Json
+          residential_proxy_enabled: boolean
+          rotation_enabled: boolean
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          body?: Json
+          body_type?: string
+          created_at?: string
+          enabled?: boolean
+          force_proxy?: boolean
+          headers?: Json
+          id?: string
+          method?: string
+          name: string
+          proxy_enabled?: boolean
+          query_params?: Json
+          residential_proxy_enabled?: boolean
+          rotation_enabled?: boolean
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          body?: Json
+          body_type?: string
+          created_at?: string
+          enabled?: boolean
+          force_proxy?: boolean
+          headers?: Json
+          id?: string
+          method?: string
+          name?: string
+          proxy_enabled?: boolean
+          query_params?: Json
+          residential_proxy_enabled?: boolean
+          rotation_enabled?: boolean
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           id: string

@@ -17,7 +17,7 @@ type TabType = 'apis' | 'import' | 'settings';
 
 const Page3Dashboard = () => {
   const navigate = useNavigate();
-  const { apis, addApi, updateApi, deleteApi, toggleApi, toggleAll } = useHitApis();
+  const { apis, loading, addApi, updateApi, deleteApi, toggleApi, toggleAll } = useHitApis();
   const { logs, addLog, clearLogs } = useHitLogs();
   const { settings, updateSettings, resetSettings } = useHitSiteSettings();
   const [activeTab, setActiveTab] = useState<TabType>('apis');
@@ -153,6 +153,7 @@ const Page3Dashboard = () => {
                       onToggleRotation={() => updateApi(api.id, { rotation_enabled: !api.rotation_enabled })}
                       onToggleForce={() => updateApi(api.id, { force_proxy: !api.force_proxy })}
                       onEdit={() => { setEditingApi(api); setShowApiForm(true); }}
+                      onDelete={() => deleteApi(api.id)}
                     />
                   ))}
                 </div>
