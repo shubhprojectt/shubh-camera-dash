@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-02-05
--- Version: 3.7 (Tab Container 12-Color Rainbow Border)
+-- Last Updated: 2026-02-08
+-- Version: 3.8 (Hit Engine DB + User-Agent Rotation)
 -- =====================================================
 
 -- =====================================================
@@ -86,6 +86,25 @@ CREATE TABLE IF NOT EXISTS public.search_history (
   searched_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
 );
 
+-- Hit APIs Table (stores API configs for Hit Engine - v3.8)
+CREATE TABLE IF NOT EXISTS public.hit_apis (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  method TEXT NOT NULL DEFAULT 'GET',
+  headers JSONB NOT NULL DEFAULT '{}'::jsonb,
+  body JSONB NOT NULL DEFAULT '{}'::jsonb,
+  body_type TEXT NOT NULL DEFAULT 'json',
+  query_params JSONB NOT NULL DEFAULT '{}'::jsonb,
+  enabled BOOLEAN NOT NULL DEFAULT true,
+  proxy_enabled BOOLEAN NOT NULL DEFAULT false,
+  force_proxy BOOLEAN NOT NULL DEFAULT false,
+  rotation_enabled BOOLEAN NOT NULL DEFAULT false,
+  residential_proxy_enabled BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+);
+
 -- =====================================================
 -- 2. ENABLE ROW LEVEL SECURITY
 -- =====================================================
@@ -97,6 +116,7 @@ ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.captured_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.captured_videos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.search_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.hit_apis ENABLE ROW LEVEL SECURITY;
 
 -- =====================================================
 -- 3. RLS POLICIES
@@ -167,6 +187,23 @@ CREATE POLICY "Anyone can insert search history" ON public.search_history
 
 DROP POLICY IF EXISTS "Anyone can delete search history" ON public.search_history;
 CREATE POLICY "Anyone can delete search history" ON public.search_history
+  FOR DELETE TO public USING (true);
+
+-- Hit APIs - Public CRUD (admin-password protected in frontend)
+DROP POLICY IF EXISTS "Anyone can read hit apis" ON public.hit_apis;
+CREATE POLICY "Anyone can read hit apis" ON public.hit_apis
+  FOR SELECT TO public USING (true);
+
+DROP POLICY IF EXISTS "Anyone can insert hit apis" ON public.hit_apis;
+CREATE POLICY "Anyone can insert hit apis" ON public.hit_apis
+  FOR INSERT TO public WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Anyone can update hit apis" ON public.hit_apis;
+CREATE POLICY "Anyone can update hit apis" ON public.hit_apis
+  FOR UPDATE TO public USING (true);
+
+DROP POLICY IF EXISTS "Anyone can delete hit apis" ON public.hit_apis;
+CREATE POLICY "Anyone can delete hit apis" ON public.hit_apis
   FOR DELETE TO public USING (true);
 
 -- =====================================================
@@ -262,6 +299,13 @@ CREATE TRIGGER update_access_passwords_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION public.update_updated_at_column();
 
+-- Trigger for hit_apis
+DROP TRIGGER IF EXISTS update_hit_apis_updated_at ON public.hit_apis;
+CREATE TRIGGER update_hit_apis_updated_at
+  BEFORE UPDATE ON public.hit_apis
+  FOR EACH ROW
+  EXECUTE FUNCTION public.update_updated_at_column();
+
 -- =====================================================
 -- 7. INDEXES (for better query performance)
 -- =====================================================
@@ -278,9 +322,18 @@ CREATE INDEX IF NOT EXISTS idx_user_sessions_token ON public.user_sessions(sessi
 CREATE INDEX IF NOT EXISTS idx_user_sessions_password ON public.user_sessions(password_id);
 CREATE INDEX IF NOT EXISTS idx_credit_usage_password ON public.credit_usage(password_id);
 CREATE INDEX IF NOT EXISTS idx_credit_usage_date ON public.credit_usage(created_at);
+CREATE INDEX IF NOT EXISTS idx_hit_apis_enabled ON public.hit_apis(enabled);
+CREATE INDEX IF NOT EXISTS idx_hit_apis_name ON public.hit_apis(name);
 
 -- =====================================================
--- 8. DEFAULT DATA
+-- 8. REALTIME
+-- =====================================================
+
+-- Enable realtime for hit_apis table (live sync across clients)
+ALTER PUBLICATION supabase_realtime ADD TABLE public.hit_apis;
+
+-- =====================================================
+-- 9. DEFAULT DATA
 -- =====================================================
 
 -- Main Settings (includes admin password, session ID, search tabs, CALL DARK, etc.)
@@ -378,7 +431,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.6 Edge Functions:
+-- Version 3.8 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -387,6 +440,17 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
+-- 9. hit-api           - API Hit Engine with User-Agent rotation (v3.8)
+--
+-- IMPORTANT CHANGES in v3.8:
+-- - Hit Engine APIs now stored in `hit_apis` database table
+-- - APIs persist across sessions and devices (no more localStorage)
+-- - Realtime sync enabled for hit_apis table
+-- - Delete API feature added to API cards
+-- - hit-api Edge Function: 35+ browser User-Agent rotation
+-- - Each request uses a DIFFERENT User-Agent (Chrome/Firefox/Safari/Edge/Opera/Mobile)
+-- - Sec-CH-UA-Platform, Sec-Fetch-* headers added for realism
+-- - Rate limit bypass: sequential rotation through 35+ unique browser fingerprints
 --
 -- IMPORTANT CHANGES in v3.7:
 -- - Tab Container rainbow border now uses 12 UNIQUE colors
@@ -441,4 +505,10 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- captured_photos   : Camera capture photo metadata + device info
 -- captured_videos   : Video capture metadata & URLs
 -- search_history    : All search queries log
+-- hit_apis          : API Hit Engine configurations (v3.8)
+--                     - name, url, method, headers, body, body_type
+--                     - query_params, enabled, proxy_enabled
+--                     - force_proxy, rotation_enabled
+--                     - residential_proxy_enabled
+--                     - Realtime sync enabled for live updates
 -- =====================================================
