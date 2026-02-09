@@ -22,6 +22,195 @@ interface ParsedResult {
   query_params: Record<string, string>;
 }
 
+/**
+ * Enhanced body parser — supports all common fetch body patterns:
+ * 1. JSON.stringify({ ... })
+ * 2. JSON.stringify([...])
+ * 3. new URLSearchParams / URLSearchParams
+ * 4. new FormData
+ * 5. Template literal body: `{"key":"${val}"}`
+ * 6. Raw string body: body: "key=val&key2=val2"
+ * 7. Raw string body: body: 'some text'
+ * 8. Variable reference: body: someVar  (detected but not parsed)
+ * 9. Inline object shorthand without JSON.stringify
+ */
+function parseBody(code: string): { body: Record<string, unknown>; bodyType: ParsedResult['bodyType']; warnings: string[] } {
+  const warnings: string[] = [];
+  let body: Record<string, unknown> = {};
+  let bodyType: ParsedResult['bodyType'] = 'none';
+
+  // 1. JSON.stringify({ ... }) or JSON.stringify([...])
+  const jsonStringifyMatch = code.match(/JSON\.stringify\s*\(\s*([\[{][\s\S]*?[}\]])\s*\)/);
+  if (jsonStringifyMatch) {
+    bodyType = 'json';
+    const rawJson = jsonStringifyMatch[1];
+    try {
+      // Try direct parse
+      body = JSON.parse(rawJson);
+    } catch {
+      try {
+        // Clean up JS object notation → JSON
+        const cleaned = rawJson
+          .replace(/'/g, '"')
+          .replace(/(\w+)\s*:/g, '"$1":')
+          .replace(/,\s*([}\]])/g, '$1')
+          .replace(/`([^`]*)`/g, '"$1"')
+          // Handle template literals with ${...} → placeholder
+          .replace(/\$\{[^}]+\}/g, '{DYNAMIC}');
+        body = JSON.parse(cleaned);
+      } catch {
+        // Last resort: extract key-value pairs with regex
+        const kvPairs = rawJson.matchAll(/["'`]?(\w+)["'`]?\s*:\s*["'`]([^"'`]*)["'`]/g);
+        for (const m of kvPairs) { body[m[1]] = m[2]; }
+        if (Object.keys(body).length === 0) {
+          warnings.push('Could not parse JSON.stringify body — manual check needed');
+        }
+      }
+    }
+    return { body, bodyType, warnings };
+  }
+
+  // 2. URLSearchParams
+  if (code.includes('URLSearchParams')) {
+    bodyType = 'form-urlencoded';
+    // Match .append("key", "value") patterns
+    const appendMatches = code.matchAll(/(?:urlencoded|params|searchParams|urlSearchParams|body|formBody)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
+    for (const m of appendMatches) { body[m[1]] = m[2]; }
+    
+    // Also match new URLSearchParams({ key: "value" })
+    const inlineParamsMatch = code.match(/new\s+URLSearchParams\s*\(\s*\{([^}]+)\}\s*\)/s);
+    if (inlineParamsMatch) {
+      const pairs = inlineParamsMatch[1].matchAll(/["'`]?(\w+)["'`]?\s*:\s*["'`]([^"'`]*)["'`]/g);
+      for (const p of pairs) { body[p[1]] = p[2]; }
+    }
+
+    // Match new URLSearchParams("key=val&key2=val2")
+    const stringParamsMatch = code.match(/new\s+URLSearchParams\s*\(\s*["'`]([^"'`]+)["'`]\s*\)/);
+    if (stringParamsMatch) {
+      const pairs = stringParamsMatch[1].split('&');
+      for (const pair of pairs) {
+        const [k, v] = pair.split('=');
+        if (k) body[decodeURIComponent(k)] = v ? decodeURIComponent(v) : '';
+      }
+    }
+
+    if (Object.keys(body).length === 0) {
+      warnings.push('URLSearchParams detected but could not extract params');
+    }
+    return { body, bodyType, warnings };
+  }
+
+  // 3. FormData
+  if (code.includes('new FormData')) {
+    bodyType = 'multipart';
+    const fdAppends = code.matchAll(/(?:formData|formdata|fd|form)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
+    for (const m of fdAppends) { body[m[1]] = m[2]; }
+    if (Object.keys(body).length === 0) {
+      warnings.push('FormData detected but could not extract fields');
+    }
+    return { body, bodyType, warnings };
+  }
+
+  // 4. Template literal body: body: `{"key":"value"}`
+  const templateBodyMatch = code.match(/body\s*:\s*`([^`]+)`/);
+  if (templateBodyMatch) {
+    const raw = templateBodyMatch[1].replace(/\$\{[^}]+\}/g, '{DYNAMIC}');
+    try {
+      body = JSON.parse(raw);
+      bodyType = 'json';
+    } catch {
+      // Try to extract key-value pairs
+      const kvPairs = raw.matchAll(/["']?(\w+)["']?\s*:\s*["']([^"']*)["']/g);
+      for (const m of kvPairs) { body[m[1]] = m[2]; }
+      if (Object.keys(body).length > 0) {
+        bodyType = 'json';
+      } else {
+        body = { _raw: raw };
+        bodyType = 'text';
+      }
+    }
+    return { body, bodyType, warnings };
+  }
+
+  // 5. Raw string body with quotes: body: "key=val&key2=val2" or body: 'text'
+  const rawStringBodyMatch = code.match(/body\s*:\s*["']([^"']+)["']/);
+  if (rawStringBodyMatch) {
+    const rawStr = rawStringBodyMatch[1];
+    // Check if it looks like form-urlencoded
+    if (rawStr.includes('=') && !rawStr.includes('{')) {
+      bodyType = 'form-urlencoded';
+      const pairs = rawStr.split('&');
+      for (const pair of pairs) {
+        const [k, v] = pair.split('=');
+        if (k) body[decodeURIComponent(k)] = v ? decodeURIComponent(v) : '';
+      }
+    } else {
+      // Try JSON parse
+      try {
+        body = JSON.parse(rawStr);
+        bodyType = 'json';
+      } catch {
+        body = { _raw: rawStr };
+        bodyType = 'text';
+      }
+    }
+    return { body, bodyType, warnings };
+  }
+
+  // 6. Inline object body without JSON.stringify: body: { key: "value" }
+  // Must come after JSON.stringify check
+  const inlineObjMatch = code.match(/body\s*:\s*(\{[\s\S]*?\})\s*[,\n\r}]/);
+  if (inlineObjMatch) {
+    const rawObj = inlineObjMatch[1];
+    // Skip if it's a variable reference like body: body or body: data
+    if (!/^\{?\s*\w+\s*\}?$/.test(rawObj.trim())) {
+      bodyType = 'json';
+      try {
+        const cleaned = rawObj
+          .replace(/'/g, '"')
+          .replace(/(\w+)\s*:/g, '"$1":')
+          .replace(/,\s*}/g, '}')
+          .replace(/`([^`]*)`/g, '"$1"')
+          .replace(/\$\{[^}]+\}/g, '{DYNAMIC}');
+        body = JSON.parse(cleaned);
+      } catch {
+        const kvPairs = rawObj.matchAll(/["'`]?(\w+)["'`]?\s*:\s*["'`]([^"'`]*)["'`]/g);
+        for (const m of kvPairs) { body[m[1]] = m[2]; }
+        if (Object.keys(body).length === 0) {
+          warnings.push('Inline body object detected but could not parse');
+        }
+      }
+      return { body, bodyType, warnings };
+    }
+  }
+
+  // 7. Variable reference: body: someVariable or body: data
+  const varBodyMatch = code.match(/body\s*:\s*(\w+)\s*[,\n\r}]/);
+  if (varBodyMatch && !['null', 'undefined', 'true', 'false'].includes(varBodyMatch[1])) {
+    // Try to find the variable definition in the code
+    const varName = varBodyMatch[1];
+    const varDefMatch = code.match(new RegExp(`(?:const|let|var)\\s+${varName}\\s*=\\s*JSON\\.stringify\\s*\\(\\s*([{\\[][\\s\\S]*?[}\\]])\\s*\\)`));
+    if (varDefMatch) {
+      bodyType = 'json';
+      try {
+        const cleaned = varDefMatch[1]
+          .replace(/'/g, '"')
+          .replace(/(\w+)\s*:/g, '"$1":')
+          .replace(/,\s*([}\]])/g, '$1');
+        body = JSON.parse(cleaned);
+      } catch {
+        const kvPairs = varDefMatch[1].matchAll(/["'`]?(\w+)["'`]?\s*:\s*["'`]([^"'`]*)["'`]/g);
+        for (const m of kvPairs) { body[m[1]] = m[2]; }
+      }
+    } else {
+      warnings.push(`Body uses variable "${varName}" — could not resolve its value`);
+    }
+    return { body, bodyType, warnings };
+  }
+
+  return { body, bodyType, warnings };
+}
+
 function parseCode(code: string): { result?: ParsedResult; error?: string; warnings: string[] } {
   const warnings: string[] = [];
   try {
@@ -51,6 +240,13 @@ function parseCode(code: string): { result?: ParsedResult; error?: string; warni
       for (const p of pairs) { headers[p[1]] = p[2]; }
     }
 
+    // Also match new Headers() constructor
+    const newHeadersMatch = code.match(/new\s+Headers\s*\(\s*\{([^}]+)\}\s*\)/s);
+    if (newHeadersMatch) {
+      const pairs = newHeadersMatch[1].matchAll(/["'`]([^"'`]+)["'`]\s*:\s*["'`]([^"'`]+)["'`]/g);
+      for (const p of pairs) { headers[p[1]] = p[2]; }
+    }
+
     for (const key of Object.keys(headers)) {
       if (HEADERS_TO_REMOVE.includes(key.toLowerCase()) || SEC_HEADER_PATTERN.test(key)) {
         delete headers[key];
@@ -60,35 +256,9 @@ function parseCode(code: string): { result?: ParsedResult; error?: string; warni
       }
     }
 
-    let bodyType: ParsedResult['bodyType'] = 'none';
-    let body: Record<string, unknown> = {};
-
-    const jsonBodyMatch = code.match(/JSON\.stringify\s*\(\s*(\{[\s\S]*?\})\s*\)/);
-    if (jsonBodyMatch) {
-      bodyType = 'json';
-      try {
-        body = JSON.parse(jsonBodyMatch[1].replace(/'/g, '"').replace(/(\w+)\s*:/g, '"$1":'));
-      } catch {
-        try {
-          const cleaned = jsonBodyMatch[1].replace(/'/g, '"').replace(/(\w+)\s*:/g, '"$1":').replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
-          body = JSON.parse(cleaned);
-        } catch {
-          warnings.push('Could not parse JSON body - manual check needed');
-        }
-      }
-    }
-
-    if (code.includes('new URLSearchParams') || code.includes('URLSearchParams')) {
-      bodyType = 'form-urlencoded';
-      const urlParamAppends = code.matchAll(/(?:urlencoded|params|searchParams)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
-      for (const m of urlParamAppends) { body[m[1]] = m[2]; }
-    }
-
-    if (code.includes('new FormData')) {
-      bodyType = 'multipart';
-      const fdAppends = code.matchAll(/(?:formData|formdata|fd)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
-      for (const m of fdAppends) { body[m[1]] = m[2]; }
-    }
+    // Enhanced body parsing
+    const { body, bodyType, warnings: bodyWarnings } = parseBody(code);
+    warnings.push(...bodyWarnings);
 
     let name = method;
     try {
@@ -149,7 +319,7 @@ export default function ApiImporter({ onImport }: ApiImporterProps) {
       <Textarea
         value={code}
         onChange={e => setCode(e.target.value)}
-        placeholder={`// Paste Node.js fetch code here\nfetch("https://api.example.com/login", {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({ phone: "{PHONE}" })\n});`}
+        placeholder={`// Paste any Node.js fetch code — all body types supported\nfetch("https://api.example.com/login", {\n  method: "POST",\n  headers: { "Content-Type": "application/json" },\n  body: JSON.stringify({ phone: "{PHONE}" })\n});\n\n// Also supports:\n// body: \`{"key":"\${val}"}\`\n// body: "key=val&key2=val2"\n// body: new URLSearchParams({...})\n// body: new FormData()`}
         className="bg-white/[0.04] border-white/[0.08] text-emerald-400/80 text-xs h-40 placeholder:text-white/15 focus:border-violet-500/40"
       />
 

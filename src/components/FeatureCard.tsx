@@ -10,200 +10,57 @@ interface FeatureCardProps {
   curved?: boolean;
 }
 
-const colorMap: Record<string, { gradient: string; border: string; text: string; glow: string; bg: string }> = {
-  green: {
-    gradient: "from-neon-green/20 to-neon-green/5",
-    border: "border-neon-green/40 hover:border-neon-green",
-    text: "text-neon-green",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-green)/0.4)]",
-    bg: "bg-neon-green",
-  },
-  pink: {
-    gradient: "from-neon-pink/20 to-neon-pink/5",
-    border: "border-neon-pink/40 hover:border-neon-pink",
-    text: "text-neon-pink",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-pink)/0.4)]",
-    bg: "bg-neon-pink",
-  },
-  orange: {
-    gradient: "from-neon-orange/20 to-neon-orange/5",
-    border: "border-neon-orange/40 hover:border-neon-orange",
-    text: "text-neon-orange",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-orange)/0.4)]",
-    bg: "bg-neon-orange",
-  },
-  cyan: {
-    gradient: "from-neon-cyan/20 to-neon-cyan/5",
-    border: "border-neon-cyan/40 hover:border-neon-cyan",
-    text: "text-neon-cyan",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-cyan)/0.4)]",
-    bg: "bg-neon-cyan",
-  },
-  red: {
-    gradient: "from-neon-red/20 to-neon-red/5",
-    border: "border-neon-red/40 hover:border-neon-red",
-    text: "text-neon-red",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-red)/0.4)]",
-    bg: "bg-neon-red",
-  },
-  purple: {
-    gradient: "from-neon-purple/20 to-neon-purple/5",
-    border: "border-neon-purple/40 hover:border-neon-purple",
-    text: "text-neon-purple",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-purple)/0.4)]",
-    bg: "bg-neon-purple",
-  },
-  yellow: {
-    gradient: "from-neon-yellow/20 to-neon-yellow/5",
-    border: "border-neon-yellow/40 hover:border-neon-yellow",
-    text: "text-neon-yellow",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-yellow)/0.4)]",
-    bg: "bg-neon-yellow",
-  },
-  blue: {
-    gradient: "from-neon-blue/20 to-neon-blue/5",
-    border: "border-neon-blue/40 hover:border-neon-blue",
-    text: "text-neon-blue",
-    glow: "shadow-[0_0_30px_hsl(var(--neon-blue)/0.4)]",
-    bg: "bg-neon-blue",
-  },
-  white: {
-    gradient: "from-white/20 to-white/5",
-    border: "border-white/40 hover:border-white",
-    text: "text-white",
-    glow: "shadow-[0_0_30px_hsl(0_0%_100%/0.4)]",
-    bg: "bg-white",
-  },
-  teal: {
-    gradient: "from-teal-400/20 to-teal-400/5",
-    border: "border-teal-400/40 hover:border-teal-400",
-    text: "text-teal-400",
-    glow: "shadow-[0_0_30px_rgba(45,212,191,0.4)]",
-    bg: "bg-teal-400",
-  },
-  lime: {
-    gradient: "from-lime-400/20 to-lime-400/5",
-    border: "border-lime-400/40 hover:border-lime-400",
-    text: "text-lime-400",
-    glow: "shadow-[0_0_30px_rgba(163,230,53,0.4)]",
-    bg: "bg-lime-400",
-  },
-  emerald: {
-    gradient: "from-emerald-400/20 to-emerald-400/5",
-    border: "border-emerald-400/40 hover:border-emerald-400",
-    text: "text-emerald-400",
-    glow: "shadow-[0_0_30px_rgba(52,211,153,0.4)]",
-    bg: "bg-emerald-400",
-  },
+const colorMap: Record<string, { accent: string; text: string; bg: string; activeBg: string; border: string }> = {
+  green: { accent: "emerald", text: "text-emerald-400", bg: "bg-emerald-500/8", activeBg: "bg-emerald-500", border: "border-emerald-500/20" },
+  pink: { accent: "pink", text: "text-pink-400", bg: "bg-pink-500/8", activeBg: "bg-pink-500", border: "border-pink-500/20" },
+  orange: { accent: "amber", text: "text-amber-400", bg: "bg-amber-500/8", activeBg: "bg-amber-500", border: "border-amber-500/20" },
+  cyan: { accent: "cyan", text: "text-cyan-400", bg: "bg-cyan-500/8", activeBg: "bg-cyan-500", border: "border-cyan-500/20" },
+  red: { accent: "red", text: "text-red-400", bg: "bg-red-500/8", activeBg: "bg-red-500", border: "border-red-500/20" },
+  purple: { accent: "violet", text: "text-violet-400", bg: "bg-violet-500/8", activeBg: "bg-violet-500", border: "border-violet-500/20" },
+  yellow: { accent: "yellow", text: "text-yellow-400", bg: "bg-yellow-500/8", activeBg: "bg-yellow-500", border: "border-yellow-500/20" },
+  blue: { accent: "blue", text: "text-blue-400", bg: "bg-blue-500/8", activeBg: "bg-blue-500", border: "border-blue-500/20" },
+  white: { accent: "white", text: "text-white/80", bg: "bg-white/8", activeBg: "bg-white", border: "border-white/20" },
+  teal: { accent: "teal", text: "text-teal-400", bg: "bg-teal-500/8", activeBg: "bg-teal-500", border: "border-teal-500/20" },
+  lime: { accent: "lime", text: "text-lime-400", bg: "bg-lime-500/8", activeBg: "bg-lime-500", border: "border-lime-500/20" },
+  emerald: { accent: "emerald", text: "text-emerald-400", bg: "bg-emerald-500/8", activeBg: "bg-emerald-500", border: "border-emerald-500/20" },
 };
 
 const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved }: FeatureCardProps) => {
   const colors = colorMap[color] || colorMap.green;
 
-  // Curved style for special tabs
-  if (curved) {
-    return (
-      <button
-        onClick={onClick}
-        className={cn(
-          "relative flex flex-col items-center gap-1 p-2 rounded-2xl border transition-all duration-200",
-          "backdrop-blur-sm bg-gradient-to-br",
-          colors.gradient,
-          colors.border,
-          "hover:scale-[1.03] active:scale-95",
-          active && [colors.glow, "border-2 scale-[1.02]"]
-        )}
-      >
-        {/* Active glow ring */}
-        {active && (
-          <div className={cn(
-            "absolute -inset-0.5 rounded-2xl opacity-40 blur-sm",
-            `bg-gradient-to-br ${colors.gradient}`
-          )} />
-        )}
-          
-        {/* Icon container - circular */}
-        <div className={cn(
-          "relative w-7 h-7 rounded-full flex items-center justify-center",
-          "bg-gradient-to-br from-background/90 to-background/50",
-          "border border-current/30",
-          colors.text
-        )}>
-          {active && (
-            <div className="absolute inset-0 rounded-full bg-current/15" />
-          )}
-          <Icon className={cn(
-            "w-3.5 h-3.5 transition-all duration-200",
-            active && "drop-shadow-[0_0_4px_currentColor] scale-110"
-          )} />
-        </div>
-        
-        {/* Label - compact */}
-        <span className={cn(
-          "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
-          colors.text,
-          active && "drop-shadow-[0_0_3px_currentColor]"
-        )}>
-          {label}
-        </span>
-        
-        {/* Active indicator */}
-        {active && (
-          <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
-        )}
-      </button>
-    );
-  }
-
   return (
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center gap-1 p-2 rounded-lg border transition-all duration-200",
-        "backdrop-blur-sm bg-gradient-to-br",
-        colors.gradient,
-        colors.border,
-        "hover:scale-[1.03] active:scale-95",
-        active && [colors.glow, "border-2 scale-[1.02]"]
+        "relative flex flex-col items-center gap-1.5 p-2.5 border transition-all duration-200",
+        curved ? "rounded-2xl" : "rounded-xl",
+        "backdrop-blur-sm",
+        active
+          ? `${colors.activeBg} border-transparent text-white shadow-lg shadow-${colors.accent}-500/20`
+          : `bg-white/[0.03] ${colors.border} hover:bg-white/[0.06] hover:scale-[1.03]`,
+        "active:scale-95"
       )}
     >
-      {/* Active glow ring */}
-      {active && (
-        <div className={cn(
-          "absolute -inset-0.5 rounded-lg opacity-40 blur-sm",
-          `bg-gradient-to-br ${colors.gradient}`
-        )} />
-      )}
-        
-      {/* Icon container - compact */}
+      {/* Icon container */}
       <div className={cn(
-        "relative w-7 h-7 rounded-md flex items-center justify-center",
-        "bg-gradient-to-br from-background/90 to-background/50",
-        "border border-current/20",
-        colors.text
+        "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+        active 
+          ? "bg-white/20" 
+          : `bg-white/[0.04] border border-white/[0.06]`
       )}>
-        {active && (
-          <div className="absolute inset-0 rounded-md bg-current/15" />
-        )}
         <Icon className={cn(
-          "w-3.5 h-3.5 transition-all duration-200",
-          active && "drop-shadow-[0_0_4px_currentColor] scale-110"
+          "w-4 h-4 transition-all",
+          active ? "text-white" : colors.text
         )} />
       </div>
       
-      {/* Label - compact */}
+      {/* Label */}
       <span className={cn(
-        "text-[8px] font-bold tracking-wide uppercase text-center leading-tight",
-        colors.text,
-        active && "drop-shadow-[0_0_3px_currentColor]"
+        "text-[8px] font-bold tracking-wider uppercase text-center leading-tight",
+        active ? "text-white" : colors.text
       )}>
         {label}
       </span>
-      
-      {/* Active indicator */}
-      {active && (
-        <div className={cn("absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-3 h-0.5 rounded-full", colors.bg)} />
-      )}
     </button>
   );
 };

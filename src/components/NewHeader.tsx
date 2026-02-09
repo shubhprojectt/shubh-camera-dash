@@ -1,52 +1,9 @@
-import { Shield, Wifi, Activity, Signal } from "lucide-react";
+import { Shield } from "lucide-react";
 import { useSettings } from "@/contexts/SettingsContext";
 import CreditDisplay from "./CreditDisplay";
 import AdminSettings from "./AdminSettings";
 import * as Icons from "lucide-react";
 import { LucideIcon } from "lucide-react";
-
-// Map color names to CSS custom property values
-const getColorClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    green: "text-neon-green",
-    pink: "text-neon-pink",
-    orange: "text-neon-orange",
-    cyan: "text-neon-cyan",
-    red: "text-neon-red",
-    purple: "text-neon-purple",
-    yellow: "text-neon-yellow",
-    blue: "text-neon-blue",
-  };
-  return colorMap[color] || colorMap.green;
-};
-
-const getBorderClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    green: "border-neon-green",
-    pink: "border-neon-pink",
-    orange: "border-neon-orange",
-    cyan: "border-neon-cyan",
-    red: "border-neon-red",
-    purple: "border-neon-purple",
-    yellow: "border-neon-yellow",
-    blue: "border-neon-blue",
-  };
-  return colorMap[color] || colorMap.green;
-};
-
-const getBgClass = (color: string) => {
-  const colorMap: Record<string, string> = {
-    green: "bg-neon-green",
-    pink: "bg-neon-pink",
-    orange: "bg-neon-orange",
-    cyan: "bg-neon-cyan",
-    red: "bg-neon-red",
-    purple: "bg-neon-purple",
-    yellow: "bg-neon-yellow",
-    blue: "bg-neon-blue",
-  };
-  return colorMap[color] || colorMap.green;
-};
 
 const NewHeader = () => {
   const { settings } = useSettings();
@@ -81,103 +38,83 @@ const NewHeader = () => {
     }
   };
 
+  // Map neon color names to tailwind violet/blue glassmorphism accent colors
+  const getAccentColor = (color: string) => {
+    const map: Record<string, string> = {
+      green: "emerald", pink: "pink", orange: "amber", cyan: "cyan",
+      red: "red", purple: "violet", yellow: "amber", blue: "blue",
+    };
+    return map[color] || "violet";
+  };
+
+  const a1 = getAccentColor(color1);
+  const a2 = getAccentColor(color2);
+
   return (
-    <header className="relative px-2 pt-2 pb-1">
-      {/* Main header card - compact with rainbow border */}
-      <div className="relative">
-        {/* Animated rainbow border - like login page (conditional) */}
-        {(settings.headerBorderEnabled ?? true) && (
-          <div className="absolute -inset-[1.5px] rounded-xl overflow-hidden">
-            <div 
-              className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
-              style={{ backgroundSize: '300% 100%' }}
-            />
-          </div>
-        )}
+    <header className="relative px-3 pt-3 pb-2 sticky top-0 z-20">
+      <div className="relative rounded-2xl bg-white/[0.04] backdrop-blur-xl border border-white/[0.08] p-3 overflow-hidden max-w-xl mx-auto">
+        {/* Subtle gradient accent */}
+        <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-${a1}-500/30 to-transparent`} />
         
-        <div className={`relative rounded-xl bg-card/95 backdrop-blur-md p-2 overflow-hidden`}>
-          {/* Corner accents - smaller */}
-          <div className={`absolute top-0 left-0 w-6 h-6 border-t border-l ${getBorderClass(color1)}/60 rounded-tl-xl`} />
-          <div className={`absolute top-0 right-0 w-6 h-6 border-t border-r ${getBorderClass(color2)}/60 rounded-tr-xl`} />
-          <div className={`absolute bottom-0 left-0 w-6 h-6 border-b border-l ${getBorderClass(color2)}/60 rounded-bl-xl`} />
-          <div className={`absolute bottom-0 right-0 w-6 h-6 border-b border-r ${getBorderClass(color1)}/60 rounded-br-xl`} />
+        {/* Top row - Status & Settings */}
+        <div className="flex items-center justify-between mb-2">
+          {/* Status indicators */}
+          <div className="flex items-center gap-1.5">
+            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg bg-${a1}-500/10 border border-${a1}-500/20`}>
+              <div className={`w-1.5 h-1.5 bg-${a1}-400 rounded-full animate-pulse`} />
+              <span className={`text-[8px] font-semibold text-${a1}-400 tracking-wider`}>LIVE</span>
+            </div>
+            <div className={`flex items-center gap-1 px-2 py-0.5 rounded-lg bg-${a2}-500/10 border border-${a2}-500/20`}>
+              <Shield className={`w-2.5 h-2.5 text-${a2}-400`} />
+              <span className={`text-[8px] font-medium text-${a2}-400 tracking-wide`}>SECURE</span>
+            </div>
+          </div>
+
+          {/* Right - Credits & Settings */}
+          <div className="flex items-center gap-1.5">
+            <CreditDisplay />
+            <AdminSettings />
+          </div>
+        </div>
+
+        {/* Main title section */}
+        <div className="text-center py-1">
+          {/* Logo */}
+          <div className="inline-flex items-center justify-center mb-1.5">
+            <div className="relative">
+              {settings.headerCustomLogo ? (
+                <img 
+                  src={settings.headerCustomLogo} 
+                  alt="Logo" 
+                  className="w-9 h-9 rounded-xl object-cover ring-1 ring-white/10"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-500 to-blue-500 flex items-center justify-center">
+                  <IconComponent className="w-5 h-5 text-white" />
+                </div>
+              )}
+            </div>
+          </div>
           
-          {/* Top row - Status & Settings - more compact */}
-          <div className="relative flex items-center justify-between mb-1.5">
-            {/* Status indicators - smaller */}
-            <div className="flex items-center gap-1.5">
-              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${getBgClass(color1)}/15 border ${getBorderClass(color1)}/50`}>
-                <Activity className={`w-2.5 h-2.5 ${getColorClass(color1)}`} />
-                <span className={`text-[8px] font-bold ${getColorClass(color1)} tracking-wider`}>LIVE</span>
-              </div>
-              <div className={`flex items-center gap-1 px-2 py-0.5 rounded-full ${getBgClass(color2)}/15 border ${getBorderClass(color2)}/40`}>
-                <Signal className={`w-2.5 h-2.5 ${getColorClass(color2)}`} />
-                <span className={`text-[8px] font-medium ${getColorClass(color2)} tracking-wide`}>SECURE</span>
-              </div>
-            </div>
-
-            {/* Right - Credits & Settings */}
-            <div className="flex items-center gap-1.5">
-              <CreditDisplay />
-              <AdminSettings />
-            </div>
-          </div>
-
-          {/* Main title section - compact */}
-          <div className="relative text-center py-1">
-            {/* Logo with glow - smaller */}
-            <div className="inline-flex items-center justify-center mb-1.5">
-              <div className="relative">
-                <div className={`absolute -inset-2 ${getBgClass(color1)}/15 rounded-xl blur-lg`} />
-                
-                {settings.headerCustomLogo ? (
-                  <img 
-                    src={settings.headerCustomLogo} 
-                    alt="Logo" 
-                    className={`relative w-9 h-9 rounded-lg object-cover border ${getBorderClass(color1)}/60`}
-                    style={{ boxShadow: `0 0 12px hsl(var(--neon-${color1}) / 0.3)` }}
-                  />
-                ) : (
-                  <div 
-                    className={`relative w-9 h-9 rounded-lg bg-gradient-to-br from-background/90 to-card/80 border ${getBorderClass(color1)}/60 flex items-center justify-center`}
-                    style={{ boxShadow: `0 0 12px hsl(var(--neon-${color1}) / 0.3)` }}
-                  >
-                    <IconComponent className={`w-5 h-5 ${getColorClass(color1)}`} />
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Title - with color cycling animation */}
-            <h1 
-              className={`text-base md:text-lg font-black tracking-wider ${getStyleClasses()}`}
-              style={{ 
-                fontFamily: settings.headerFont || "'Orbitron', sans-serif",
-                ...(settings.headerStyle === 'gradient' && {
-                  backgroundImage: `linear-gradient(135deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})))`,
-                })
-              }}
-            >
-              <span className="animate-color-cycle">
-                {settings.headerName1 || "SHUBH"}
-              </span>
-              <span className="mx-1.5 text-muted-foreground/40">×</span>
-              <span className="animate-color-cycle" style={{ animationDelay: '-4s' }}>
-                {settings.headerName2 || "OSINT"}
-              </span>
-            </h1>
-            
-            {/* Subtitle - smaller */}
-            <div className="flex items-center justify-center gap-1.5 mt-1">
-              <div className={`w-6 h-px bg-gradient-to-r from-transparent to-current ${getColorClass(color1)}/40`} />
-              <Shield className={`w-2.5 h-2.5 ${getColorClass(color1)}/70`} />
-              <p className="text-[7px] text-muted-foreground/80 tracking-[0.15em] uppercase font-medium">
-                Intelligence Framework
-              </p>
-              <Shield className={`w-2.5 h-2.5 ${getColorClass(color2)}/70`} />
-              <div className={`w-6 h-px bg-gradient-to-l from-transparent to-current ${getColorClass(color2)}/40`} />
-            </div>
-          </div>
+          {/* Title */}
+          <h1 
+            className={`text-base md:text-lg font-bold text-white tracking-wider ${getStyleClasses()}`}
+            style={{ 
+              fontFamily: settings.headerFont || "'Orbitron', sans-serif",
+              ...(settings.headerStyle === 'gradient' && {
+                backgroundImage: `linear-gradient(135deg, hsl(var(--neon-${color1})), hsl(var(--neon-${color2})))`,
+              })
+            }}
+          >
+            <span>{settings.headerName1 || "SHUBH"}</span>
+            <span className="mx-1.5 text-white/20">×</span>
+            <span>{settings.headerName2 || "OSINT"}</span>
+          </h1>
+          
+          {/* Subtitle */}
+          <p className="text-[8px] text-white/30 tracking-[0.2em] uppercase font-medium mt-1">
+            Intelligence Framework
+          </p>
         </div>
       </div>
     </header>
