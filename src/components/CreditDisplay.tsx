@@ -20,26 +20,10 @@ const CreditDisplay = () => {
   const isEmpty = credits === 0;
 
   const getStyles = () => {
-    if (isUnlimited) return { 
-      bg: "bg-gradient-to-r from-neon-purple/20 to-neon-pink/20", 
-      border: "border-neon-purple/40", 
-      text: "text-neon-purple" 
-    };
-    if (isEmpty) return { 
-      bg: "bg-gradient-to-r from-red-500/20 to-red-600/20", 
-      border: "border-red-500/40", 
-      text: "text-red-400" 
-    };
-    if (isLow) return { 
-      bg: "bg-gradient-to-r from-neon-yellow/20 to-neon-orange/20", 
-      border: "border-neon-yellow/40", 
-      text: "text-neon-yellow" 
-    };
-    return { 
-      bg: "bg-gradient-to-r from-neon-green/20 to-neon-cyan/20", 
-      border: "border-neon-green/40", 
-      text: "text-neon-green" 
-    };
+    if (isUnlimited) return { bg: "bg-violet-500/15", border: "border-violet-500/25", text: "text-violet-400" };
+    if (isEmpty) return { bg: "bg-red-500/15", border: "border-red-500/25", text: "text-red-400" };
+    if (isLow) return { bg: "bg-amber-500/15", border: "border-amber-500/25", text: "text-amber-400" };
+    return { bg: "bg-emerald-500/15", border: "border-emerald-500/25", text: "text-emerald-400" };
   };
 
   const styles = getStyles();
@@ -47,7 +31,7 @@ const CreditDisplay = () => {
   return (
     <div className="flex items-center gap-1.5">
       {/* Credit Badge */}
-      <div className={`flex items-center gap-1.5 px-2 py-1 rounded-xl border backdrop-blur-sm ${styles.bg} ${styles.border} transition-all duration-300`}>
+      <div className={`flex items-center gap-1.5 px-2 py-1 rounded-lg border backdrop-blur-sm ${styles.bg} ${styles.border} transition-all duration-300`}>
         {isUnlimited ? (
           <Sparkles className={`w-3.5 h-3.5 ${styles.text} animate-pulse`} />
         ) : (
@@ -63,14 +47,14 @@ const CreditDisplay = () => {
           className="p-0.5 hover:bg-white/10 rounded-md transition-colors"
           title="Refresh"
         >
-          <RefreshCw className={`w-3 h-3 text-muted-foreground hover:${styles.text} ${isRefreshing ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`w-3 h-3 text-white/40 hover:text-white/60 ${isRefreshing ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {/* Logout */}
       <button
         onClick={logout}
-        className="p-1.5 rounded-xl border border-red-500/30 bg-red-500/10 hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+        className="p-1.5 rounded-lg border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 transition-all"
         title="Logout"
       >
         <LogOut className="w-3.5 h-3.5 text-red-400" />

