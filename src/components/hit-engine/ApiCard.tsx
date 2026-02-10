@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import { HitApi } from '@/hooks/useHitApis';
 import { Switch } from '@/components/ui/switch';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Zap, Globe, Shield, RotateCw, Home, Edit2, Trash2 } from 'lucide-react';
 
 interface ApiCardProps {
@@ -22,7 +24,10 @@ const methodColors: Record<string, string> = {
 };
 
 export default function ApiCard({ api, onToggle, onToggleProxy, onToggleResidential, onToggleRotation, onToggleForce, onEdit, onDelete }: ApiCardProps) {
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
   return (
+    <>
     <div className={`rounded-xl border p-4 space-y-3 transition-all ${
       api.enabled 
         ? 'border-white/[0.08] bg-white/[0.03]' 
@@ -65,11 +70,27 @@ export default function ApiCard({ api, onToggle, onToggleProxy, onToggleResident
           className="flex-1 h-9 rounded-xl bg-white/[0.04] border border-white/[0.06] text-white/50 text-xs font-medium hover:bg-white/[0.08] transition-colors flex items-center justify-center gap-2">
           <Edit2 className="w-3.5 h-3.5" /> Edit
         </button>
-        <button onClick={onDelete}
+        <button onClick={() => setShowDeleteConfirm(true)}
           className="h-9 px-4 rounded-xl bg-red-500/[0.08] border border-red-500/[0.15] text-red-400/70 text-xs font-medium hover:bg-red-500/[0.15] transition-colors flex items-center justify-center gap-2">
           <Trash2 className="w-3.5 h-3.5" /> Delete
         </button>
       </div>
     </div>
+
+    <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+      <AlertDialogContent className="bg-[#18181b] border-white/10">
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-white">Delete API?</AlertDialogTitle>
+          <AlertDialogDescription className="text-white/50">
+            "{api.name}" ko permanently delete kar diya jayega. Kya aap sure hain?
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="bg-white/[0.06] border-white/10 text-white/70 hover:bg-white/[0.1] hover:text-white">No</AlertDialogCancel>
+          <AlertDialogAction onClick={onDelete} className="bg-red-500/80 text-white hover:bg-red-500">Yes, Delete</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
