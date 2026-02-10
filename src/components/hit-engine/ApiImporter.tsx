@@ -73,9 +73,9 @@ function parseBody(code: string): { body: Record<string, unknown>; bodyType: Par
   // 2. URLSearchParams
   if (code.includes('URLSearchParams')) {
     bodyType = 'form-urlencoded';
-    // Match .append("key", "value") patterns
-    const appendMatches = code.matchAll(/(?:urlencoded|params|searchParams|urlSearchParams|body|formBody)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
-    for (const m of appendMatches) { body[m[1]] = m[2]; }
+    // Match ANY variable.append("key", "value") patterns — not just specific names
+    const appendMatches = code.matchAll(/(\w+)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]*)["'`]\s*\)/g);
+    for (const m of appendMatches) { body[m[2]] = m[3]; }
     
     // Also match new URLSearchParams({ key: "value" })
     const inlineParamsMatch = code.match(/new\s+URLSearchParams\s*\(\s*\{([^}]+)\}\s*\)/s);
@@ -103,8 +103,9 @@ function parseBody(code: string): { body: Record<string, unknown>; bodyType: Par
   // 3. FormData
   if (code.includes('new FormData')) {
     bodyType = 'multipart';
-    const fdAppends = code.matchAll(/(?:formData|formdata|fd|form)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]+)["'`]\s*\)/gi);
-    for (const m of fdAppends) { body[m[1]] = m[2]; }
+    // Match ANY variable.append("key", "value") for FormData
+    const fdAppends = code.matchAll(/(\w+)\.append\s*\(\s*["'`]([^"'`]+)["'`]\s*,\s*["'`]([^"'`]*)["'`]\s*\)/g);
+    for (const m of fdAppends) { body[m[2]] = m[3]; }
     if (Object.keys(body).length === 0) {
       warnings.push('FormData detected but could not extract fields');
     }
