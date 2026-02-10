@@ -15,6 +15,11 @@ import CallDark from "./CallDark";
 import ImageToInfo from "./ImageToInfo";
 import HackerLoader from "./HackerLoader";
 import AnimatedJsonViewer from "./AnimatedJsonViewer";
+import QuickHitEngine from "./hit-engine/QuickHitEngine";
+import LogsPanel from "./hit-engine/LogsPanel";
+import { useHitApis } from "@/hooks/useHitApis";
+import { useHitLogs } from "@/hooks/useHitLogs";
+import { useHitSiteSettings } from "@/hooks/useHitSiteSettings";
 import { useSettings } from "@/contexts/SettingsContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -35,6 +40,11 @@ const SearchPanel = () => {
   const [error, setError] = useState<string | null>(null);
   const [copiedField, setCopiedField] = useState<string | null>(null);
   
+  // Hit Engine hooks for SMS BOMBER tab
+  const { apis } = useHitApis();
+  const { logs, addLog, clearLogs } = useHitLogs();
+  const { settings: hitSettings } = useHitSiteSettings();
+  
   const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
   const activeButton = enabledTabs.find(b => b.label === activeTab);
 
@@ -46,10 +56,14 @@ const SearchPanel = () => {
     }
     
     if (tab?.searchType === "smsbomber") {
-      const url = tab.apiUrl?.trim();
-      if (url) {
-        window.open(url, '_blank');
-        toast({ title: "SMS BOMBER", description: "Opening SMS Bomber..." });
+      // Open inline — no redirect
+      if (activeTab === label) {
+        setActiveTab(null);
+      } else {
+        setActiveTab(label);
+        setSearchQuery("");
+        setResult(null);
+        setError(null);
       }
       return;
     }
@@ -274,7 +288,7 @@ const SearchPanel = () => {
   };
 
   const showSearchInput = activeTab && activeButton && 
-    !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo"].includes(activeButton.searchType);
+    !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo", "smsbomber"].includes(activeButton.searchType);
 
   return (
     <div className="px-3 space-y-4 max-w-xl mx-auto">
@@ -384,6 +398,33 @@ const SearchPanel = () => {
 
       {/* Image to Info Panel */}
       {activeButton?.searchType === "imagetoinfo" && <ImageToInfo />}
+
+      {/* SMS BOMBER - Inline Hit Engine */}
+      {activeButton?.searchType === "smsbomber" && (
+        <div className="space-y-4">
+          <QuickHitEngine
+            apis={apis}
+            onLog={addLog}
+            title="HIT ENGINE 1"
+            phoneLabel={hitSettings.phoneLabel}
+            phonePlaceholder={hitSettings.phonePlaceholder}
+            hitButtonText={hitSettings.hitButtonText}
+            stopButtonText={hitSettings.stopButtonText}
+            noApisWarning={hitSettings.noApisWarning}
+          />
+          <QuickHitEngine
+            apis={apis}
+            onLog={addLog}
+            title="HIT ENGINE 2"
+            phoneLabel={hitSettings.phoneLabel}
+            phonePlaceholder={hitSettings.phonePlaceholder}
+            hitButtonText={hitSettings.hitButtonText}
+            stopButtonText={hitSettings.stopButtonText}
+            noApisWarning={hitSettings.noApisWarning}
+          />
+          <LogsPanel logs={logs} onClear={clearLogs} />
+        </div>
+      )}
 
       {/* Results Section */}
       {showSearchInput && (
