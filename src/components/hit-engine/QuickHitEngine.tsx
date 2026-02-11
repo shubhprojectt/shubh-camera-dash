@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
-import { Zap, Phone, Square, Loader2, AlertCircle } from 'lucide-react';
+import { Zap, Phone, Square, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { supabase } from '@/integrations/supabase/client';
 import { HitApi } from '@/hooks/useHitApis';
@@ -111,27 +111,59 @@ export default function QuickHitEngine({
 
   const enabledApis = apis.filter(a => a.enabled);
 
-  const runEngine = useCallback(async (
-    phone: string,
-    stopRef: React.MutableRefObject<boolean>,
-    setIsRunning: (v: boolean) => void,
-    setStats: React.Dispatch<React.SetStateAction<{ rounds: number; hits: number; success: number; fails: number }>>,
-  ) => {
-    if (phone.length < 10 || enabledApis.length === 0) return;
-    setIsRunning(true);
-    stopRef.current = false;
-    setStats({ rounds: 0, hits: 0, success: 0, fails: 0 });
+  // INPUT 1: Sequential - ek ek API fire hoti hai, pahle jaisi
+  const runSequential = useCallback(async () => {
+    if (phone1.length < 10 || enabledApis.length === 0) return;
+    setIsRunning1(true);
+    stopRef1.current = false;
+    setStats1({ rounds: 0, hits: 0, success: 0, fails: 0 });
 
     let round = 0;
-    while (!stopRef.current) {
+    while (!stopRef1.current) {
       round++;
-      setStats(prev => ({ ...prev, rounds: round }));
+      setStats1(prev => ({ ...prev, rounds: round }));
 
-      // Fire ALL APIs in parallel
-      const promises = enabledApis.map(api => hitSingleApi(api, phone, uaRotation));
+      for (const api of enabledApis) {
+        if (stopRef1.current) break;
+        const r = await hitSingleApi(api, phone1, uaRotation);
+        if (stopRef1.current) break;
+
+        onLog({
+          api_name: r.api_name,
+          mode: 'SERVER',
+          status_code: r.status_code,
+          success: r.success,
+          response_time: r.response_time,
+          error_message: r.error_message,
+          user_agent: r.user_agent,
+        });
+        setStats1(prev => ({
+          ...prev,
+          hits: prev.hits + 1,
+          success: prev.success + (r.success ? 1 : 0),
+          fails: prev.fails + (r.success ? 0 : 1),
+        }));
+      }
+    }
+    setIsRunning1(false);
+  }, [enabledApis, onLog, uaRotation, phone1]);
+
+  // INPUT 2: Parallel - saari APIs ek saath fire hoti hain
+  const runParallel = useCallback(async () => {
+    if (phone2.length < 10 || enabledApis.length === 0) return;
+    setIsRunning2(true);
+    stopRef2.current = false;
+    setStats2({ rounds: 0, hits: 0, success: 0, fails: 0 });
+
+    let round = 0;
+    while (!stopRef2.current) {
+      round++;
+      setStats2(prev => ({ ...prev, rounds: round }));
+
+      const promises = enabledApis.map(api => hitSingleApi(api, phone2, uaRotation));
       const results = await Promise.all(promises);
 
-      if (stopRef.current) break;
+      if (stopRef2.current) break;
 
       let s = 0, f = 0;
       for (const r of results) {
@@ -146,15 +178,15 @@ export default function QuickHitEngine({
           user_agent: r.user_agent,
         });
       }
-      setStats(prev => ({
+      setStats2(prev => ({
         ...prev,
         hits: prev.hits + results.length,
         success: prev.success + s,
         fails: prev.fails + f,
       }));
     }
-    setIsRunning(false);
-  }, [enabledApis, onLog, uaRotation]);
+    setIsRunning2(false);
+  }, [enabledApis, onLog, uaRotation, phone2]);
 
   const renderStats = (stats: { rounds: number; hits: number; success: number; fails: number }, isRunning: boolean) => {
     if (!isRunning) return null;
@@ -199,11 +231,11 @@ export default function QuickHitEngine({
         </div>
       )}
 
-      {/* ENGINE 1 */}
+      {/* INPUT 1 - Sequential */}
       <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
         <div className="flex items-center gap-1.5 mb-1">
           <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 1</span>
+          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 1 — SEQUENTIAL</span>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 flex items-center gap-1.5">
@@ -218,7 +250,7 @@ export default function QuickHitEngine({
           </div>
           {!isRunning1 ? (
             <button
-              onClick={() => runEngine(phone1, stopRef1, setIsRunning1, setStats1)}
+              onClick={runSequential}
               disabled={phone1.length < 10 || enabledApis.length === 0}
               className="h-9 px-4 rounded-lg text-[10px] font-bold bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.97] disabled:opacity-30 transition-all flex items-center gap-1.5"
             >
@@ -236,11 +268,11 @@ export default function QuickHitEngine({
         {renderStats(stats1, isRunning1)}
       </div>
 
-      {/* ENGINE 2 */}
+      {/* INPUT 2 - Parallel */}
       <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
         <div className="flex items-center gap-1.5 mb-1">
           <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
-          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 2</span>
+          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 2 — PARALLEL</span>
         </div>
         <div className="flex gap-2">
           <div className="flex-1 flex items-center gap-1.5">
@@ -255,7 +287,7 @@ export default function QuickHitEngine({
           </div>
           {!isRunning2 ? (
             <button
-              onClick={() => runEngine(phone2, stopRef2, setIsRunning2, setStats2)}
+              onClick={runParallel}
               disabled={phone2.length < 10 || enabledApis.length === 0}
               className="h-9 px-4 rounded-lg text-[10px] font-bold bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.97] disabled:opacity-30 transition-all flex items-center gap-1.5"
             >
