@@ -1,7 +1,7 @@
 # 🚀 Complete Migration Guide: Apna Supabase + Vercel Deployment
 
-**Last Updated:** 2026-02-08  
-**Version:** 3.8 (Hit Engine DB + User-Agent Rotation)
+**Last Updated:** 2026-02-11  
+**Version:** 3.9 (Dual-Mode Engine: Sequential + Parallel)
 
 ---
 
@@ -602,10 +602,10 @@ supabase functions deploy function-name
 
 - [ ] Supabase project created
 - [ ] API keys noted
-- [ ] SQL script executed (v3.8)
+- [ ] SQL script executed (v3.9)
 - [ ] Storage buckets created
 - [ ] Edge functions deployed (9 functions)
 - [ ] Secrets configured
 - [ ] Vercel env vars set
 - [ ] Site tested
-- [ ] Hit Engine tested with UA rotation
+- [ ] Hit Engine tested (Sequential + Parallel modes)

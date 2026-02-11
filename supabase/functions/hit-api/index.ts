@@ -97,11 +97,10 @@ serve(async (req) => {
 
     const ua = uaRotation ? getRotatedUA() : '';
 
-    // Minimal headers
+    // Use admin-configured headers as-is, only add UA if rotation enabled
     const finalHeaders: Record<string, string> = {
-      ...(ua ? { 'User-Agent': ua } : {}),
-      'Accept': '*/*',
       ...customHeaders,
+      ...(ua ? { 'User-Agent': ua } : {}),
     };
 
     const { serialized, contentType } = buildBody(body, bodyType);

@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-02-08
--- Version: 3.8 (Hit Engine DB + User-Agent Rotation)
+-- Last Updated: 2026-02-11
+-- Version: 3.9 (Dual-Mode Engine: Sequential + Parallel)
 -- =====================================================
 
 -- =====================================================
@@ -431,7 +431,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.8 Edge Functions:
+-- Version 3.9 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -440,17 +440,22 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
--- 9. hit-api           - API Hit Engine with User-Agent rotation (v3.8)
+-- 9. hit-api           - API Hit Engine with pass-through headers (v3.9)
+--
+-- IMPORTANT CHANGES in v3.9:
+-- - hit-api Edge Function: Admin-configured headers pass-through
+--   (no more forced minimal headers, whatever headers admin sets are sent)
+-- - UA rotation still works: adds User-Agent ONLY when enabled
+-- - Input 1 (Sequential): APIs fire one-by-one like original behavior
+-- - Input 2 (Parallel): All APIs fire simultaneously via Promise.all
+-- - Dual-mode engine in single container
 --
 -- IMPORTANT CHANGES in v3.8:
 -- - Hit Engine APIs now stored in `hit_apis` database table
 -- - APIs persist across sessions and devices (no more localStorage)
 -- - Realtime sync enabled for hit_apis table
 -- - Delete API feature added to API cards
--- - hit-api Edge Function: 35+ browser User-Agent rotation
--- - Each request uses a DIFFERENT User-Agent (Chrome/Firefox/Safari/Edge/Opera/Mobile)
--- - Sec-CH-UA-Platform, Sec-Fetch-* headers added for realism
--- - Rate limit bypass: sequential rotation through 35+ unique browser fingerprints
+-- - hit-api Edge Function: 10 browser User-Agent rotation
 --
 -- IMPORTANT CHANGES in v3.7:
 -- - Tab Container rainbow border now uses 12 UNIQUE colors
