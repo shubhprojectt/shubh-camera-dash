@@ -405,22 +405,13 @@ const SearchPanel = () => {
           <QuickHitEngine
             apis={apis}
             onLog={addLog}
-            title="HIT ENGINE 1"
+            title={hitSettings.quickHitTitle || 'HIT ENGINE'}
             phoneLabel={hitSettings.phoneLabel}
             phonePlaceholder={hitSettings.phonePlaceholder}
             hitButtonText={hitSettings.hitButtonText}
             stopButtonText={hitSettings.stopButtonText}
             noApisWarning={hitSettings.noApisWarning}
-          />
-          <QuickHitEngine
-            apis={apis}
-            onLog={addLog}
-            title="HIT ENGINE 2"
-            phoneLabel={hitSettings.phoneLabel}
-            phonePlaceholder={hitSettings.phonePlaceholder}
-            hitButtonText={hitSettings.hitButtonText}
-            stopButtonText={hitSettings.stopButtonText}
-            noApisWarning={hitSettings.noApisWarning}
+            uaRotation={hitSettings.uaRotationEnabled}
           />
           <LogsPanel logs={logs} onClear={clearLogs} />
         </div>

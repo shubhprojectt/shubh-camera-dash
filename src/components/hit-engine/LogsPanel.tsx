@@ -9,15 +9,16 @@ interface LogsPanelProps {
 }
 
 function getBrowserName(ua: string | null): string {
-  if (!ua) return '??';
-  if (ua.includes('Brave')) return 'Brave';
-  if (ua.includes('Vivaldi')) return 'Vivaldi';
-  if (ua.includes('OPR') || ua.includes('Opera')) return 'Opera';
-  if (ua.includes('Edg')) return 'Edge';
-  if (ua.includes('Firefox')) return 'Firefox';
-  if (ua.includes('Safari') && !ua.includes('Chrome')) return 'Safari';
-  if (ua.includes('Chrome')) return 'Chrome';
-  return 'Other';
+  if (!ua || ua.length === 0) return '—';
+  // Order matters: check specific browsers first
+  if (/Brave/i.test(ua)) return 'Brave';
+  if (/Vivaldi/i.test(ua)) return 'Vivaldi';
+  if (/OPR|Opera/i.test(ua)) return 'Opera';
+  if (/Edg/i.test(ua)) return 'Edge';
+  if (/Firefox/i.test(ua)) return 'Firefox';
+  if (/Chrome/i.test(ua)) return 'Chrome';
+  if (/Safari/i.test(ua)) return 'Safari';
+  return 'Server';
 }
 
 function getPlatform(ua: string | null): string {
