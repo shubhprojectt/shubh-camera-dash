@@ -1,7 +1,6 @@
 import { useState, useRef, useCallback } from 'react';
-import { Zap, Phone, Clock, Square, Loader2, AlertCircle } from 'lucide-react';
+import { Zap, Phone, Square, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
 import { supabase } from '@/integrations/supabase/client';
 import { HitApi } from '@/hooks/useHitApis';
 import { HitLog } from '@/hooks/useHitLogs';
@@ -29,78 +28,95 @@ interface QuickHitEngineProps {
   hitButtonText?: string;
   stopButtonText?: string;
   noApisWarning?: string;
+  uaRotation?: boolean;
+}
+
+async function hitSingleApi(api: HitApi, phone: string, uaRotation: boolean): Promise<{
+  api_name: string;
+  success: boolean;
+  status_code: number | null;
+  response_time: number | null;
+  error_message: string | null;
+  user_agent: string | null;
+}> {
+  const finalUrl = replacePlaceholders(api.url, phone);
+  const finalHeaders: Record<string, string> = {};
+  for (const [k, v] of Object.entries(api.headers)) {
+    finalHeaders[replacePlaceholders(k, phone)] = replacePlaceholders(v, phone);
+  }
+  const finalBody = api.body && Object.keys(api.body).length > 0 ? replaceInObj(api.body, phone) : undefined;
+
+  let urlWithParams = finalUrl;
+  if (api.query_params && Object.keys(api.query_params).length > 0) {
+    try {
+      const url = new URL(finalUrl);
+      for (const [k, v] of Object.entries(api.query_params)) {
+        url.searchParams.set(replacePlaceholders(k, phone), replacePlaceholders(v, phone));
+      }
+      urlWithParams = url.toString();
+    } catch {}
+  }
+
+  try {
+    const { data, error } = await supabase.functions.invoke('hit-api', {
+      body: {
+        url: urlWithParams,
+        method: api.method,
+        headers: finalHeaders,
+        body: finalBody,
+        bodyType: api.bodyType,
+        uaRotation,
+      },
+    });
+    if (error) throw error;
+    return {
+      api_name: api.name,
+      success: data?.success ?? false,
+      status_code: data?.status_code ?? null,
+      response_time: data?.response_time ?? 0,
+      error_message: data?.error_message ?? null,
+      user_agent: data?.user_agent_used ?? null,
+    };
+  } catch (err) {
+    return {
+      api_name: api.name,
+      success: false,
+      status_code: null,
+      response_time: 0,
+      error_message: err instanceof Error ? err.message : 'Unknown error',
+      user_agent: null,
+    };
+  }
 }
 
 export default function QuickHitEngine({
   apis,
   onLog,
-  title = 'QUICK HIT',
+  title = 'HIT ENGINE',
   phoneLabel = 'Phone Number',
   phonePlaceholder = '91XXXXXXXXXX',
   hitButtonText = 'START',
   stopButtonText = 'STOP',
   noApisWarning = 'Admin me APIs add karo.',
+  uaRotation = true,
 }: QuickHitEngineProps) {
-  const [phone, setPhone] = useState('');
-  const [delay, setDelay] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentApi, setCurrentApi] = useState('');
-  const [stats, setStats] = useState({ rounds: 0, hits: 0, success: 0, fails: 0 });
-  const stopRef = useRef(false);
+  const [phone1, setPhone1] = useState('');
+  const [phone2, setPhone2] = useState('');
+  const [isRunning1, setIsRunning1] = useState(false);
+  const [isRunning2, setIsRunning2] = useState(false);
+  const [stats1, setStats1] = useState({ rounds: 0, hits: 0, success: 0, fails: 0 });
+  const [stats2, setStats2] = useState({ rounds: 0, hits: 0, success: 0, fails: 0 });
+  const stopRef1 = useRef(false);
+  const stopRef2 = useRef(false);
 
   const enabledApis = apis.filter(a => a.enabled);
 
-  const hitApi = useCallback(async (api: HitApi, phoneNumber: string) => {
-    const finalUrl = replacePlaceholders(api.url, phoneNumber);
-    const finalHeaders: Record<string, string> = {};
-    for (const [k, v] of Object.entries(api.headers)) {
-      finalHeaders[replacePlaceholders(k, phoneNumber)] = replacePlaceholders(v, phoneNumber);
-    }
-    const finalBody = api.body && Object.keys(api.body).length > 0 ? replaceInObj(api.body, phoneNumber) : undefined;
-
-    let urlWithParams = finalUrl;
-    if (api.query_params && Object.keys(api.query_params).length > 0) {
-      const url = new URL(finalUrl);
-      for (const [k, v] of Object.entries(api.query_params)) {
-        url.searchParams.set(replacePlaceholders(k, phoneNumber), replacePlaceholders(v, phoneNumber));
-      }
-      urlWithParams = url.toString();
-    }
-
-    try {
-      const { data, error } = await supabase.functions.invoke('hit-api', {
-        body: {
-          url: urlWithParams,
-          method: api.method,
-          headers: finalHeaders,
-          body: finalBody,
-          bodyType: api.bodyType,
-          useProxy: api.proxy_enabled,
-          useResidentialProxy: api.residential_proxy_enabled,
-        },
-      });
-
-      if (error) throw error;
-
-      return {
-        success: data?.success ?? false,
-        status_code: data?.status_code ?? null,
-        response_time: data?.response_time ?? 0,
-        error_message: data?.error_message ?? null,
-        user_agent_used: data?.user_agent_used ?? null,
-      };
-    } catch (err) {
-      return {
-        success: false,
-        status_code: null,
-        response_time: 0,
-        error_message: err instanceof Error ? err.message : 'Unknown error',
-        user_agent_used: null,
-      };
-    }
-  }, []);
-
-  const start = useCallback(async () => {
+  const runEngine = useCallback(async (
+    phone: string,
+    stopRef: React.MutableRefObject<boolean>,
+    setIsRunning: (v: boolean) => void,
+    setStats: React.Dispatch<React.SetStateAction<{ rounds: number; hits: number; success: number; fails: number }>>,
+  ) => {
     if (phone.length < 10 || enabledApis.length === 0) return;
     setIsRunning(true);
     stopRef.current = false;
@@ -111,133 +127,151 @@ export default function QuickHitEngine({
       round++;
       setStats(prev => ({ ...prev, rounds: round }));
 
-      for (const api of enabledApis) {
-        if (stopRef.current) break;
-        setCurrentApi(api.name);
+      // Fire ALL APIs in parallel
+      const promises = enabledApis.map(api => hitSingleApi(api, phone, uaRotation));
+      const results = await Promise.all(promises);
 
-        const result = await hitApi(api, phone);
-        
-        setStats(prev => ({
-          ...prev,
-          hits: prev.hits + 1,
-          success: prev.success + (result.success ? 1 : 0),
-          fails: prev.fails + (result.success ? 0 : 1),
-        }));
+      if (stopRef.current) break;
 
+      let s = 0, f = 0;
+      for (const r of results) {
+        if (r.success) s++; else f++;
         onLog({
-          api_name: api.name,
+          api_name: r.api_name,
           mode: 'SERVER',
-          status_code: result.status_code,
-          success: result.success,
-          response_time: result.response_time,
-          error_message: result.error_message,
-          user_agent: result.user_agent_used || null,
+          status_code: r.status_code,
+          success: r.success,
+          response_time: r.response_time,
+          error_message: r.error_message,
+          user_agent: r.user_agent,
         });
-
-        if (delay > 0 && !stopRef.current) {
-          await new Promise(r => setTimeout(r, delay));
-        }
       }
+      setStats(prev => ({
+        ...prev,
+        hits: prev.hits + results.length,
+        success: prev.success + s,
+        fails: prev.fails + f,
+      }));
     }
     setIsRunning(false);
-    setCurrentApi('');
-  }, [phone, delay, enabledApis, hitApi, onLog]);
+  }, [enabledApis, onLog, uaRotation]);
 
-  const stop = useCallback(() => {
-    stopRef.current = true;
-  }, []);
+  const renderStats = (stats: { rounds: number; hits: number; success: number; fails: number }, isRunning: boolean) => {
+    if (!isRunning) return null;
+    return (
+      <div className="grid grid-cols-4 gap-1.5 text-center">
+        {[
+          { label: 'Round', value: stats.rounds, color: 'text-white/80' },
+          { label: 'Hits', value: stats.hits, color: 'text-blue-400' },
+          { label: 'OK', value: stats.success, color: 'text-emerald-400' },
+          { label: 'Fail', value: stats.fails, color: 'text-red-400' },
+        ].map(s => (
+          <div key={s.label} className="p-1.5 rounded-lg bg-white/[0.03] border border-white/[0.06]">
+            <p className="text-[8px] text-white/30">{s.label}</p>
+            <p className={`text-xs font-semibold ${s.color}`}>{s.value}</p>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   return (
-    <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-5 space-y-4">
+    <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-4 space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">
-            <Zap className="w-4 h-4 text-violet-400" />
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-violet-500/20 to-blue-500/20 flex items-center justify-center">
+            <Zap className="w-3.5 h-3.5 text-violet-400" />
           </div>
           <h2 className="text-sm font-semibold text-white tracking-tight">{title}</h2>
         </div>
         {enabledApis.length > 0 && (
-          <span className="h-6 px-2.5 rounded-full bg-white/[0.06] text-white/50 text-[10px] font-medium flex items-center">
-            {enabledApis.length}/{apis.length}
+          <span className="h-5 px-2 rounded-full bg-white/[0.06] text-white/50 text-[9px] font-medium flex items-center">
+            {enabledApis.length} APIs
           </span>
         )}
       </div>
 
       {enabledApis.length === 0 && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.1]">
+        <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/[0.06] border border-amber-500/[0.1]">
           <AlertCircle className="w-3.5 h-3.5 text-amber-400/70" />
-          <p className="text-[11px] text-white/40">{noApisWarning}</p>
+          <p className="text-[10px] text-white/40">{noApisWarning}</p>
         </div>
       )}
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
-          <Phone className="w-3 h-3" /> {phoneLabel}
-        </label>
-        <Input
-          value={phone}
-          onChange={e => setPhone(e.target.value.replace(/[^0-9+]/g, ''))}
-          placeholder={phonePlaceholder}
-          className="h-11 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/15 focus:border-violet-500/40"
-          disabled={isRunning}
-        />
+      {/* ENGINE 1 */}
+      <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+        <div className="flex items-center gap-1.5 mb-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 1</span>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 flex items-center gap-1.5">
+            <Phone className="w-3 h-3 text-white/30 flex-shrink-0" />
+            <Input
+              value={phone1}
+              onChange={e => setPhone1(e.target.value.replace(/[^0-9+]/g, ''))}
+              placeholder={phonePlaceholder}
+              className="h-9 bg-white/[0.04] border-white/[0.08] text-white text-xs placeholder:text-white/15 focus:border-violet-500/40"
+              disabled={isRunning1}
+            />
+          </div>
+          {!isRunning1 ? (
+            <button
+              onClick={() => runEngine(phone1, stopRef1, setIsRunning1, setStats1)}
+              disabled={phone1.length < 10 || enabledApis.length === 0}
+              className="h-9 px-4 rounded-lg text-[10px] font-bold bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.97] disabled:opacity-30 transition-all flex items-center gap-1.5"
+            >
+              <Zap className="w-3 h-3" /> {hitButtonText}
+            </button>
+          ) : (
+            <button
+              onClick={() => { stopRef1.current = true; }}
+              className="h-9 px-4 rounded-lg text-[10px] font-bold bg-red-600 text-white hover:bg-red-700 active:scale-[0.97] transition-all flex items-center gap-1.5"
+            >
+              <Square className="w-3 h-3" /> {stopButtonText}
+            </button>
+          )}
+        </div>
+        {renderStats(stats1, isRunning1)}
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[11px] font-medium text-white/40 flex items-center gap-1.5">
-          <Clock className="w-3 h-3" /> Delay: {delay}ms
-        </label>
-        <Slider
-          value={[delay]}
-          onValueChange={v => setDelay(v[0])}
-          max={2000}
-          step={50}
-          className="py-2"
-          disabled={isRunning}
-        />
+      {/* ENGINE 2 */}
+      <div className="space-y-2 p-3 rounded-xl bg-white/[0.02] border border-white/[0.05]">
+        <div className="flex items-center gap-1.5 mb-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+          <span className="text-[9px] font-bold text-white/40 tracking-wider">INPUT 2</span>
+        </div>
+        <div className="flex gap-2">
+          <div className="flex-1 flex items-center gap-1.5">
+            <Phone className="w-3 h-3 text-white/30 flex-shrink-0" />
+            <Input
+              value={phone2}
+              onChange={e => setPhone2(e.target.value.replace(/[^0-9+]/g, ''))}
+              placeholder={phonePlaceholder}
+              className="h-9 bg-white/[0.04] border-white/[0.08] text-white text-xs placeholder:text-white/15 focus:border-violet-500/40"
+              disabled={isRunning2}
+            />
+          </div>
+          {!isRunning2 ? (
+            <button
+              onClick={() => runEngine(phone2, stopRef2, setIsRunning2, setStats2)}
+              disabled={phone2.length < 10 || enabledApis.length === 0}
+              className="h-9 px-4 rounded-lg text-[10px] font-bold bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.97] disabled:opacity-30 transition-all flex items-center gap-1.5"
+            >
+              <Zap className="w-3 h-3" /> {hitButtonText}
+            </button>
+          ) : (
+            <button
+              onClick={() => { stopRef2.current = true; }}
+              className="h-9 px-4 rounded-lg text-[10px] font-bold bg-red-600 text-white hover:bg-red-700 active:scale-[0.97] transition-all flex items-center gap-1.5"
+            >
+              <Square className="w-3 h-3" /> {stopButtonText}
+            </button>
+          )}
+        </div>
+        {renderStats(stats2, isRunning2)}
       </div>
-
-      {isRunning && (
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {[
-            { label: 'Round', value: stats.rounds, color: 'text-white/80' },
-            { label: 'Hits', value: stats.hits, color: 'text-blue-400' },
-            { label: 'OK', value: stats.success, color: 'text-emerald-400' },
-            { label: 'Fail', value: stats.fails, color: 'text-red-400' },
-          ].map(s => (
-            <div key={s.label} className="p-2 rounded-lg bg-white/[0.03] border border-white/[0.06]">
-              <p className="text-[9px] text-white/30">{s.label}</p>
-              <p className={`text-sm font-semibold ${s.color}`}>{s.value}</p>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {currentApi && (
-        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-violet-500/[0.06] border border-violet-500/[0.1]">
-          <Loader2 className="w-3.5 h-3.5 text-violet-400 animate-spin" />
-          <span className="text-[11px] text-white/50 truncate">{currentApi}</span>
-        </div>
-      )}
-
-      {!isRunning ? (
-        <button
-          onClick={start}
-          disabled={phone.length < 10 || enabledApis.length === 0}
-          className="w-full h-11 rounded-xl font-medium text-sm bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.98] disabled:opacity-30 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
-        >
-          <Zap className="w-4 h-4" />
-          {hitButtonText} ({enabledApis.length})
-        </button>
-      ) : (
-        <button
-          onClick={stop}
-          className="w-full h-11 rounded-xl font-medium text-sm bg-red-600 text-white hover:bg-red-700 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          <Square className="w-4 h-4" />
-          {stopButtonText}
-        </button>
-      )}
     </div>
   );
 }

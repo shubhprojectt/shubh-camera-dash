@@ -48,28 +48,17 @@ const Page3 = () => {
             <p className="text-[11px] text-white/50 leading-relaxed">{settings.warningText}</p>
           </div>
 
-          {/* Quick Hit Engine 1 */}
+          {/* Quick Hit Engine - Dual Input */}
           <QuickHitEngine
             apis={apis}
             onLog={addLog}
-            title={settings.quickHitTitle || 'HIT ENGINE 1'}
+            title={settings.quickHitTitle || 'HIT ENGINE'}
             phoneLabel={settings.phoneLabel}
             phonePlaceholder={settings.phonePlaceholder}
             hitButtonText={settings.hitButtonText}
             stopButtonText={settings.stopButtonText}
             noApisWarning={settings.noApisWarning}
-          />
-
-          {/* Quick Hit Engine 2 */}
-          <QuickHitEngine
-            apis={apis}
-            onLog={addLog}
-            title="HIT ENGINE 2"
-            phoneLabel={settings.phoneLabel}
-            phonePlaceholder={settings.phonePlaceholder}
-            hitButtonText={settings.hitButtonText}
-            stopButtonText={settings.stopButtonText}
-            noApisWarning={settings.noApisWarning}
+            uaRotation={settings.uaRotationEnabled}
           />
 
           {/* Logs */}
