@@ -8,7 +8,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-[100dvh] relative overflow-x-hidden" style={{ background: 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 20%, #0d1b3c 40%, #0a2a3c 60%, #0d2e2e 80%, #0a1a2a 100%)' }}>
+      <div className="min-h-[100dvh] relative overflow-x-hidden" style={{ background: 'linear-gradient(160deg, #0d0520 0%, #1a0940 18%, #2d1b69 35%, #1e1060 50%, #162050 65%, #0f2847 80%, #0a2a3c 100%)' }}>
         {/* Background */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           {settings.backgroundImage ? (
