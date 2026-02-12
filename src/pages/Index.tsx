@@ -8,7 +8,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-[100dvh] bg-[#09090b] relative overflow-x-hidden">
+      <div className="min-h-[100dvh] relative overflow-x-hidden" style={{ background: 'linear-gradient(160deg, #0a0a1a 0%, #1a0a2e 20%, #0d1b3c 40%, #0a2a3c 60%, #0d2e2e 80%, #0a1a2a 100%)' }}>
         {/* Background */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           {settings.backgroundImage ? (
@@ -26,9 +26,10 @@ const Index = () => {
             />
           ) : (
             <>
-              <div className="absolute top-[-20%] right-[-10%] w-[500px] h-[500px] rounded-full bg-violet-600/[0.07] blur-[100px]" />
-              <div className="absolute bottom-[-15%] left-[-10%] w-[400px] h-[400px] rounded-full bg-blue-600/[0.05] blur-[100px]" />
-              <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full bg-emerald-600/[0.04] blur-[100px]" />
+              <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-purple-600/[0.15] blur-[120px]" />
+              <div className="absolute top-[20%] left-[-10%] w-[350px] h-[350px] rounded-full bg-blue-500/[0.12] blur-[100px]" />
+              <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-teal-500/[0.10] blur-[120px]" />
+              <div className="absolute top-[50%] left-[40%] w-[300px] h-[300px] rounded-full bg-cyan-500/[0.08] blur-[100px]" />
             </>
           )}
         </div>
