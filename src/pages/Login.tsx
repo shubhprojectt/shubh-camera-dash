@@ -93,74 +93,64 @@ const Login = () => {
       </div>
 
       {/* Login Card */}
-      <div className="relative w-full max-w-[320px]">
+      <div className="relative w-full max-w-[270px]">
         {/* Card glow effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-3xl opacity-40 blur-xl" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-40 blur-xl" />
         
         {/* Animated border */}
-        <div className="absolute -inset-[2px] rounded-3xl overflow-hidden">
+        <div className="absolute -inset-[2px] rounded-2xl overflow-hidden">
           <div 
             className="absolute inset-0 bg-gradient-to-r from-neon-green via-neon-cyan via-neon-pink to-neon-green animate-rainbow-border"
             style={{ backgroundSize: '300% 100%' }}
           />
         </div>
         
-        <div className="relative bg-card/95 backdrop-blur-xl rounded-3xl p-6 border border-white/10">
-          {/* Decorative corners */}
-          <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-neon-green/60 rounded-tl-lg" />
-          <div className="absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-neon-cyan/60 rounded-tr-lg" />
-          <div className="absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-neon-cyan/60 rounded-bl-lg" />
-          <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-neon-green/60 rounded-br-lg" />
-
+        <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl p-5 border border-white/10">
           {/* Icon with glow */}
-          <div className="flex justify-center mb-4">
+          <div className="flex justify-center mb-3">
             <div className="relative">
-              <div className="absolute -inset-3 bg-neon-green/20 rounded-2xl blur-xl" />
-              <div className="relative w-14 h-14 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
-                <Lock className="w-7 h-7 text-neon-green" />
+              <div className="absolute -inset-3 bg-neon-green/20 rounded-xl blur-xl" />
+              <div className="relative w-11 h-11 rounded-xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
+                <Lock className="w-5 h-5 text-neon-green" />
               </div>
-              {/* Floating sparkle */}
-              <Sparkles className="absolute -top-1 -right-1 w-4 h-4 text-neon-cyan" />
+              <Sparkles className="absolute -top-1 -right-1 w-3 h-3 text-neon-cyan" />
             </div>
           </div>
 
           {/* Title */}
-          <div className="text-center mb-5">
-            <h1 className="text-xl font-display font-black tracking-wide">
+          <div className="text-center mb-4">
+            <h1 className="text-base font-display font-black tracking-wide">
               <span className="bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent">
                 {settings.headerName1 || "SHUBH"} {settings.headerName2 || "OSINT"}
               </span>
             </h1>
-            <p className="text-xs text-muted-foreground/70 mt-1 font-medium">
+            <p className="text-[10px] text-muted-foreground/70 mt-1 font-medium">
               Enter password to continue
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="relative">
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value.toUpperCase())}
-                placeholder="••••••••"
-                className="h-12 bg-background/60 border-2 border-neon-green/20 text-foreground text-center text-base placeholder:text-muted-foreground/30 focus:border-neon-green/60 focus:bg-background/80 rounded-xl transition-all"
-                disabled={isLoading}
-                autoFocus
-              />
-              <div className="absolute inset-0 rounded-xl pointer-events-none border border-neon-green/10" />
-            </div>
+          <form onSubmit={handleSubmit} className="space-y-3">
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value.toUpperCase())}
+              placeholder="••••••••"
+              className="h-10 bg-background/60 border-2 border-neon-green/20 text-foreground text-center text-sm placeholder:text-muted-foreground/30 focus:border-neon-green/60 focus:bg-background/80 rounded-lg transition-all"
+              disabled={isLoading}
+              autoFocus
+            />
 
             <Button
               type="submit"
               disabled={isLoading || !password.trim()}
-              className="w-full h-12 rounded-xl text-sm font-black tracking-wider bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green text-background hover:shadow-[0_0_30px_hsl(var(--neon-green)/0.5)] transition-all duration-300 active:scale-[0.98]"
+              className="w-full h-10 rounded-lg text-xs font-black tracking-wider bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green text-background hover:shadow-[0_0_25px_hsl(var(--neon-green)/0.5)] transition-all duration-300 active:scale-[0.98]"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <>
-                  <Shield className="w-4 h-4 mr-2" />
+                  <Shield className="w-3.5 h-3.5 mr-1.5" />
                   UNLOCK ACCESS
                 </>
               )}
@@ -168,9 +158,9 @@ const Login = () => {
           </form>
 
           {/* Footer */}
-          <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-white/5">
-            <div className="w-1.5 h-1.5 rounded-full bg-neon-green" />
-            <p className="text-[10px] text-muted-foreground/50 font-medium tracking-wide">
+          <div className="flex items-center justify-center gap-1.5 mt-4 pt-3 border-t border-white/5">
+            <div className="w-1 h-1 rounded-full bg-neon-green" />
+            <p className="text-[9px] text-muted-foreground/50 font-medium tracking-wide">
               Protected Access
             </p>
           </div>

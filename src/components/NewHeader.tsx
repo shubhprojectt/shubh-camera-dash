@@ -98,7 +98,7 @@ const NewHeader = () => {
           
           {/* Title */}
           <h1 
-            className={`text-base md:text-lg font-bold text-white tracking-wider ${getStyleClasses()}`}
+            className={`text-base md:text-lg font-bold tracking-wider ${getStyleClasses()}`}
             style={{ 
               fontFamily: settings.headerFont || "'Orbitron', sans-serif",
               ...(settings.headerStyle === 'gradient' && {
@@ -106,9 +106,9 @@ const NewHeader = () => {
               })
             }}
           >
-            <span>{settings.headerName1 || "SHUBH"}</span>
+            <span className="animate-color-cycle">{settings.headerName1 || "SHUBH"}</span>
             <span className="mx-1.5 text-white/20">×</span>
-            <span>{settings.headerName2 || "OSINT"}</span>
+            <span className="animate-color-cycle" style={{ animationDelay: '-3s' }}>{settings.headerName2 || "OSINT"}</span>
           </h1>
           
           {/* Subtitle */}
