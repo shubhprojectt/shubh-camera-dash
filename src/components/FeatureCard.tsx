@@ -32,31 +32,31 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved }: Feat
     <button
       onClick={onClick}
       className={cn(
-        "relative flex flex-col items-center gap-1.5 p-2.5 border transition-all duration-200",
-        curved ? "rounded-2xl" : "rounded-xl",
+        "relative flex flex-col items-center gap-1 p-1.5 border transition-all duration-200",
+        curved ? "rounded-xl" : "rounded-lg",
         "backdrop-blur-sm",
         active
           ? `${colors.activeBg} border-transparent text-white shadow-lg shadow-${colors.accent}-500/20`
-          : `bg-white/[0.03] ${colors.border} hover:bg-white/[0.06] hover:scale-[1.03]`,
+          : `bg-white/[0.04] ${colors.border} hover:bg-white/[0.08] hover:scale-[1.03]`,
         "active:scale-95"
       )}
     >
       {/* Icon container */}
       <div className={cn(
-        "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+        "w-6 h-6 rounded-md flex items-center justify-center transition-all",
         active 
           ? "bg-white/20" 
           : `bg-white/[0.04] border border-white/[0.06]`
       )}>
         <Icon className={cn(
-          "w-4 h-4 transition-all",
+          "w-3 h-3 transition-all",
           active ? "text-white" : colors.text
         )} />
       </div>
       
       {/* Label */}
       <span className={cn(
-        "text-[8px] font-bold tracking-wider uppercase text-center leading-tight",
+        "text-[7px] font-bold tracking-wider uppercase text-center leading-tight",
         active ? "text-white" : colors.text
       )}>
         {label}
