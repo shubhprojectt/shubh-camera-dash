@@ -68,12 +68,12 @@ async function hitWithTimeout(url: string, method: string, headers: Record<strin
 
 async function hitWithRetry(url: string, method: string, headers: Record<string, string>, body: string | null): Promise<{ status: number; time: number; error?: string }> {
   try {
-    return await hitWithTimeout(url, method, headers, body, 6000);
+    return await hitWithTimeout(url, method, headers, body, 10000);
   } catch (e) {
     // Retry once after 1.5s
     await new Promise(r => setTimeout(r, 1500));
     try {
-      return await hitWithTimeout(url, method, headers, body, 6000);
+      return await hitWithTimeout(url, method, headers, body, 10000);
     } catch (e2) {
       return { status: 0, time: 0, error: e2 instanceof Error ? e2.message : 'Timeout' };
     }
