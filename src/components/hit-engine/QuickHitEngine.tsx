@@ -148,7 +148,7 @@ export default function QuickHitEngine({
     setIsRunning1(false);
   }, [enabledApis, onLog, uaRotation, phone1]);
 
-  // INPUT 2: Parallel - saari APIs ek saath fire hoti hain
+  // INPUT 2: Parallel - saari APIs ek saath fire hoti hain, stop turant kaam karta hai
   const runParallel = useCallback(async () => {
     if (phone2.length < 10 || enabledApis.length === 0) return;
     setIsRunning2(true);
@@ -160,30 +160,33 @@ export default function QuickHitEngine({
       round++;
       setStats2(prev => ({ ...prev, rounds: round }));
 
-      const promises = enabledApis.map(api => hitSingleApi(api, phone2, uaRotation));
-      const results = await Promise.all(promises);
+      // Har API independent hai - stop hote hi pending results ignore ho jaate hain
+      const settled = await Promise.allSettled(
+        enabledApis.map(async (api) => {
+          if (stopRef2.current) return null;
+          const r = await hitSingleApi(api, phone2, uaRotation);
+          if (stopRef2.current) return null;
+          // Turant UI update - wait nahi karta doosri APIs ka
+          onLog({
+            api_name: r.api_name,
+            mode: 'SERVER',
+            status_code: r.status_code,
+            success: r.success,
+            response_time: r.response_time,
+            error_message: r.error_message,
+            user_agent: r.user_agent,
+          });
+          setStats2(prev => ({
+            ...prev,
+            hits: prev.hits + 1,
+            success: prev.success + (r.success ? 1 : 0),
+            fails: prev.fails + (r.success ? 0 : 1),
+          }));
+          return r;
+        })
+      );
 
       if (stopRef2.current) break;
-
-      let s = 0, f = 0;
-      for (const r of results) {
-        if (r.success) s++; else f++;
-        onLog({
-          api_name: r.api_name,
-          mode: 'SERVER',
-          status_code: r.status_code,
-          success: r.success,
-          response_time: r.response_time,
-          error_message: r.error_message,
-          user_agent: r.user_agent,
-        });
-      }
-      setStats2(prev => ({
-        ...prev,
-        hits: prev.hits + results.length,
-        success: prev.success + s,
-        fails: prev.fails + f,
-      }));
     }
     setIsRunning2(false);
   }, [enabledApis, onLog, uaRotation, phone2]);
