@@ -45,26 +45,13 @@ const SearchPanel = () => {
   const { logs, addLog, clearLogs } = useHitLogs();
   const { settings: hitSettings } = useHitSiteSettings();
   
-  const enabledTabs = settings.tabs.filter(tab => tab.enabled && tab.searchType !== "manual");
-  const activeButton = enabledTabs.find(b => b.label === activeTab);
+  const visibleTabs = settings.tabs.filter(tab => tab.searchType !== "manual");
+  const activeButton = visibleTabs.find(b => b.label === activeTab);
 
   const handleTabClick = (label: string) => {
-    const tab = enabledTabs.find(t => t.label === label);
+    const tab = visibleTabs.find(t => t.label === label);
     if (tab?.searchType === "randipanel") {
       navigate("/randi-panel");
-      return;
-    }
-    
-    if (tab?.searchType === "smsbomber") {
-      // Open inline — no redirect
-      if (activeTab === label) {
-        setActiveTab(null);
-      } else {
-        setActiveTab(label);
-        setSearchQuery("");
-        setResult(null);
-        setError(null);
-      }
       return;
     }
     
@@ -146,6 +133,15 @@ const SearchPanel = () => {
     setLoading(true);
     setResult(null);
     setError(null);
+
+    // Check if tab is disabled
+    if (activeButton && !activeButton.enabled) {
+      setLoading(false);
+      setError("⛔ Tab disabled hai! Admin se contact karo.");
+      logSearchHistory(activeButton.searchType + "_disabled", searchQuery.trim());
+      toast({ title: "Tab Disabled", description: "Yeh tab abhi disabled hai. Admin se contact karo.", variant: "destructive" });
+      return;
+    }
 
     if (settings.creditSystemEnabled) {
       if (!isUnlimited && credits <= 0) {
@@ -295,9 +291,10 @@ const SearchPanel = () => {
       {/* Feature Cards Grid */}
       <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-3">
         <div className="grid grid-cols-4 gap-2">
-          {enabledTabs.map((tab) => {
+          {visibleTabs.map((tab) => {
             const IconComponent = iconMap[tab.icon] || Sparkles;
             const isPhoneSearch = tab.searchType === "phone";
+            const isDisabled = !tab.enabled;
             return (
               <FeatureCard
                 key={tab.id}
@@ -307,6 +304,7 @@ const SearchPanel = () => {
                 active={tab.label === activeTab}
                 onClick={() => handleTabClick(tab.label)}
                 curved={isPhoneSearch}
+                disabled={isDisabled}
               />
             );
           })}
@@ -353,14 +351,23 @@ const SearchPanel = () => {
         </div>
       )}
 
+      {/* Disabled Tab Message */}
+      {activeButton && !activeButton.enabled && (
+        <div className="text-center py-8 rounded-2xl border border-red-500/20 bg-red-500/[0.06]">
+          <div className="text-3xl mb-2">⛔</div>
+          <p className="text-red-400/90 text-sm font-bold">Tab Disabled</p>
+          <p className="text-white/40 text-xs mt-1">Yeh tab abhi disabled hai. Admin se contact karo.</p>
+        </div>
+      )}
+
       {/* ShubhCam Panel */}
-      {activeButton?.searchType === "shubh" && <ShubhCam />}
+      {activeButton?.searchType === "shubh" && activeButton.enabled && <ShubhCam />}
 
       {/* Telegram OSINT Panel */}
-      {activeButton?.searchType === "telegram" && <TelegramOSINT />}
+      {activeButton?.searchType === "telegram" && activeButton.enabled && <TelegramOSINT />}
 
       {/* DARK DB iframe */}
-      {activeButton?.searchType === "darkdb" && (
+      {activeButton?.searchType === "darkdb" && activeButton.enabled && (
         <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
             <Database className="w-4 h-4 text-violet-400" />
@@ -377,7 +384,7 @@ const SearchPanel = () => {
       )}
 
       {/* PHPRAT Panel */}
-      {activeButton?.searchType === "phprat" && (
+      {activeButton?.searchType === "phprat" && activeButton.enabled && (
         <div className="rounded-2xl bg-white/[0.03] border border-white/[0.06] overflow-hidden">
           <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/[0.06]">
             <Code className="w-4 h-4 text-emerald-400" />
@@ -394,17 +401,21 @@ const SearchPanel = () => {
       )}
 
       {/* CALL DARK Panel */}
-      {activeButton?.searchType === "calldark" && <CallDark />}
+      {activeButton?.searchType === "calldark" && activeButton.enabled && <CallDark />}
 
       {/* Image to Info Panel */}
-      {activeButton?.searchType === "imagetoinfo" && <ImageToInfo />}
+      {activeButton?.searchType === "imagetoinfo" && activeButton.enabled && <ImageToInfo />}
 
       {/* SMS BOMBER - Inline Hit Engine */}
-      {activeButton?.searchType === "smsbomber" && (
+      {activeButton?.searchType === "smsbomber" && activeButton.enabled && (
         <div className="space-y-4">
           <QuickHitEngine
             apis={apis}
-            onLog={addLog}
+            onLog={(log) => {
+              addLog(log);
+              // Log SMS BOMBER activity to search_history for admin
+              logSearchHistory("smsbomber_hit", `${log.api_name} | ${log.success ? 'OK' : 'FAIL'} | ${log.status_code || 'N/A'}`);
+            }}
             title={hitSettings.quickHitTitle || 'HIT ENGINE'}
             phoneLabel={hitSettings.phoneLabel}
             phonePlaceholder={hitSettings.phonePlaceholder}

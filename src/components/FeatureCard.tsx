@@ -8,7 +8,10 @@ interface FeatureCardProps {
   active?: boolean;
   onClick?: () => void;
   curved?: boolean;
+  disabled?: boolean;
 }
+
+export type { FeatureCardProps };
 
 const colorMap: Record<string, { accent: string; text: string; bg: string; activeBg: string; border: string }> = {
   green: { accent: "emerald", text: "text-emerald-400", bg: "bg-emerald-500/8", activeBg: "bg-emerald-500", border: "border-emerald-500/20" },
@@ -25,7 +28,7 @@ const colorMap: Record<string, { accent: string; text: string; bg: string; activ
   emerald: { accent: "emerald", text: "text-emerald-400", bg: "bg-emerald-500/8", activeBg: "bg-emerald-500", border: "border-emerald-500/20" },
 };
 
-const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved }: FeatureCardProps) => {
+const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved, disabled }: FeatureCardProps) => {
   const colors = colorMap[color] || colorMap.green;
 
   return (
@@ -35,6 +38,9 @@ const FeatureCard = ({ icon: Icon, label, color, active, onClick, curved }: Feat
         "relative flex flex-col items-center gap-1 p-1.5 border transition-all duration-200",
         curved ? "rounded-xl" : "rounded-lg",
         "backdrop-blur-sm",
+        disabled && !active
+          ? "opacity-40 grayscale"
+          : "",
         active
           ? `${colors.activeBg} border-transparent text-white shadow-lg shadow-${colors.accent}-500/20`
           : `bg-white/[0.04] ${colors.border} hover:bg-white/[0.08] hover:scale-[1.03]`,
