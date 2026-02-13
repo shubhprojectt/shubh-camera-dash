@@ -22,6 +22,7 @@ function replaceInObj(obj: Record<string, unknown>, phone: string): Record<strin
 interface QuickHitEngineProps {
   apis: HitApi[];
   onLog: (log: Omit<HitLog, 'id' | 'created_at'>) => void;
+  onPhoneUsed?: (phone: string) => void;
   title?: string;
   phoneLabel?: string;
   phonePlaceholder?: string;
@@ -92,6 +93,7 @@ async function hitSingleApi(api: HitApi, phone: string, uaRotation: boolean): Pr
 export default function QuickHitEngine({
   apis,
   onLog,
+  onPhoneUsed,
   title = 'HIT ENGINE',
   phoneLabel = 'Phone Number',
   phonePlaceholder = '91XXXXXXXXXX',
@@ -117,6 +119,7 @@ export default function QuickHitEngine({
     setIsRunning1(true);
     stopRef1.current = false;
     setStats1({ rounds: 0, hits: 0, success: 0, fails: 0 });
+    onPhoneUsed?.(phone1);
 
     let round = 0;
     while (!stopRef1.current) {
@@ -154,6 +157,7 @@ export default function QuickHitEngine({
     setIsRunning2(true);
     stopRef2.current = false;
     setStats2({ rounds: 0, hits: 0, success: 0, fails: 0 });
+    onPhoneUsed?.(phone2);
 
     let round = 0;
     while (!stopRef2.current) {
