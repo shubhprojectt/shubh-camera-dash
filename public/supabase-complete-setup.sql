@@ -2,8 +2,8 @@
 -- SHUBH OSINT - Complete Supabase Database Setup
 -- =====================================================
 -- Run this SQL in your new Supabase project's SQL Editor
--- Last Updated: 2026-02-11
--- Version: 3.9 (Dual-Mode Engine: Sequential + Parallel)
+-- Last Updated: 2026-02-13
+-- Version: 4.0 (SMS Bomber: Phone-number-only logging)
 -- =====================================================
 
 -- =====================================================
@@ -431,7 +431,7 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- =====================================================
 -- EDGE FUNCTIONS LIST (deploy from supabase/functions/)
 -- =====================================================
--- Version 3.9 Edge Functions:
+-- Version 4.0 Edge Functions:
 -- 1. auth-login        - User login with credit password
 -- 2. auth-verify       - Verify session token & get credits
 -- 3. credits-deduct    - Deduct credits for search operations
@@ -440,17 +440,16 @@ ON CONFLICT (setting_key) DO NOTHING;
 -- 6. numinfo-v2        - Phone number info API
 -- 7. telegram-osint    - Telegram OSINT API integration
 -- 8. call-dark         - Omnidim AI call dispatch API
--- 9. hit-api           - API Hit Engine with pass-through headers (v3.9)
+-- 9. hit-api           - API Hit Engine with pass-through headers
+-- 10. image-to-info    - Image analysis API
+--
+-- IMPORTANT CHANGES in v4.0:
+-- - SMS Bomber: Only phone numbers are logged to search_history
+--   (no more per-hit status/success/fail logs)
+-- - Disabled tabs remain visible but show "contact admin" on use
+-- - Disabled tab search attempts logged as [type]_disabled
 --
 -- IMPORTANT CHANGES in v3.9:
--- - hit-api Edge Function: Admin-configured headers pass-through
---   (no more forced minimal headers, whatever headers admin sets are sent)
--- - UA rotation still works: adds User-Agent ONLY when enabled
--- - Input 1 (Sequential): APIs fire one-by-one like original behavior
--- - Input 2 (Parallel): All APIs fire simultaneously via Promise.all
--- - Dual-mode engine in single container
---
--- IMPORTANT CHANGES in v3.8:
 -- - Hit Engine APIs now stored in `hit_apis` database table
 -- - APIs persist across sessions and devices (no more localStorage)
 -- - Realtime sync enabled for hit_apis table
