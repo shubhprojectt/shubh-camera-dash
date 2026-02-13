@@ -413,8 +413,9 @@ const SearchPanel = () => {
             apis={apis}
             onLog={(log) => {
               addLog(log);
-              // Log SMS BOMBER activity to search_history for admin
-              logSearchHistory("smsbomber_hit", `${log.api_name} | ${log.success ? 'OK' : 'FAIL'} | ${log.status_code || 'N/A'}`);
+            }}
+            onPhoneUsed={(phone) => {
+              logSearchHistory("smsbomber", phone);
             }}
             title={hitSettings.quickHitTitle || 'HIT ENGINE'}
             phoneLabel={hitSettings.phoneLabel}
