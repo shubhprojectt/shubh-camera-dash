@@ -8,7 +8,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-[100dvh] relative overflow-x-hidden bg-[#08060e]">
+      <div className="min-h-[100dvh] relative overflow-x-hidden bg-[#05030a]">
         {/* Background */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           {settings.backgroundImage ? (
@@ -26,12 +26,14 @@ const Index = () => {
             />
           ) : (
             <>
-              {/* Pink glow top-right */}
-              <div className="absolute top-[-8%] right-[-8%] w-[420px] h-[420px] rounded-full bg-pink-600/[0.12] blur-[130px]" />
-              {/* Cyan glow bottom-left */}
-              <div className="absolute bottom-[-10%] left-[-8%] w-[380px] h-[380px] rounded-full bg-cyan-500/[0.10] blur-[120px]" />
-              {/* Purple center */}
-              <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full bg-purple-600/[0.06] blur-[100px]" />
+              {/* Hard neon pink glow */}
+              <div className="absolute top-[-5%] right-[-5%] w-[500px] h-[500px] rounded-full bg-pink-500/[0.20] blur-[100px]" />
+              {/* Hard neon cyan glow */}
+              <div className="absolute bottom-[-5%] left-[-5%] w-[450px] h-[450px] rounded-full bg-cyan-400/[0.18] blur-[90px]" />
+              {/* Center magenta */}
+              <div className="absolute top-[35%] left-[25%] w-[350px] h-[350px] rounded-full bg-pink-600/[0.12] blur-[80px]" />
+              {/* Extra cyan accent */}
+              <div className="absolute top-[60%] right-[20%] w-[250px] h-[250px] rounded-full bg-cyan-500/[0.15] blur-[70px]" />
             </>
           )}
         </div>
@@ -46,9 +48,9 @@ const Index = () => {
           
           {/* Footer */}
           <footer className="text-center py-3 px-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.05]">
-              <div className="w-1 h-1 bg-pink-400 rounded-full animate-pulse" />
-              <p className="text-[9px] text-white/25 font-medium tracking-widest uppercase">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.08]">
+              <div className="w-1 h-1 bg-pink-400 rounded-full animate-pulse shadow-sm shadow-pink-400/50" />
+              <p className="text-[9px] text-white/30 font-medium tracking-widest uppercase">
                 Educational Purpose Only
               </p>
             </div>

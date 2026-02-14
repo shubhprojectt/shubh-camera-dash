@@ -289,8 +289,8 @@ const SearchPanel = () => {
   return (
     <div className="px-3 space-y-3 max-w-xl mx-auto">
       {/* Feature Cards Grid */}
-      <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] p-3">
-        <div className="grid grid-cols-4 gap-2">
+        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-pink-500/[0.05]">
+          <div className="grid grid-cols-4 gap-2">
           {visibleTabs.map((tab) => {
             const IconComponent = iconMap[tab.icon] || Sparkles;
             const isPhoneSearch = tab.searchType === "phone";
@@ -313,9 +313,9 @@ const SearchPanel = () => {
 
       {/* Search Input Section */}
       {showSearchInput && (
-        <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] p-3">
+        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-cyan-500/[0.05]">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+            <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-sm shadow-pink-400/50" />
             <span className="text-[10px] font-bold text-white/50 tracking-wider uppercase">
               {activeButton?.label || "SEARCH"}
             </span>
