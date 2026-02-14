@@ -45,16 +45,16 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
       {/* Background effects */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Gradient orbs */}
-        <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-neon-green/10 rounded-full blur-[80px]" />
-        <div className="absolute bottom-[20%] right-[10%] w-[200px] h-[200px] bg-neon-cyan/10 rounded-full blur-[80px]" />
+        <div className="absolute top-[20%] left-[10%] w-[200px] h-[200px] bg-pink-500/15 rounded-full blur-[80px]" />
+        <div className="absolute bottom-[20%] right-[10%] w-[200px] h-[200px] bg-cyan-400/15 rounded-full blur-[80px]" />
         
         {/* Subtle grid */}
         <div 
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage: `
-              linear-gradient(hsl(var(--neon-green)) 1px, transparent 1px),
-              linear-gradient(90deg, hsl(var(--neon-green)) 1px, transparent 1px)
+              linear-gradient(rgba(255,51,153,0.4) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,51,153,0.4) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px'
           }}
@@ -64,22 +64,22 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
       {/* Lock Card */}
       <div className="relative w-full max-w-sm">
         {/* Animated border glow */}
-        <div className="absolute -inset-[1px] bg-gradient-to-r from-neon-green via-neon-cyan to-neon-pink rounded-2xl opacity-60 animate-gradient-shift bg-[length:200%_auto]" />
+        <div className="absolute -inset-[1px] bg-gradient-to-r from-pink-500 via-cyan-400 to-pink-500 rounded-2xl opacity-60 animate-gradient-shift bg-[length:200%_auto]" />
         
         <div className="relative bg-card/95 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
           {/* Lock icon with glow */}
           <div className="flex justify-center mb-5">
             <div className="relative">
-              <div className="absolute -inset-4 bg-neon-green/20 rounded-full blur-xl animate-pulse" />
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-neon-green/20 to-neon-cyan/20 border-2 border-neon-green/40 flex items-center justify-center">
-                <Lock className="w-8 h-8 text-neon-green" />
+              <div className="absolute -inset-4 bg-pink-500/20 rounded-full blur-xl animate-pulse" />
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-pink-500/20 to-cyan-400/20 border-2 border-pink-500/40 flex items-center justify-center">
+                <Lock className="w-8 h-8 text-pink-400" />
               </div>
             </div>
           </div>
 
           {/* Title */}
           <div className="text-center mb-5">
-            <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-neon-green via-neon-cyan to-neon-green bg-clip-text text-transparent mb-1">
+            <h1 className="text-2xl font-display font-bold bg-gradient-to-r from-pink-400 via-cyan-400 to-pink-400 bg-clip-text text-transparent mb-1">
               {settings.headerName1 || "SHUBH"} {settings.headerName2 || "OSINT"}
             </h1>
             <p className="text-sm text-muted-foreground">
@@ -94,13 +94,13 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter password..."
-              className="h-12 bg-background/80 border-neon-green/30 text-foreground text-center text-base placeholder:text-muted-foreground/50 focus:border-neon-green rounded-xl"
+              className="h-12 bg-background/80 border-pink-500/30 text-foreground text-center text-base placeholder:text-muted-foreground/50 focus:border-pink-500 rounded-xl"
               onKeyDown={(e) => e.key === "Enter" && handleUnlock()}
             />
 
             <Button
               onClick={handleUnlock}
-              className="w-full h-12 rounded-xl text-base font-bold bg-gradient-to-r from-neon-green to-neon-cyan text-background hover:shadow-[0_0_25px_hsl(var(--neon-green)/0.5)] transition-all active:scale-[0.98]"
+              className="w-full h-12 rounded-xl text-base font-bold bg-gradient-to-r from-pink-500 to-cyan-400 text-background hover:shadow-[0_0_25px_rgba(255,51,153,0.5)] transition-all active:scale-[0.98]"
             >
               UNLOCK ACCESS
             </Button>
@@ -108,7 +108,7 @@ const PasswordProtection = ({ children }: PasswordProtectionProps) => {
 
           {/* Footer */}
           <div className="flex items-center justify-center gap-2 mt-5 pt-4 border-t border-white/5">
-            <Shield className="w-3.5 h-3.5 text-neon-green/60" />
+            <Shield className="w-3.5 h-3.5 text-pink-400/60" />
             <p className="text-[11px] text-muted-foreground/60">
               Protected Access
             </p>
