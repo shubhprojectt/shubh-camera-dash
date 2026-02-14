@@ -289,7 +289,7 @@ const SearchPanel = () => {
   return (
     <div className="px-3 space-y-3 max-w-xl mx-auto">
       {/* Feature Cards Grid */}
-        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-pink-500/[0.05]">
+        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-emerald-500/[0.05]">
           <div className="grid grid-cols-4 gap-2">
           {visibleTabs.map((tab) => {
             const IconComponent = iconMap[tab.icon] || Sparkles;
@@ -313,9 +313,9 @@ const SearchPanel = () => {
 
       {/* Search Input Section */}
       {showSearchInput && (
-        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-cyan-500/[0.05]">
+        <div className="rounded-2xl bg-white/[0.04] backdrop-blur-sm border border-white/[0.08] p-3 shadow-lg shadow-emerald-500/[0.05]">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-pink-400 shadow-sm shadow-pink-400/50" />
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
             <span className="text-[10px] font-bold text-white/50 tracking-wider uppercase">
               {activeButton?.label || "SEARCH"}
             </span>
@@ -325,13 +325,13 @@ const SearchPanel = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={activeButton?.placeholder || "Enter search query..."}
-              className="flex-1 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus:border-pink-500/40 focus:ring-pink-500/20 h-10 text-sm font-mono rounded-xl"
+              className="flex-1 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus:border-emerald-500/40 focus:ring-emerald-500/20 h-10 text-sm font-mono rounded-xl"
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
             <Button
               onClick={handleSearch}
               disabled={loading}
-              className="h-10 px-4 rounded-xl font-bold bg-gradient-to-r from-pink-500 to-cyan-500 text-white hover:opacity-90 active:scale-[0.97] transition-all shadow-lg shadow-pink-500/20"
+              className="h-10 px-4 rounded-xl font-bold bg-gradient-to-r from-emerald-500 to-pink-500 text-white hover:opacity-90 active:scale-[0.97] transition-all shadow-lg shadow-emerald-500/20"
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             </Button>
