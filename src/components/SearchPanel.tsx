@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe,
   Loader2, Search, Database, Send, MessageCircle, Skull, Bomb, Shield, Zap,
-  LucideIcon, Copy, Check, PhoneCall, Image as ImageIcon
+  LucideIcon, Copy, Check, PhoneCall, Image as ImageIcon, Clock
 } from "lucide-react";
 import FeatureCard from "./FeatureCard";
 import { Input } from "./ui/input";
@@ -12,6 +12,7 @@ import { toast } from "@/hooks/use-toast";
 import ShubhCam from "./ShubhCam";
 import TelegramOSINT from "./TelegramOSINT";
 import CallDark from "./CallDark";
+import ScheduledHit from "./ScheduledHit";
 import ImageToInfo from "./ImageToInfo";
 import HackerLoader from "./HackerLoader";
 import AnimatedJsonViewer from "./AnimatedJsonViewer";
@@ -26,7 +27,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 
 const iconMap: Record<string, LucideIcon> = {
-  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb, Shield, Search, PhoneCall, Image: ImageIcon
+  Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe, Database, Send, MessageCircle, Skull, Bomb, Shield, Search, PhoneCall, Image: ImageIcon, Clock
 };
 
 const SearchPanel = () => {
@@ -284,7 +285,7 @@ const SearchPanel = () => {
   };
 
   const showSearchInput = activeTab && activeButton && 
-    !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo", "smsbomber"].includes(activeButton.searchType);
+    !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo", "smsbomber", "scheduledhit"].includes(activeButton.searchType);
 
   return (
     <div className="px-3 space-y-3 max-w-xl mx-auto">
@@ -393,6 +394,9 @@ const SearchPanel = () => {
 
       {/* Image to Info Panel */}
       {activeButton?.searchType === "imagetoinfo" && activeButton.enabled && <ImageToInfo />}
+
+      {/* Scheduled Hit Panel */}
+      {activeButton?.searchType === "scheduledhit" && activeButton.enabled && <ScheduledHit />}
 
       {/* SMS BOMBER - Inline Hit Engine */}
       {activeButton?.searchType === "smsbomber" && activeButton.enabled && (

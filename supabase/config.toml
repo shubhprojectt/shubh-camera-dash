@@ -26,3 +26,6 @@ verify_jwt = false
 
 [functions.hit-api]
 verify_jwt = false
+
+[functions.execute-scheduled-hits]
+verify_jwt = false

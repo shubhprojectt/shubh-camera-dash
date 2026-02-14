@@ -229,6 +229,45 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_hits: {
+        Row: {
+          created_at: string
+          id: string
+          interval_seconds: number
+          is_active: boolean
+          last_executed_at: string | null
+          next_execution_at: string | null
+          phone_number: string
+          start_time: string
+          total_hits: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          interval_seconds?: number
+          is_active?: boolean
+          last_executed_at?: string | null
+          next_execution_at?: string | null
+          phone_number: string
+          start_time: string
+          total_hits?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          interval_seconds?: number
+          is_active?: boolean
+          last_executed_at?: string | null
+          next_execution_at?: string | null
+          phone_number?: string
+          start_time?: string
+          total_hits?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       search_history: {
         Row: {
           id: string
