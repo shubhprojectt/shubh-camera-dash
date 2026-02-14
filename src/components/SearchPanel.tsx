@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Phone, CreditCard, Car, Camera, Users, ClipboardPaste, Sparkles, Code, Globe,
-  Loader2, Search, Database, Send, MessageCircle, Skull, Bomb, Shield, Zap, ArrowRight,
+  Loader2, Search, Database, Send, MessageCircle, Skull, Bomb, Shield, Zap,
   LucideIcon, Copy, Check, PhoneCall, Image as ImageIcon
 } from "lucide-react";
 import FeatureCard from "./FeatureCard";
@@ -287,9 +287,9 @@ const SearchPanel = () => {
     !["shubh", "darkdb", "telegram", "phprat", "calldark", "imagetoinfo", "smsbomber"].includes(activeButton.searchType);
 
   return (
-    <div className="px-3 space-y-4 max-w-xl mx-auto">
+    <div className="px-3 space-y-3 max-w-xl mx-auto">
       {/* Feature Cards Grid */}
-      <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-3">
+      <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] p-3">
         <div className="grid grid-cols-4 gap-2">
           {visibleTabs.map((tab) => {
             const IconComponent = iconMap[tab.icon] || Sparkles;
@@ -308,44 +308,32 @@ const SearchPanel = () => {
               />
             );
           })}
-          
-          {/* More Button */}
-          <Link to="/page2">
-            <div className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06] hover:scale-[1.03] transition-all active:scale-95">
-              <div className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center text-amber-400">
-                <ArrowRight className="w-4 h-4" />
-              </div>
-              <span className="text-[8px] font-bold tracking-wider uppercase text-amber-400">More</span>
-            </div>
-          </Link>
         </div>
       </div>
 
       {/* Search Input Section */}
       {showSearchInput && (
-        <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.06] p-4">
-          {/* Search label */}
-          <div className="flex items-center gap-2 mb-3">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-            <span className="text-[11px] font-semibold text-white/60 tracking-wider uppercase">
+        <div className="rounded-2xl bg-white/[0.03] backdrop-blur-sm border border-white/[0.05] p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-pink-400" />
+            <span className="text-[10px] font-bold text-white/50 tracking-wider uppercase">
               {activeButton?.label || "SEARCH"}
             </span>
           </div>
-          
           <div className="flex gap-2">
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={activeButton?.placeholder || "Enter search query..."}
-              className="flex-1 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus:border-violet-500/40 h-11 text-sm font-mono rounded-xl"
+              className="flex-1 bg-white/[0.04] border-white/[0.08] text-white placeholder:text-white/20 focus:border-pink-500/40 focus:ring-pink-500/20 h-10 text-sm font-mono rounded-xl"
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
             <Button
               onClick={handleSearch}
               disabled={loading}
-              className="h-11 px-5 rounded-xl font-bold bg-gradient-to-r from-violet-600 to-blue-600 text-white hover:opacity-90 active:scale-[0.98] transition-all"
+              className="h-10 px-4 rounded-xl font-bold bg-gradient-to-r from-pink-500 to-cyan-500 text-white hover:opacity-90 active:scale-[0.97] transition-all shadow-lg shadow-pink-500/20"
             >
-              {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             </Button>
           </div>
         </div>
