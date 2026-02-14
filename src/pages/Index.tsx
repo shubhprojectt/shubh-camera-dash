@@ -8,7 +8,7 @@ const Index = () => {
 
   return (
     <PasswordProtection>
-      <div className="min-h-[100dvh] relative overflow-x-hidden" style={{ background: 'linear-gradient(160deg, #0d0520 0%, #1a0940 18%, #2d1b69 35%, #1e1060 50%, #162050 65%, #0f2847 80%, #0a2a3c 100%)' }}>
+      <div className="min-h-[100dvh] relative overflow-x-hidden bg-[#08060e]">
         {/* Background */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           {settings.backgroundImage ? (
@@ -26,10 +26,12 @@ const Index = () => {
             />
           ) : (
             <>
-              <div className="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-purple-600/[0.15] blur-[120px]" />
-              <div className="absolute top-[20%] left-[-10%] w-[350px] h-[350px] rounded-full bg-blue-500/[0.12] blur-[100px]" />
-              <div className="absolute bottom-[-10%] right-[10%] w-[450px] h-[450px] rounded-full bg-teal-500/[0.10] blur-[120px]" />
-              <div className="absolute top-[50%] left-[40%] w-[300px] h-[300px] rounded-full bg-cyan-500/[0.08] blur-[100px]" />
+              {/* Pink glow top-right */}
+              <div className="absolute top-[-8%] right-[-8%] w-[420px] h-[420px] rounded-full bg-pink-600/[0.12] blur-[130px]" />
+              {/* Cyan glow bottom-left */}
+              <div className="absolute bottom-[-10%] left-[-8%] w-[380px] h-[380px] rounded-full bg-cyan-500/[0.10] blur-[120px]" />
+              {/* Purple center */}
+              <div className="absolute top-[40%] left-[30%] w-[300px] h-[300px] rounded-full bg-purple-600/[0.06] blur-[100px]" />
             </>
           )}
         </div>
@@ -38,16 +40,16 @@ const Index = () => {
         <div className="relative z-10 min-h-[100dvh] flex flex-col">
           <NewHeader />
           
-          <main className="flex-1 pb-6">
+          <main className="flex-1 pb-4">
             <SearchPanel />
           </main>
           
           {/* Footer */}
-          <footer className="text-center py-4 px-4">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-              <p className="text-[10px] text-white/30 font-medium tracking-wider">
-                FOR EDUCATIONAL PURPOSES ONLY
+          <footer className="text-center py-3 px-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/[0.03] border border-white/[0.05]">
+              <div className="w-1 h-1 bg-pink-400 rounded-full animate-pulse" />
+              <p className="text-[9px] text-white/25 font-medium tracking-widest uppercase">
+                Educational Purpose Only
               </p>
             </div>
           </footer>
